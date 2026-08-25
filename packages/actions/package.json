@@ -1,0 +1,48 @@
+{
+  "name": "@statewavedev/guide-actions",
+  "version": "0.0.1",
+  "description": "Framework-independent action runtime for Statewave Guide.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "Statewave <hello@statewave.ai>",
+  "homepage": "https://statewave.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smaramwbc/statewave-guide.git",
+    "directory": "packages/actions"
+  },
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@statewavedev/guide-shared": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

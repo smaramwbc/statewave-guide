@@ -1,0 +1,53 @@
+{
+  "name": "@statewavedev/guide-indexer",
+  "version": "0.0.1",
+  "description": "Deterministic source-code analysis that builds the Statewave Guide application graph.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "Statewave <hello@statewave.ai>",
+  "homepage": "https://statewave.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smaramwbc/statewave-guide.git",
+    "directory": "packages/indexer"
+  },
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "statewave-guide": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@statewavedev/guide-shared": "workspace:*",
+    "picocolors": "^1.1.1",
+    "ts-morph": "^28.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}

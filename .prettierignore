@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+.statewave-guide
+LICENSE
+
+# Indexer fixtures are asserted on by file+line; formatting must not move them.
+packages/indexer/test/fixtures
+
+# Auto-managed by Statewave — reformatting here is overwritten on the next sync.
+CLAUDE.md
+.github/copilot-instructions.md

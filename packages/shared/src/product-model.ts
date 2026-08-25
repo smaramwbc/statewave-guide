@@ -1,0 +1,133 @@
+/**
+ * The Product Model: what the application *is*, expressed as data.
+ *
+ * Everything here is a plain data contract with no runtime behaviour. The
+ * indexer produces it from source code, a {@link ProductFeature} describes one
+ * user-facing capability, and the guide runtime consumes it to answer questions
+ * and to decide what it is allowed to point at.
+ *
+ * @packageDocumentation
+ */
+
+/**
+ * Where a piece of extracted knowledge came from.
+ *
+ * Every node the indexer emits carries provenance. This is what keeps the
+ * Product Model auditable: a claim about the application can always be traced
+ * back to the file and line that justified it, and a claim without provenance
+ * is by definition not a deterministic fact.
+ */
+export interface ProvenanceReference {
+  /** The kind of artefact the fact was derived from. */
+  source: 'source-code' | 'test' | 'openapi' | 'docs' | 'git';
+  /** Project-relative POSIX path, e.g. `src/pages/Clients.tsx`. */
+  file?: string;
+  /** Named symbol within the file, e.g. a component or function name. */
+  symbol?: string;
+  /** 1-based line number. */
+  line?: number;
+  /** 1-based column number. */
+  column?: number;
+  /** Git commit the fact was observed at, when known. */
+  commit?: string;
+}
+
+/**
+ * The semantic kind of a UI element.
+ *
+ * Kept deliberately coarse. The value describes what the element *is to a
+ * user*, not which HTML tag renders it — a `button` may be an `<a>`, and a
+ * `dialog` may be a portal-rendered `<div>`.
+ */
+export type ProductElementType =
+  'button' | 'link' | 'tab' | 'input' | 'form' | 'menu' | 'dialog' | 'table' | 'section' | 'other';
+
+/**
+ * A single addressable UI element belonging to a feature.
+ *
+ * The `id` is the semantic identifier that appears as `data-guide` in source
+ * code and as a registered element at runtime. It is the join key across the
+ * whole system.
+ */
+export interface ProductElement {
+  /** Semantic identifier, e.g. `clients.create`. */
+  id: string;
+  /** What kind of thing this is to a user. */
+  type: ProductElementType;
+  /** Short human-readable label, usually the visible text. */
+  label?: string;
+  /** Longer explanation of what the element does. */
+  description?: string;
+  /** The feature this element belongs to, when known. */
+  featureId?: string;
+  /** Where this element was observed. */
+  provenance?: ProvenanceReference[];
+  /** Adapter-specific extras. Never interpreted by the runtime. */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * One user-facing capability of the application.
+ *
+ * A feature is the unit the guide reasons about: "creating a client" rather
+ * than "the `ClientForm` component". Features are what an end user asks
+ * questions about, so they own the routes, elements and actions involved.
+ */
+export interface ProductFeature {
+  /** Stable identifier, e.g. `clients`. */
+  id: string;
+  /** Discriminator, so features can share a collection with future node kinds. */
+  kind: 'feature';
+  /** Short human-readable title. */
+  title: string;
+  /** What the feature does, in the user's language. */
+  description?: string;
+  /** Route patterns where the feature lives, e.g. `/clients/:id`. */
+  routes?: string[];
+  /** Permissions a user needs before the feature is usable. */
+  permissions?: string[];
+  /** Addressable UI elements belonging to the feature. */
+  elements?: ProductElement[];
+  /** Names of registered guide actions relevant to the feature. */
+  actions?: string[];
+  /** Identifiers of related features. */
+  relationships?: string[];
+  /** Where this feature was derived from. */
+  provenance?: ProvenanceReference[];
+  /** Adapter-specific extras. Never interpreted by the runtime. */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * A complete Product Model: the knowledge the guide has about an application.
+ *
+ * Intentionally free of timestamps. Two runs of the indexer over unchanged
+ * source must produce byte-identical output so the model is reviewable in a
+ * diff, so anything non-deterministic belongs outside this structure.
+ */
+export interface ProductModel {
+  /** Schema version of this document. */
+  version: 1;
+  /** Human-readable name of the indexed application, when known. */
+  application?: string;
+  /** Features, sorted by `id`. */
+  features: ProductFeature[];
+}
+
+/**
+ * A single hit from a {@link ProductFeature} search.
+ *
+ * Providers rank results themselves; the runtime does not re-sort them.
+ */
+export interface ProductKnowledgeResult {
+  /** Identifier of the matched feature. Mirrors `feature.id`. */
+  id: string;
+  /** The matched feature. */
+  feature: ProductFeature;
+  /** Provider-defined relevance in `[0, 1]`, higher is better. */
+  score: number;
+  /** Elements within the feature that matched the query, when applicable. */
+  matchedElements?: ProductElement[];
+  /** Short text supporting the match, for display or model grounding. */
+  excerpt?: string;
+}

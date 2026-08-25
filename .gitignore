@@ -1,0 +1,19 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+.DS_Store
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+.vite/
+.eslintcache
+
+# Generated application graphs.
+# In THIS repository they are build artefacts of the demo and the test fixtures,
+# so they are ignored. In your own application the graph is deterministic, and
+# committing it gives you reviewable diffs of your product model — see the
+# README for that trade-off.
+.statewave-guide/

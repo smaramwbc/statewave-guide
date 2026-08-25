@@ -1,0 +1,43 @@
+{
+  "name": "statewave-guide",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Memory-powered, code-aware, interactive application guidance.",
+  "license": "Apache-2.0",
+  "author": "Statewave <hello@statewave.ai>",
+  "homepage": "https://statewave.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/smaramwbc/statewave-guide.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build": "pnpm -r --filter \"./packages/**\" build",
+    "build:example": "pnpm --filter @statewavedev/guide-react-demo build",
+    "clean": "pnpm -r exec rm -rf dist .turbo && rm -rf node_modules/.cache",
+    "typecheck": "pnpm -r --filter \"./packages/**\" typecheck",
+    "test": "pnpm -r --filter \"./packages/**\" test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev:example": "pnpm --filter @statewavedev/guide-react-demo dev",
+    "index:example": "pnpm --filter @statewavedev/guide-react-demo guide:index",
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm format:check"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^22.19.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.11"
+  }
+}

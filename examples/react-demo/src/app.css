@@ -1,0 +1,273 @@
+/* Deliberately plain. The point of this demo is the architecture, not the design. */
+
+:root {
+  --bg: #0e1116;
+  --panel: #161b22;
+  --border: #262d36;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #4c8dff;
+  --ok: #3fb950;
+  --err: #f85149;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    14px/1.55 ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    sans-serif;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  border-right: 1px solid var(--border);
+  padding: 20px 14px;
+  background: var(--panel);
+}
+
+.sidebar h1 {
+  font-size: 15px;
+  margin: 0 0 2px;
+}
+
+.sidebar .tagline {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0 0 20px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 7px 10px;
+  border-radius: 6px;
+}
+
+.sidebar nav a:hover {
+  background: #1f242c;
+  color: var(--text);
+}
+
+.sidebar nav a.active {
+  background: #1f2a3d;
+  color: var(--text);
+}
+
+main {
+  padding: 28px 32px 120px;
+  max-width: 900px;
+}
+
+h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.lede {
+  color: var(--muted);
+  margin: 0 0 24px;
+}
+
+section {
+  margin-bottom: 28px;
+}
+
+section h3 {
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+button {
+  font: inherit;
+  background: #21262d;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: #3d444d;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06131f;
+  font-weight: 600;
+}
+
+input,
+select {
+  font: inherit;
+  background: #0d1117;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  width: 260px;
+}
+
+label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+label span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+dialog {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  min-width: 340px;
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+
+.spacer {
+  height: 60vh;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  background: #1c2128;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Developer panel — a debugging surface, not part of the product. */
+
+.guide-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 340px;
+  max-height: 70vh;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+  z-index: 2147483000;
+}
+
+.guide-panel h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.guide-panel__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.guide-panel__buttons button {
+  font-size: 12px;
+  padding: 5px 9px;
+}
+
+.guide-panel__buttons button.danger {
+  border-color: #5b2b2b;
+  color: #ffb4ab;
+}
+
+.guide-panel__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 10px;
+  margin: 0 0 10px;
+  font-size: 12px;
+}
+
+.guide-panel__facts dt {
+  color: var(--muted);
+}
+
+.guide-panel__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.guide-panel__result {
+  margin: 0;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #0d1117;
+  border: 1px solid var(--border);
+}
+
+.guide-panel__result.ok {
+  border-color: #234d2c;
+  color: var(--ok);
+}
+
+.guide-panel__result.err {
+  border-color: #5b2b2b;
+  color: var(--err);
+}

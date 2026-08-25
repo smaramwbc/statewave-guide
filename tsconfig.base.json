@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": false,
+    "useUnknownInCatchVariables": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    // No workspace `paths` on purpose. Packages resolve each other through
+    // node_modules -> dist, exactly as a published consumer would, so a type
+    // that fails to survive declaration emit fails here rather than in the
+    // wild. Run `pnpm build` before `pnpm typecheck`; Vitest and Vite alias to
+    // source so the inner dev loop still needs no build step.
+    "skipDefaultLibCheck": true
+  },
+  "exclude": ["node_modules", "dist"]
+}
