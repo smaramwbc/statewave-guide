@@ -40,6 +40,9 @@ import { compareStrings } from './compare.js';
 import type { EvidencePack } from './evidence-pack.js';
 import type { SemanticGenerationRequest } from './provider.js';
 import { redactSecrets } from './safety.js';
+import { computeFeatureScope } from './scope.js';
+import type { ClaimOpportunity } from './opportunities.js';
+import type { FeatureScope, ScopeClass } from './scope.js';
 
 /** Opens the untrusted data block. */
 export const EVIDENCE_FENCE_OPEN = '<<<STATEWAVE_EVIDENCE_BEGIN>>>';
@@ -206,6 +209,21 @@ export interface EvidenceNodeSummary {
   name?: string;
   /** Kind-specific facts, keys sorted. */
   facts?: Record<string, string>;
+  /**
+   * What this fact is to the feature being described.
+   *
+   * A pack is a neighbourhood, and it always was — the model needs to see what
+   * a feature is *not* in order to decline. What it lacked was any way to tell
+   * the difference. Without this, "the settings form submits" and "this feature
+   * is the settings form" look identical in the data block, which is how a
+   * `<code>` element displaying an API key acquired a submit capability.
+   *
+   * `belongs` is the feature's own behaviour. `reaches` is somewhere it leads
+   * or something behind an endpoint it calls. `context` is where it lives.
+   * `other` is a neighbour: real, shown deliberately, and nothing this feature
+   * may speak for.
+   */
+  scope: 'belongs' | 'reaches' | 'context' | 'other';
 }
 
 /** One relationship, as the model sees it. */
@@ -340,15 +358,30 @@ function describeNode(node: ApplicationNode): { name?: string; facts?: Record<st
   }
 }
 
-function summariseNode(node: ApplicationNode): EvidenceNodeSummary {
+function summariseNode(node: ApplicationNode, scope: FeatureScope): EvidenceNodeSummary {
   const { name, facts } = describeNode(node);
   return {
     id: safeId(node.id),
     kind: node.kind,
     provenance: safeText(provenanceSummary(node)),
+    scope: scopeLabel(scope.classify(node.id)),
     ...(name === undefined ? {} : { name: safeText(name) }),
     ...(facts === undefined ? {} : { facts }),
   };
+}
+
+/** How a scope class reads in the data block. */
+function scopeLabel(scope: ScopeClass): EvidenceNodeSummary['scope'] {
+  switch (scope) {
+    case 'OWNED':
+      return 'belongs';
+    case 'REACHABLE':
+      return 'reaches';
+    case 'CONTEXTUAL':
+      return 'context';
+    case 'OUTSIDE':
+      return 'other';
+  }
 }
 
 function summariseRelationship(relationship: Relationship): EvidenceRelationshipSummary {
@@ -383,14 +416,22 @@ function summariseRelationship(relationship: Relationship): EvidenceRelationship
  * `/reset/[redacted]` while `routes` and the node's own id spelled the key out
  * in full was redacting the copy and shipping the original.
  */
-export function toEvidenceDocument(pack: EvidencePack): EvidenceDocument {
+export function toEvidenceDocument(pack: EvidencePack, scope?: FeatureScope): EvidenceDocument {
+  const resolved =
+    scope ??
+    computeFeatureScope({
+      featureId: pack.featureId,
+      roots: [pack.root],
+      nodes: pack.nodes,
+      relationships: pack.relationships,
+    });
   return {
     featureId: safeId(pack.featureId),
     root: safeId(pack.root),
     truncated: pack.truncated,
     routes: pack.routes.map(safeId),
     permissions: pack.permissions.map(safeId),
-    nodes: pack.nodes.map(summariseNode),
+    nodes: pack.nodes.map((node) => summariseNode(node, resolved)),
     relationships: pack.relationships.map(summariseRelationship),
     unknown: pack.refusals.map(safeText),
   };
@@ -409,19 +450,77 @@ export function neutraliseFence(text: string): string {
 }
 
 /** Serialises a pack into the fenced, labelled, untrusted data block. */
-export function renderEvidence(pack: EvidencePack): string {
-  const json = JSON.stringify(toEvidenceDocument(pack), null, 2);
+export function renderEvidence(
+  pack: EvidencePack,
+  scope?: FeatureScope,
+  opportunities: readonly ClaimOpportunity[] = [],
+): string {
+  const document = {
+    ...toEvidenceDocument(pack, scope),
+    // Offered inside the fenced block, with the evidence, because they are
+    // *derived from* the evidence and carry ids the model must quote back
+    // verbatim. They are not instructions and must never read as any: an
+    // opportunity says "this could truthfully be said", never "say this".
+    opportunities: opportunities.map((opportunity) => ({
+      id: safeId(opportunity.id),
+      type: opportunity.type,
+      ...(opportunity.action === undefined ? {} : { action: opportunity.action }),
+      subject: safeId(opportunity.subjectRef),
+      provedBy: opportunity.targets.map(safeId),
+      belongsBecause: safeText(opportunity.ownershipSummary),
+    })),
+  };
+  const json = JSON.stringify(document, null, 2);
   return `${EVIDENCE_FENCE_OPEN}\n${neutraliseFence(json)}\n${EVIDENCE_FENCE_CLOSE}`;
 }
+
+/**
+ * The accept-or-decline contract, appended when opportunities were found.
+ *
+ * Authored here and never interpolated with evidence — the same rule the rest
+ * of this file follows, for the same reason.
+ *
+ * The emphasis on declining is deliberate and comes from measurement. In Round
+ * 1 the model proposed a factual claim on all thirty refusal candidates and
+ * declined none, so restraint scored 0/30. A model with no way to say "true,
+ * and not worth telling anyone" says something instead.
+ */
+export const OPPORTUNITY_INSTRUCTION = `
+The evidence block lists \`opportunities\`: factual claims that have ALREADY been
+proved against this application's graph. For each one, answer with a decision in
+\`decisions\`:
+
+  { "opportunityId": "<id, copied exactly>", "decision": "accept", "text": "<one sentence a user would recognise>" }
+  { "opportunityId": "<id, copied exactly>", "decision": "decline", "reason": "<why not, briefly>" }
+
+Rules:
+- Accept an opportunity only when a person using this product would recognise it
+  as something the product does, and would want to be told. Technically true is
+  not the same as worth saying.
+- DECLINE freely. Declining every opportunity is a valid and sometimes correct
+  answer. An opportunity you decline is not a failure; a claim nobody needed is.
+- You supply only the wording. The subject, the action and the evidence are
+  fixed, and anything you write about them will be checked against the graph.
+- Do not invent an opportunity id. Do not answer an opportunity that is not
+  listed. Do not put a factual claim in \`factualClaims\` when opportunities were
+  offered — use \`decisions\`.
+- \`languageClaims\` still describe THIS feature only. A fact marked \`other\` in
+  the evidence belongs to a different feature and must not be described here.
+`;
 
 /** Builds the request that asks for one feature's language. */
 export function buildFeatureEnrichmentRequest(
   pack: EvidencePack,
   signal?: AbortSignal,
+  scope?: FeatureScope,
+  opportunities: readonly ClaimOpportunity[] = [],
 ): SemanticGenerationRequest<FeatureEnrichment> {
   return {
-    system: FEATURE_ENRICHMENT_INSTRUCTION,
-    evidence: renderEvidence(pack),
+    system:
+      opportunities.length > 0
+        ? `${FEATURE_ENRICHMENT_INSTRUCTION}\n${OPPORTUNITY_INSTRUCTION}`
+        : FEATURE_ENRICHMENT_INSTRUCTION,
+    evidence: renderEvidence(pack, scope, opportunities),
     schema: featureEnrichmentSchema,
     task: FEATURE_ENRICHMENT_TASK,
     ...(signal === undefined ? {} : { signal }),

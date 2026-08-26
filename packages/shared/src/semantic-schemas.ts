@@ -196,6 +196,8 @@ export const productClaimStatusSchema = z.enum([
 export const semanticRejectionReasonSchema = z.enum([
   'NO_SUPPORTING_EVIDENCE',
   'UNKNOWN_GRAPH_REFERENCE',
+  'SUBJECT_OUT_OF_SCOPE',
+  'TARGET_OUT_OF_SCOPE',
   'UNKNOWN_ROUTE',
   'UNKNOWN_PERMISSION',
   'UNKNOWN_ENDPOINT',
@@ -238,6 +240,7 @@ export const productWorkflowSchema = z.object({
   id: z.string().min(1),
   featureId: z.string().min(1),
   title: z.string().min(1),
+  orderBasis: z.enum(['ownership-path', 'unknown']).default('unknown'),
   steps: z.array(productWorkflowStepSchema),
   evidence: z.array(semanticEvidenceSchema),
   generatedBy: generatorAttributionSchema.optional(),
@@ -393,6 +396,67 @@ export const languageClaimEnrichmentSchema = z
  * rather than assert. Everything the feature *claims about the application* goes
  * through `factualClaims`, where it can be checked.
  */
+/**
+ * A model's answer to one {@link ClaimOpportunity}.
+ *
+ * Round 1 asked a model to invent factual claims from a graph. It found the
+ * right evidence 89% of the time and produced a provable claim 20% of the time,
+ * and the gap was almost never fabrication — it was citing a fact without
+ * citing the relationship that proved it. Deterministic code already knows
+ * which assertions the rules would uphold, so it now proposes them and the
+ * model answers.
+ *
+ * Nothing here can change what is being claimed. The subject, the rule, the
+ * action and the evidence all come from the opportunity; a decision carries
+ * only the parts deterministic code cannot supply — whether a user would
+ * recognise this as something the product does, and how to say it.
+ *
+ * `decline` is a first-class answer, and the reason Round 1's restraint was
+ * 0/30: a model with no way to say "this is technically true and not worth
+ * telling anyone" will say something instead.
+ */
+/**
+ * Fields a decision may leave unstated, for the same reason as everywhere else:
+ * a strict wire format cannot omit a key, so a model with nothing to say sends
+ * `""`.
+ */
+function dropUnstatedDecisionValues(value: unknown): unknown {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return value;
+  const copy: Record<string, unknown> = { ...(value as Record<string, unknown>) };
+  for (const key of ['text', 'reason', 'subjectLabel']) {
+    if (copy[key] === '' || copy[key] === null) delete copy[key];
+  }
+  return copy;
+}
+
+const claimDecisionSchema = z.preprocess(
+  dropUnstatedDecisionValues,
+  z
+    .object({
+      opportunityId: z.string().min(1).max(SEMANTIC_LIMITS.maxTitleLength),
+      decision: z.enum(['accept', 'decline']),
+      /** Required to accept. How the claim reads to a person; rendered, never verified. */
+      text: z.string().min(1).max(SEMANTIC_LIMITS.maxStepLength).optional(),
+      /** How the subject reads. Rendered, never resolved. */
+      subjectLabel: z.string().min(1).max(SEMANTIC_LIMITS.maxTitleLength).optional(),
+      /** Why not. Prose for a reviewer; never acted on. */
+      reason: z.string().min(1).max(SEMANTIC_LIMITS.maxDescriptionLength).optional(),
+    })
+    .strict()
+    // A flat object with a refinement rather than a discriminated union: Zod
+    // emits `oneOf` for a union and Anthropic's structured output rejects the
+    // request outright with "Schema type 'oneOf' is not supported". The
+    // constraint is the same either way — an accepted opportunity needs
+    // wording, because the wording is the only thing the model was asked for.
+    .refine((decision) => decision.decision !== 'accept' || decision.text !== undefined, {
+      message: 'An accepted opportunity must carry the sentence it should read as.',
+      path: ['text'],
+    }),
+);
+
+/** Validates {@link ClaimDecision}. */
+export { claimDecisionSchema };
+
 export const featureEnrichmentSchema = z
   .object({
     title: z.string().min(1).max(SEMANTIC_LIMITS.maxTitleLength),
@@ -401,6 +465,16 @@ export const featureEnrichmentSchema = z
       .array(factualClaimEnrichmentSchema)
       .max(SEMANTIC_LIMITS.maxFactualClaims)
       .default([]),
+    /**
+     * Answers to the opportunities this feature was offered.
+     *
+     * The factual path from Round 2 onward. `factualClaims` above remains for
+     * a provider given no opportunities to answer — and for stored models
+     * written before opportunities existed — but a claim invented outside an
+     * opportunity has to survive every gate on its own, which is what Round 1
+     * measured at 20%.
+     */
+    decisions: z.array(claimDecisionSchema).max(SEMANTIC_LIMITS.maxFactualClaims).default([]),
     languageClaims: z
       .array(languageClaimEnrichmentSchema)
       .max(SEMANTIC_LIMITS.maxLanguageClaims)

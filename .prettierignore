@@ -19,3 +19,7 @@ docs/benchmarks
 # them is meaningless — the next run rewrites the file — and a failing style
 # check on a machine-written output would block `verify` for no reason.
 benchmarks/*/results/
+# Same: the human-review artefact is generated, and the next run rewrites it.
+benchmarks/*/review-*.json
+benchmarks/*/human-review-*.json
+benchmarks/*/human-review-*.md

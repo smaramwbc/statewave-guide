@@ -33,6 +33,18 @@ import {
 import { createProjectIndexer } from '../packages/indexer/dist/index.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
+/**
+ * Which round this run belongs to, and what shaped it.
+ *
+ * Recorded on every artefact because a metric without its inputs is not
+ * evidence. Round 2 changed the prompt, the scope algorithm and the planner at
+ * once; a reader comparing it to Round 1 needs to know that.
+ */
+const ROUND = 'round-2';
+const PROMPT_VERSION = 'v2';
+const SCOPE_VERSION = 'forward-spine-1';
+const PLANNER_VERSION = 'matrix-probe-1';
+
 const BENCH = path.join(ROOT, 'benchmarks/provider-reality-check');
 
 // ---------------------------------------------------------------------------
@@ -180,6 +192,18 @@ function emptyMetrics() {
     requiredWorkflowExpected: 0,
     requiredWorkflowRecovered: 0,
     capabilitiesOutsideAllowed: 0,
+    // Round 2. The planner offers only claims the verifier has already proved,
+    // so what is being measured here is not whether a model can find a fact —
+    // it is whether it can tell a fact worth saying from one that is merely
+    // true. Round 1 could not measure that at all: restraint scored 0/30
+    // because declining was not something the schema let a model express.
+    opportunitiesOffered: 0,
+    opportunitiesAccepted: 0,
+    opportunitiesDeclined: 0,
+    // The Round 1 defect, counted directly. Both must stay at zero for
+    // accepted claims; as *proposals* they are the interesting signal.
+    subjectOutOfScope: 0,
+    targetOutOfScope: 0,
     // The one case where the verifier let something through: a claim that
     // passed structural verification while asserting an action the gold set
     // forbids for that feature. A bare count is not inspectable — knowing that
@@ -258,6 +282,8 @@ function scoreFeature(metrics, feature, claims, prose, goldEntry) {
     if (reason === 'UNKNOWN_PERMISSION') metrics.invalidPermissionsProposed += 1;
     if (reason === 'UNKNOWN_ROUTE') metrics.invalidRoutesProposed += 1;
     if (reason === 'EVIDENCE_DOES_NOT_SUPPORT_CLAIM') metrics.evidenceDoesNotSupport += 1;
+    if (reason === 'SUBJECT_OUT_OF_SCOPE') metrics.subjectOutOfScope += 1;
+    if (reason === 'TARGET_OUT_OF_SCOPE') metrics.targetOutOfScope += 1;
     if (reason === 'UNSUPPORTED_CLAIM_RULE') metrics.unsupportedClaimRule += 1;
   }
 
@@ -391,6 +417,11 @@ for (const item of ready) {
     // `SemanticUsage` reports tokens and latency, not a call count — the
     // pipeline is what knows how many candidates it sent. Reused features cost
     // no call, so they are subtracted rather than assumed away.
+    for (const tally of enrichment.opportunities ?? []) {
+      metrics.opportunitiesOffered += tally.offered;
+      metrics.opportunitiesAccepted += tally.accepted;
+      metrics.opportunitiesDeclined += tally.declined;
+    }
     metrics.calls += selected.length - enrichment.reused.length;
     // A provider that reports no token usage leaves these undefined. Coercing
     // that to zero would print a confident `0 in / 0 out`, which reads as
@@ -514,15 +545,27 @@ console.log(`
 // ---------------------------------------------------------------------------
 
 for (const r of results) {
-  const dir = path.join(BENCH, 'results', `${r.id}`);
+  // Rounds are kept apart on disk, permanently. Round 1's numbers are the only
+  // baseline for judging Round 2, and a benchmark that overwrites its own
+  // history can only ever report that things are fine now.
+  const dir = path.join(BENCH, 'results', ROUND);
   mkdirSync(dir, { recursive: true });
   writeFileSync(
-    path.join(dir, `dataset-v${dataset.version}-gold-v${gold.version}.json`),
+    path.join(
+      dir,
+      `${r.id}-dataset-v${dataset.version}-gold-v${gold.version}-prompt-${PROMPT_VERSION}.json`,
+    ),
     JSON.stringify(
       {
+        round: ROUND,
         provider: r.id,
         model: r.model,
         settings: r.settings,
+        dataset: `v${dataset.version}`,
+        gold: `v${gold.version}`,
+        prompt: PROMPT_VERSION,
+        scopeAlgorithm: SCOPE_VERSION,
+        opportunityPlanner: PLANNER_VERSION,
         runs: args.runs,
         runAt: runStamp,
         stability: r.stability,

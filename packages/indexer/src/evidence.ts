@@ -88,7 +88,20 @@ export type InferenceRule =
   /** A permission recogniser configured by name. */
   | 'configured-permission-recogniser'
   /** A `handleSubmit(fn)` wrapper in a form's `onSubmit`. */
-  | 'form-submit-wrapper';
+  | 'form-submit-wrapper'
+  /**
+   * A `type="submit"` control lexically inside a `<form>` whose `onSubmit`
+   * resolved.
+   *
+   * The platform, not a convention: activating a submit control inside a form
+   * submits that form. Without this edge the graph attaches `submits_to` only
+   * to the `<form>` element, so the button a user actually presses is a leaf
+   * with no outgoing behaviour — and any claim that "pressing Save submits the
+   * form" can only be supported by citing a *sibling's* edge. That is the
+   * misattribution `docs/adr/0010` exists to stop, so the edge that makes the
+   * claim honest has to exist.
+   */
+  | 'submit-control-in-form';
 
 /**
  * The confidence scale.

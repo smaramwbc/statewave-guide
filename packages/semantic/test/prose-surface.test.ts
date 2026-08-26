@@ -95,12 +95,18 @@ describe('the wording of a verified claim', () => {
     // `clients.export` is a real button. A claim citing it may say "export",
     // because the indexer read that word out of the source rather than a model
     // choosing it. What the claim may not do is add anything else.
+    //
+    // Filed under `clients.export`, which is the feature that owns the button:
+    // the same sentence filed under `clients.create` is a sibling's evidence,
+    // and the wording gate never gets to run on it.
     const licensed = onlyClaim(
       verifyFixture({
+        featureId: 'clients.export',
         factualClaims: [
           factual({
             type: 'workflow_step',
             text: 'Press the export button.',
+            subjectRef: ID.exportButton,
             targets: [ID.exportButton],
           }),
         ],
@@ -110,10 +116,12 @@ describe('the wording of a verified claim', () => {
 
     const unlicensed = onlyClaim(
       verifyFixture({
+        featureId: 'clients.export',
         factualClaims: [
           factual({
             type: 'workflow_step',
             text: 'Press the export button to email the list to finance.',
+            subjectRef: ID.exportButton,
             targets: [ID.exportButton],
           }),
         ],
@@ -207,6 +215,7 @@ describe('what the watchlist cannot do, pinned so it stays visible', () => {
   it('accepts a business meaning the graph cannot contradict', () => {
     const claim = onlyClaim(
       verifyFixture({
+        featureId: 'clients.delete',
         factualClaims: [
           factual({
             action: 'delete',

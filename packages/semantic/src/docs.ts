@@ -429,12 +429,21 @@ export function renderWorkflowDoc(
     'ApplicationGraph and belong to this feature. The **wording** of a step is generated language',
     'and was not itself verified — only what it points at was.',
     '',
-    '## Steps',
-    '',
+    ...(workflow.orderBasis === 'ownership-path'
+      ? ['## Steps', '']
+      : [
+          '## Steps, in no particular order',
+          '',
+          'The graph does not establish which of these happens first, so they are listed rather',
+          'than sequenced. An order nobody proved would send a reader to the wrong control first',
+          'and teach them the product works in a way it does not.',
+          '',
+        ]),
   ];
 
+  const ordered = workflow.orderBasis === 'ownership-path';
   for (const step of workflow.steps) {
-    lines.push(`${step.index}. ${cell(step.text)}`);
+    lines.push(`${ordered ? `${step.index}.` : '-'} ${cell(step.text)}`);
     lines.push(`   - Points at: ${code(step.targets)}`);
   }
   lines.push('');

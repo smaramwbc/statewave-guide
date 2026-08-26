@@ -87,6 +87,7 @@ import type {
   SemanticEvidence,
   SemanticRejectionReason,
   SemanticVerificationSummary,
+  WorkflowOrderBasis,
 } from '@statewavedev/guide-shared';
 import { isFactualClaimType } from '@statewavedev/guide-shared';
 import type { FeatureCandidate } from './candidates.js';
@@ -98,7 +99,10 @@ import { SEMANTIC_GENERATOR_VERSION } from './constants.js';
 import type { EvidencePack, EvidencePackLimits } from './evidence-pack.js';
 import { buildEvidencePack } from './evidence-pack.js';
 import { dependencyFingerprint, graphHash } from './fingerprint.js';
+import { planClaimOpportunities } from './opportunities.js';
 import { buildFeatureEnrichmentRequest } from './prompt.js';
+import { computeFeatureScope } from './scope.js';
+import type { FeatureScope } from './scope.js';
 import type { SemanticModelProvider, SemanticUsage } from './provider.js';
 import type { ClaimVerifierRegistry } from './registry.js';
 import type { ProseRenderer } from './render.js';
@@ -186,6 +190,20 @@ export interface EnrichmentRun {
   reused: string[];
   /** Everything a reader should know that is not a refusal. */
   warnings: string[];
+  /**
+   * What the deterministic planner offered and what the model did with it.
+   *
+   * Reported per feature rather than summed, because the interesting number is
+   * not how many opportunities existed but how often a model, given a provable
+   * claim, decided it was not worth saying. Round 1 had no way to measure that:
+   * restraint scored 0/30 because declining was not expressible.
+   */
+  opportunities: {
+    featureId: string;
+    offered: number;
+    accepted: number;
+    declined: number;
+  }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -381,18 +399,51 @@ function buildWorkflow(
   featureTitle: string,
   claims: readonly ProductClaim[],
   attribution: GeneratorAttribution,
+  scope: FeatureScope,
 ): ProductWorkflow | undefined {
-  const steps: ProductWorkflowStep[] = [];
-  for (const claim of claims) {
-    if (claim.type !== 'workflow_step' || claim.status === 'rejected') continue;
-    steps.push({
-      index: steps.length + 1,
-      text: claim.text,
-      targets: sortedUnique(claim.assertion?.targets ?? []),
-      evidence: claim.evidence,
+  // Order comes from the graph, never from the order the model happened to
+  // answer in. A feature's behaviour path *is* its sequence: the control is
+  // pressed, the handler runs, the dialog opens, the form submits. How far
+  // along that path a step's evidence sits is how far along the workflow it
+  // belongs, and that is a fact rather than a narrative.
+  const pending = claims
+    .filter((claim) => claim.type === 'workflow_step' && claim.status !== 'rejected')
+    .map((claim) => {
+      const targets = sortedUnique(claim.assertion?.targets ?? []);
+      const depths = targets
+        .map((target) => scope.ownershipPath(target)?.length)
+        .filter((depth): depth is number => depth !== undefined);
+      return {
+        claim,
+        targets,
+        // The furthest point this step reaches. A step that touches both the
+        // button and the endpoint belongs where it ends up, not where it began.
+        depth: depths.length === 0 ? undefined : Math.max(...depths),
+      };
     });
-  }
-  if (steps.length === 0) return undefined;
+  if (pending.length === 0) return undefined;
+
+  // Unknown when the graph does not separate the steps: every step at the same
+  // distance, or any step the graph cannot place at all. An invented sequence
+  // is worse than an unordered list, so the absence is recorded rather than
+  // papered over with response order.
+  const depths = pending.map((entry) => entry.depth);
+  const placed = depths.every((depth) => depth !== undefined);
+  const distinct = new Set(depths).size;
+  const orderBasis: WorkflowOrderBasis =
+    placed && distinct === pending.length ? 'ownership-path' : 'unknown';
+
+  const ordered =
+    orderBasis === 'ownership-path'
+      ? [...pending].sort((a, b) => (a.depth ?? 0) - (b.depth ?? 0))
+      : [...pending].sort((a, b) => compareStrings(a.claim.id, b.claim.id));
+
+  const steps: ProductWorkflowStep[] = ordered.map((entry, position) => ({
+    index: position + 1,
+    text: entry.claim.text,
+    targets: entry.targets,
+    evidence: entry.claim.evidence,
+  }));
 
   const evidence = new Map<string, SemanticEvidence>();
   for (const step of steps) {
@@ -402,6 +453,7 @@ function buildWorkflow(
     id: `${featureId}#workflow`,
     featureId,
     title: `How to ${decapitalise(featureTitle)}`,
+    orderBasis,
     steps,
     evidence: [...evidence.values()].sort((a, b) => compareStrings(a.ref, b.ref)),
     generatedBy: attribution,
@@ -516,6 +568,8 @@ interface CandidateOutcome {
   decided: boolean;
   /** True when the provider never answered, so nothing about the feature was decided. */
   unavailable?: boolean;
+  /** What the planner offered this candidate and what the model did with it. */
+  opportunities?: EnrichmentRun['opportunities'][number];
 }
 
 /** The 1-based ordinal encoded in a claim id, or 0 when there is none to read. */
@@ -572,6 +626,7 @@ function replayEnrichment(
     title: feature.title,
     description: feature.description,
     factualClaims,
+    decisions: [],
     languageClaims,
     confidenceReason: 'Replayed from a previous Product Model and re-verified against this graph.',
   };
@@ -618,6 +673,23 @@ async function enrichCandidate(
   },
 ): Promise<CandidateOutcome> {
   const pack = buildEvidencePack(options.graph, candidate, options.limits);
+  // Computed over the pack, so the scope the model is shown, the scope the
+  // planner enumerates from and the scope the verifier gates on are the same
+  // object. Three notions of ownership that must agree eventually disagree.
+  const scope = computeFeatureScope({
+    featureId: candidate.id,
+    roots: candidate.rootNodes,
+    nodes: pack.nodes,
+    relationships: pack.relationships,
+  });
+  const opportunities = planClaimOpportunities({
+    candidate,
+    knownFeatureIds: shared.knownFeatureIds,
+    pack,
+    graph: options.graph,
+    scope,
+    ...(options.registry === undefined ? {} : { registry: options.registry }),
+  });
   const fingerprint = dependencyFingerprint(pack);
   const freshProvenance: ClaimProvenance = {
     graphHash: shared.hash,
@@ -651,7 +723,7 @@ async function enrichCandidate(
       reused: true,
     };
   } else {
-    const request = buildFeatureEnrichmentRequest(pack, options.signal);
+    const request = buildFeatureEnrichmentRequest(pack, options.signal, scope, opportunities);
     const result = await options.provider.generateStructured(request);
     shared.onUsage(result.usage);
 
@@ -695,6 +767,8 @@ async function enrichCandidate(
     enrichment: source.enrichment,
     attribution: source.attribution,
     provenance: source.provenance,
+    scope,
+    plan: opportunities,
     ...(options.registry === undefined ? {} : { registry: options.registry }),
   });
 
@@ -720,12 +794,22 @@ async function enrichCandidate(
       warnings: verification.warnings,
       reused: false,
       decided: true,
+      opportunities: {
+        featureId: candidate.id,
+        offered: opportunities.length,
+        accepted: (source.enrichment.decisions ?? []).filter(
+          (decision) => decision.decision === 'accept',
+        ).length,
+        declined: (source.enrichment.decisions ?? []).filter(
+          (decision) => decision.decision === 'decline',
+        ).length,
+      },
     };
   }
 
   const title = verification.title;
   const accepted = verification.claims.filter((claim) => claim.status !== 'rejected');
-  const workflow = buildWorkflow(candidate.id, title, accepted, source.attribution);
+  const workflow = buildWorkflow(candidate.id, title, accepted, source.attribution, scope);
   const purpose = accepted.find((claim) => claim.type === 'purpose')?.text;
 
   const facts = scopedFacts(featureScope(candidate.rootNodes, pack), pack.nodes);
@@ -778,6 +862,16 @@ async function enrichCandidate(
     warnings: verification.warnings,
     reused: source.reused,
     decided: true,
+    opportunities: {
+      featureId: candidate.id,
+      offered: opportunities.length,
+      accepted: (source.enrichment.decisions ?? []).filter(
+        (decision) => decision.decision === 'accept',
+      ).length,
+      declined: (source.enrichment.decisions ?? []).filter(
+        (decision) => decision.decision === 'decline',
+      ).length,
+    },
   };
 }
 
@@ -831,6 +925,7 @@ export async function enrichApplicationGraph(options: EnrichmentOptions): Promis
   const rejected: EnrichmentRejection[] = [];
   const reused: string[] = [];
   const warnings: string[] = [];
+  const opportunityTally: EnrichmentRun['opportunities'] = [];
   let decided = 0;
   let unavailable = 0;
 
@@ -860,6 +955,7 @@ export async function enrichApplicationGraph(options: EnrichmentOptions): Promis
     claims.push(...outcome.claims);
     rejected.push(...outcome.rejections);
     warnings.push(...outcome.warnings.map((warning) => `${candidate.id}: ${warning}`));
+    if (outcome.opportunities !== undefined) opportunityTally.push(outcome.opportunities);
     if (outcome.reused) reused.push(candidate.id);
     if (outcome.feature !== undefined) features.push(outcome.feature);
     if (outcome.workflow !== undefined) workflows.push(outcome.workflow);
@@ -979,5 +1075,12 @@ export async function enrichApplicationGraph(options: EnrichmentOptions): Promis
     verification,
   };
 
-  return { model, usage, rejected, reused: reused.sort(compareStrings), warnings };
+  return {
+    model,
+    usage,
+    rejected,
+    reused: reused.sort(compareStrings),
+    warnings,
+    opportunities: opportunityTally,
+  };
 }

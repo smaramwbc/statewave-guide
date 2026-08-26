@@ -346,6 +346,7 @@ export function enrichment(
     title: 'Create a client',
     description: 'Adds a client record from the clients page.',
     factualClaims,
+    decisions: [],
     languageClaims,
     confidenceReason: 'Every claim points at the clients neighbourhood.',
     ...overrides,

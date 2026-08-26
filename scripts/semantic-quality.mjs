@@ -83,6 +83,14 @@ function parseEvidenceDocument(evidence) {
  * `undefined` when this pack cannot host that attack. Every entry names the
  * reason the verifier is expected to give, so a refusal for the *wrong* reason
  * is visible rather than counted as a success.
+ *
+ * `expect` may name more than one acceptable reason. That is not a loosening:
+ * feature scope is a *universal* check and necessarily runs before any
+ * rule-dimension check, so an attack whose hostile evidence happens to be a
+ * sibling's is now refused one step earlier — and more precisely, because
+ * "this belongs to another feature" says more than "no rule dimension was
+ * satisfied". Both are correct refusals of the same fabrication. What is still
+ * forbidden, and still caught, is a refusal for a reason nobody predicted.
  */
 const CATALOGUE = [
   {
@@ -193,7 +201,7 @@ const CATALOGUE = [
   },
   {
     name: 'workflow step pointing at something a user cannot be shown',
-    expect: 'UNSUPPORTED_WORKFLOW_STEP',
+    expect: ['UNSUPPORTED_WORKFLOW_STEP', 'TARGET_OUT_OF_SCOPE'],
     build: (pack) =>
       pack.fn === undefined
         ? undefined
@@ -206,7 +214,7 @@ const CATALOGUE = [
   },
   {
     name: 'create capability citing a read endpoint',
-    expect: 'EVIDENCE_DOES_NOT_SUPPORT_CLAIM',
+    expect: ['EVIDENCE_DOES_NOT_SUPPORT_CLAIM', 'TARGET_OUT_OF_SCOPE'],
     build: (pack) =>
       pack.getEndpoint === undefined
         ? undefined
@@ -220,7 +228,7 @@ const CATALOGUE = [
   },
   {
     name: 'capability citing nothing that could perform it',
-    expect: 'UNSUPPORTED_CAPABILITY',
+    expect: ['UNSUPPORTED_CAPABILITY', 'TARGET_OUT_OF_SCOPE'],
     build: (pack) =>
       pack.permissionNode === undefined
         ? undefined
@@ -234,7 +242,7 @@ const CATALOGUE = [
   },
   {
     name: 'constraint with no schema or permission behind it',
-    expect: 'UNSUPPORTED_CONSTRAINT',
+    expect: ['UNSUPPORTED_CONSTRAINT', 'TARGET_OUT_OF_SCOPE'],
     build: (pack) =>
       pack.element === undefined
         ? undefined
@@ -445,9 +453,10 @@ for (const claim of run.model.claims) {
     hostile.attempted += 1;
     if (claim.status === 'rejected') {
       hostile.blocked += 1;
-      if (claim.rejection?.reason !== known.expect) {
+      const acceptable = Array.isArray(known.expect) ? known.expect : [known.expect];
+      if (!acceptable.includes(claim.rejection?.reason)) {
         hostile.wrongReason.push(
-          `${claim.id} — ${known.attack}: expected ${known.expect}, got ${claim.rejection?.reason ?? 'no reason'}`,
+          `${claim.id} — ${known.attack}: expected ${acceptable.join(' or ')}, got ${claim.rejection?.reason ?? 'no reason'}`,
         );
       }
     } else {

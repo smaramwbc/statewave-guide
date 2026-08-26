@@ -185,6 +185,25 @@ export type SemanticRejectionReason =
   /** The claim cited a graph id that does not exist. */
   | 'UNKNOWN_GRAPH_REFERENCE'
   /** The claim named a route the graph does not contain. */
+  /**
+   * The subject is a real identity, and the wrong one for this feature.
+   *
+   * Never `UNKNOWN_SUBJECT`: that reason means "no such thing", and saying it
+   * about something that demonstrably exists teaches a reader nothing and sends
+   * them looking for a typo. This claim's problem is ownership, not existence —
+   * `element:settings.form` really is a form and really does submit, but a
+   * claim filed under `settings.new-key` would be read as being about the key.
+   */
+  | 'SUBJECT_OUT_OF_SCOPE'
+  /**
+   * A cited fact is real, is in this feature's evidence, and belongs to another
+   * feature.
+   *
+   * Pack membership means a fact was *shown* to the model — a pack is a
+   * neighbourhood, deliberately, so the model can see what a feature is not.
+   * It has never meant the fact is this feature's.
+   */
+  | 'TARGET_OUT_OF_SCOPE'
   | 'UNKNOWN_ROUTE'
   /** The claim named a permission the graph does not contain. */
   | 'UNKNOWN_PERMISSION'
@@ -335,12 +354,29 @@ export interface ProductWorkflowStep {
 }
 
 /** An ordered path through a feature, expressed for a person. */
+/**
+ * Where a workflow's step order came from.
+ *
+ * `ownership-path` means the graph proved it: each step sits further along the
+ * feature's own behaviour path than the one before, so "first this, then that"
+ * is a fact rather than a narrative. `unknown` means the graph does not order
+ * these steps, and the renderer must say so.
+ *
+ * The distinction exists because an invented sequence is worse than an
+ * unordered list. A list a reader can scan costs them a moment; an order that
+ * is wrong sends them to the wrong control first and teaches them the product
+ * works in a way it does not.
+ */
+export type WorkflowOrderBasis = 'ownership-path' | 'unknown';
+
 export interface ProductWorkflow {
   /** Deterministic id: `${featureId}#workflow`. */
   id: string;
   featureId: string;
   title: string;
   steps: ProductWorkflowStep[];
+  /** Whether the graph proved this order, or only supplied the set. */
+  orderBasis: WorkflowOrderBasis;
   evidence: SemanticEvidence[];
   generatedBy?: GeneratorAttribution;
 }

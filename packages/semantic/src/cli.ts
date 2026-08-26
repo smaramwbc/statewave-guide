@@ -53,6 +53,7 @@ import {
   createSilentIo,
   formatDocsReport,
   formatEnrichmentReport,
+  formatOpportunityReport,
   formatWritten,
   reportError,
   reportWarning,
@@ -366,6 +367,10 @@ async function runEnrich(
 
   const written = await writeProductModel(run.model, fileOptions);
   for (const line of formatEnrichmentReport(run)) io.out(line);
+  // Printed after the counts, because it answers the question the counts
+  // provoke: a thin feature is either a gap in the graph or a judgement the
+  // model made, and those have opposite fixes.
+  for (const line of formatOpportunityReport(run)) io.out(line);
   for (const line of formatWritten('Product model written to:', written.relativePath)) {
     io.out(line);
   }

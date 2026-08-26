@@ -13,6 +13,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import type { FactualClaimEnrichment } from '@statewavedev/guide-shared';
 import { ID, factual, onlyClaim, verifyFixture } from './helpers.js';
 import { createClaimVerifierRegistry } from '../src/registry.js';
 import type {
@@ -20,6 +21,20 @@ import type {
   ClaimVerifierRegistration,
   ClaimVerifierResult,
 } from '../src/registry.js';
+
+/**
+ * The feature that owns the export button, and a claim filed under it.
+ *
+ * The button, its handler and its permission belong to `clients.export`, which
+ * the fixture discovers as a feature in its own right. Filing an export claim
+ * under a sibling would make it a claim about somebody else's evidence, and the
+ * scope gate refuses that before any registration is consulted — so the
+ * registry would never be exercised at all.
+ */
+const EXPORT_FEATURE = 'clients.export';
+function exportClaim(overrides: Partial<FactualClaimEnrichment> = {}): FactualClaimEnrichment {
+  return factual({ action: 'export', subjectRef: `feature:${EXPORT_FEATURE}`, ...overrides });
+}
 
 /**
  * What an application that genuinely knows its own export path would register.
@@ -62,10 +77,14 @@ describe('built-ins are authoritative by default', () => {
   it('keeps the matrix in charge of every pair a registration did not claim', () => {
     const registry = createClaimVerifierRegistry();
     registry.register(exportVerifier);
+    // Both claims are filed under the delete button and cite the one endpoint
+    // it owns, so nothing here turns on scope: the create rule refuses the
+    // DELETE endpoint on its merits, and the delete rule accepts it.
     const result = verifyFixture({
+      featureId: 'clients.delete',
       registry,
       factualClaims: [
-        factual({ action: 'create', targets: [ID.get] }),
+        factual({ action: 'create', subjectRef: 'feature:clients.delete', targets: [ID.del] }),
         factual({ action: 'delete', subjectRef: ID.remove, targets: [ID.del] }),
       ],
     });
@@ -80,8 +99,9 @@ describe('a custom verifier can support export', () => {
 
   it('upholds an export claim the matrix would have refused to judge', () => {
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     const claim = onlyClaim(result);
     expect(claim.status).toBe('structurally_verified');
@@ -92,16 +112,21 @@ describe('a custom verifier can support export', () => {
 
   it('records that something other than the matrix decided', () => {
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     expect(result.warnings.join(' ')).toContain('capability/export');
   });
 
   it('still refuses an export claim its own verifier rejects', () => {
+    // The handler is genuinely this feature's, so the claim survives the scope
+    // gate and reaches the application's verifier — which then refuses it for
+    // the only reason it knows: nothing cited is an export control.
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.post] })],
+      factualClaims: [exportClaim({ targets: [ID.handleExport] })],
     });
     const claim = onlyClaim(result);
     expect(claim.status).toBe('rejected');
@@ -135,8 +160,9 @@ describe('a custom verifier cannot bypass the evidence requirements', () => {
     const { registration } = permissive([]);
     registry.register(registration);
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     const claim = onlyClaim(result);
     expect(claim.status).toBe('rejected');
@@ -150,8 +176,9 @@ describe('a custom verifier cannot bypass the evidence requirements', () => {
     const { registration } = permissive(['api:POST:/clients/import']);
     registry.register(registration);
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     expect(onlyClaim(result).rejection?.reason).toBe('UNKNOWN_GRAPH_REFERENCE');
   });
@@ -161,8 +188,9 @@ describe('a custom verifier cannot bypass the evidence requirements', () => {
     const { registration } = permissive([ID.invoiceApi]);
     registry.register(registration);
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     expect(onlyClaim(result).rejection?.reason).toBe('UNKNOWN_GRAPH_REFERENCE');
   });
@@ -202,10 +230,9 @@ describe('a custom verifier cannot bypass the evidence requirements', () => {
     const { registration, calls } = permissive([ID.exportButton]);
     registry.register(registration);
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [
-        factual({ action: 'export', route: '/admin/exports', targets: [ID.exportButton] }),
-      ],
+      factualClaims: [exportClaim({ route: '/admin/exports', targets: [ID.exportButton] })],
     });
     expect(onlyClaim(result).rejection?.reason).toBe('UNKNOWN_ROUTE');
     expect(calls).toHaveLength(0);
@@ -216,8 +243,9 @@ describe('a custom verifier cannot bypass the evidence requirements', () => {
     const { registration, calls } = permissive([ID.exportButton]);
     registry.register(registration);
     verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     const context = calls[0];
     expect(context).toBeDefined();
@@ -236,8 +264,9 @@ describe('a custom verifier cannot bypass the evidence requirements', () => {
       },
     });
     const result = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     const claim = onlyClaim(result);
     expect(claim.status).toBe('rejected');
@@ -326,15 +355,17 @@ describe('registration bookkeeping', () => {
     const registry = createClaimVerifierRegistry();
     const dispose = registry.register(exportVerifier);
     const supported = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     expect(onlyClaim(supported).status).toBe('structurally_verified');
 
     dispose();
     const unsupported = verifyFixture({
+      featureId: EXPORT_FEATURE,
       registry,
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      factualClaims: [exportClaim({ targets: [ID.exportButton] })],
     });
     expect(onlyClaim(unsupported).outcome).toBe('EXPLICITLY_UNSUPPORTED');
   });

@@ -1,0 +1,2134 @@
+{
+  "round": "round-2",
+  "scoredBy": null,
+  "scoredAt": null,
+  "rubric": {
+    "0": "useless",
+    "1": "minimally useful",
+    "2": "useful",
+    "3": "excellent"
+  },
+  "instructions": [
+    "Score each feature 0-3 on whether what was produced would help a person use this product.",
+    "Do not score accuracy: everything under acceptedClaims has already been verified against the graph.",
+    "A feature that correctly produced almost nothing may still deserve a low score. Say so. Restraint that leaves a user with nothing useful is still nothing useful.",
+    "The pipeline that generated this must not score it. If the only available reviewer is the model under test, leave the scores null and record that no independent review happened."
+  ],
+  "provider": "anthropic-opus-5",
+  "model": "claude-opus-5",
+  "dataset": "v1",
+  "gold": "v1",
+  "prompt": "v2",
+  "features": [
+    {
+      "featureId": "clients.create",
+      "band": "easy",
+      "goldExpectations": {
+        "featureId": "clients.create",
+        "band": "easy",
+        "requiredConcepts": [
+          "create a client"
+        ],
+        "requiredEvidence": [
+          "element:clients.create",
+          "api:POST:/api/clients"
+        ],
+        "allowedCapabilityActions": [
+          "create",
+          "submit",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [
+          "element:clients.create"
+        ],
+        "requiredPermissions": [
+          "clients:create"
+        ],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "note": "The flagship path. A description that does not convey \"add a new client\" has failed the task even if every claim verified."
+      },
+      "scope": {
+        "owned": 19,
+        "reachable": 1,
+        "contextual": 2
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "clients.create#capability:create#f298c845",
+          "type": "capability",
+          "action": "create",
+          "subject": "element:clients.create",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "clients.create#capability:submit#f298c845",
+          "type": "capability",
+          "action": "submit",
+          "subject": "element:clients.create",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "clients.create#constraint#f298c845",
+          "type": "constraint",
+          "subject": "element:clients.create",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "clients.create#permission#f298c845",
+          "type": "permission",
+          "subject": "element:clients.create",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "clients.create#workflow_step#fe7987cb",
+          "type": "workflow_step",
+          "subject": "component:frontend/src/components/ClientForm.tsx#ClientForm",
+          "belongsBecause": "invokes > opens > renders"
+        },
+        {
+          "id": "clients.create#workflow_step#cf94cc8d",
+          "type": "workflow_step",
+          "subject": "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+          "belongsBecause": "invokes > opens"
+        },
+        {
+          "id": "clients.create#workflow_step#f298c845",
+          "type": "workflow_step",
+          "subject": "element:clients.create",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "clients.create#workflow_step#ffba87b4",
+          "type": "workflow_step",
+          "subject": "element:clients.create-dialog.form",
+          "belongsBecause": "invokes > opens > renders > contains"
+        },
+        {
+          "id": "clients.create#workflow_step#848827aa",
+          "type": "workflow_step",
+          "subject": "element:clients.create-dialog.submit",
+          "belongsBecause": "invokes > opens > renders > contains"
+        },
+        {
+          "id": "clients.create#workflow_step#a153c08b",
+          "type": "workflow_step",
+          "subject": "feature:clients.create",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "capability",
+          "action": "create",
+          "status": "structurally_verified",
+          "text": "You can create a new client from the Clients page using the \"New client\" button and its dialog.",
+          "evidence": []
+        },
+        {
+          "type": "capability",
+          "action": "submit",
+          "status": "structurally_verified",
+          "text": "Submitting the new client form with \"Create client\" saves the client.",
+          "evidence": []
+        },
+        {
+          "type": "permission",
+          "status": "structurally_verified",
+          "text": "Creating a client requires the clients:create permission.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Add client, onboard client, new customer",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I add a new client?",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why can't I see the New client button?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "The client form asks for a name, billing email and plan, and offers Cancel or Create client.",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "The new client dialog holds the form used to enter the client's details.",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Selecting \"New client\" opens the create client dialog.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [
+        {
+          "type": "purpose",
+          "text": "Lets an administrator onboard a new client record with its name, billing email and plan.",
+          "reason": "EVIDENCE_DOES_NOT_SUPPORT_CLAIM"
+        }
+      ],
+      "workflow": [
+        "The client form asks for a name, billing email and plan, and offers Cancel or Create client.",
+        "The new client dialog holds the form used to enter the client's details.",
+        "Selecting \"New client\" opens the create client dialog."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: clients.create\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Add a new client\n\nYou can create a new client and submit the client form.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (6 of 6). Its identifier is `clients.create`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | — |\n| Elements | `clients.create`, `clients.create-dialog`, `clients.create-dialog.cancel`, `clients.create-dialog.email`, `clients.create-dialog.form`, `clients.create-dialog.name`, `clients.create-dialog.plan`, `clients.create-dialog.submit` |\n| Permissions | `clients:create` |\n| Entry points | `element:clients.create` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| You can create a new client from the Clients page using the \"New client\" button and its dialog. | capability/create | subject `element:clients.create` | `api:POST:/api/clients`, `component:frontend/src/components/ClientForm.tsx#ClientForm`, `component:frontend/src/components/ClientForm.tsx#ClientForm\\|submits_to\\|function:frontend/src/components/ClientForm.tsx#submitClient`, `component:frontend/src/components/NewClientDialog.tsx#NewClientDialog`, `element:clients.create`, `element:clients.create-dialog`, `element:clients.create-dialog.cancel`, `element:clients.create-dialog.email` |\n| Submitting the new client form with \"Create client\" saves the client. | capability/submit | subject `element:clients.create` | `component:frontend/src/components/ClientForm.tsx#ClientForm`, `component:frontend/src/components/ClientForm.tsx#ClientForm\\|submits_to\\|function:frontend/src/components/ClientForm.tsx#submitClient`, `component:frontend/src/components/NewClientDialog.tsx#NewClientDialog`, `element:clients.create`, `element:clients.create-dialog`, `element:clients.create-dialog.cancel`, `element:clients.create-dialog.email`, `element:clients.create-dialog.form` |\n| Creating a client requires the clients:create permission. | permission | subject `element:clients.create` | `element:clients.create\\|requires_permission\\|permission:clients:create`, `permission:clients:create` |\n| The client form asks for a name, billing email and plan, and offers Cancel or Create client. | workflow_step | subject `component:frontend/src/components/ClientForm.tsx#ClientForm` | `api:POST:/api/clients`, `component:frontend/src/components/ClientForm.tsx#ClientForm`, `element:clients.create-dialog.cancel`, `element:clients.create-dialog.email`, `element:clients.create-dialog.form`, `element:clients.create-dialog.name`, `element:clients.create-dialog.plan`, `element:clients.create-dialog.submit` |\n| The new client dialog holds the form used to enter the client's details. | workflow_step | subject `component:frontend/src/components/NewClientDialog.tsx#NewClientDialog` | `api:POST:/api/clients`, `component:frontend/src/components/ClientForm.tsx#ClientForm`, `component:frontend/src/components/NewClientDialog.tsx#NewClientDialog`, `element:clients.create-dialog`, `element:clients.create-dialog.cancel`, `element:clients.create-dialog.email`, `element:clients.create-dialog.form`, `element:clients.create-dialog.name` |\n| Selecting \"New client\" opens the create client dialog. | workflow_step | subject `element:clients.create` | `api:POST:/api/clients`, `component:frontend/src/components/ClientForm.tsx#ClientForm`, `component:frontend/src/components/NewClientDialog.tsx#NewClientDialog`, `element:clients.create`, `element:clients.create-dialog`, `element:clients.create-dialog.cancel`, `element:clients.create-dialog.email`, `element:clients.create-dialog.form` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _synonym_ — Add client, onboard client, new customer\n- _user_question_ — How do I add a new client?\n- _user_question_ — Why can't I see the New client button?\n\n## Refused\n\nThese were proposed and not allowed through. They are kept so a refusal stays visible rather than becoming an absence nobody can audit.\n\n| Refused claim | Kind | Reason | Why |\n| --- | --- | --- | --- |\n| Lets an administrator onboard a new client record with its name, billing email and plan. | purpose | EVIDENCE_DOES_NOT_SUPPORT_CLAIM | The wording asserts \"email\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on. |\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Add client, onboard client, new customer\n- How do I add a new client?\n- Why can't I see the New client button?\n\n## Related\n\n`api.get.partial-clients`, `client-detail.audit`, `client-detail.change-plan`, `client-detail.delete`, `client-detail.rename`, `clients.error`, `clients.export`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "client-detail.delete",
+      "band": "easy",
+      "goldExpectations": {
+        "featureId": "client-detail.delete",
+        "band": "easy",
+        "requiredConcepts": [
+          "delete a client"
+        ],
+        "requiredEvidence": [
+          "element:client-detail.delete",
+          "api:DELETE:/api/clients/:param"
+        ],
+        "allowedCapabilityActions": [
+          "delete",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [
+          "element:client-detail.delete"
+        ],
+        "requiredPermissions": [
+          "clients:delete"
+        ],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "archives the client",
+          "soft delete",
+          "can be undone"
+        ],
+        "note": "DELETE proves a delete path exists. It does not prove what deletion does to the record — archive semantics are the classic overreach here."
+      },
+      "scope": {
+        "owned": 3,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "client-detail.delete#constraint#f0157bfb",
+          "type": "constraint",
+          "subject": "element:client-detail.delete",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.delete#permission#f0157bfb",
+          "type": "permission",
+          "subject": "element:client-detail.delete",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.delete#workflow_step#7e89161d",
+          "type": "workflow_step",
+          "subject": "feature:client-detail.delete",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "constraint",
+          "status": "structurally_verified",
+          "text": "The Delete button on the client detail page is only available with the clients:delete permission.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets an authorised user remove a client record from the client's own detail page.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Remove client, delete customer, drop account.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why can't I see the Delete button on a client?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Select Delete on the client detail page to begin removing the client.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Select Delete on the client detail page to begin removing the client."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: client-detail.delete\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Delete a client\n\nInput is validated before it is accepted.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (2 of 2). Its identifier is `client-detail.delete`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients/:clientId` |\n| Elements | `client-detail.delete` |\n| Permissions | `clients:delete` |\n| Entry points | `element:client-detail.delete` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| The Delete button on the client detail page is only available with the clients:delete permission. | constraint | subject `element:client-detail.delete` | `element:client-detail.delete\\|requires_permission\\|permission:clients:delete`, `permission:clients:delete` |\n| Select Delete on the client detail page to begin removing the client. | workflow_step | subject `feature:client-detail.delete` | `element:client-detail.delete` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets an authorised user remove a client record from the client's own detail page.\n- _synonym_ — Remove client, delete customer, drop account.\n- _user_question_ — Why can't I see the Delete button on a client?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Remove client, delete customer, drop account.\n- Why can't I see the Delete button on a client?\n\n## Related\n\n`client-detail.audit`, `client-detail.change-plan`, `client-detail.rename`, `clients.error`, `clients.search`, `invoices.list.clear`, `invoices.list.open`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "nav.clients",
+      "band": "easy",
+      "goldExpectations": {
+        "featureId": "nav.clients",
+        "band": "easy",
+        "requiredConcepts": [
+          "open the clients screen"
+        ],
+        "requiredEvidence": [
+          "element:nav.clients",
+          "route:/clients"
+        ],
+        "allowedCapabilityActions": [
+          "navigate",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create",
+          "delete",
+          "update"
+        ],
+        "requiredWorkflowTargets": [
+          "element:nav.clients"
+        ],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "note": "A link. Claiming it creates or edits anything is a fabrication with almost no evidence to hide behind."
+      },
+      "scope": {
+        "owned": 1,
+        "reachable": 1,
+        "contextual": 2
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "nav.clients#capability:navigate#66a45150",
+          "type": "capability",
+          "action": "navigate",
+          "subject": "feature:nav.clients",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "nav.clients#navigation#66a45150",
+          "type": "navigation",
+          "subject": "feature:nav.clients",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "nav.clients#workflow_step#66a45150",
+          "type": "workflow_step",
+          "subject": "feature:nav.clients",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "capability",
+          "action": "navigate",
+          "status": "structurally_verified",
+          "text": "Selecting \"Clients\" in the main navigation takes you to the Clients page.",
+          "evidence": []
+        },
+        {
+          "type": "navigation",
+          "status": "structurally_verified",
+          "text": "The Clients link leads to /clients.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Gives quick access to the client list from anywhere in the app.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Customers link, client list tab",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Where do I find my clients?",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: nav.clients\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Clients Navigation Link\n\nYou can open nav clients from the Clients screen.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (2 of 2). Its identifier is `nav.clients`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients` |\n| Elements | `clients`, `clients.count`, `clients.create`, `clients.error`, `clients.export`, `clients.refresh`, `clients.search`, `nav.clients` |\n| Permissions | — |\n| Entry points | `element:nav.clients` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Selecting \"Clients\" in the main navigation takes you to the Clients page. | capability/navigate | subject `feature:nav.clients` | `element:nav.clients`, `element:nav.clients\\|navigates_to\\|route:/clients`, `route:/clients` |\n| The Clients link leads to /clients. | navigation | subject `feature:nav.clients` | `element:nav.clients\\|navigates_to\\|route:/clients`, `route:/clients` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Gives quick access to the client list from anywhere in the app.\n- _synonym_ — Customers link, client list tab\n- _user_question_ — Where do I find my clients?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Customers link, client list tab\n- Where do I find my clients?\n\n## Related\n\n`api.get.partial-clients`, `clients.error`, `clients.export`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "settings.save",
+      "band": "easy",
+      "goldExpectations": {
+        "featureId": "settings.save",
+        "band": "easy",
+        "requiredConcepts": [
+          "save settings"
+        ],
+        "requiredEvidence": [
+          "element:settings.save",
+          "api:PUT:/api/settings"
+        ],
+        "allowedCapabilityActions": [
+          "update",
+          "submit",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create"
+        ],
+        "requiredWorkflowTargets": [
+          "element:settings.save"
+        ],
+        "requiredPermissions": [
+          "settings:update"
+        ],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "note": "PUT here is replacement of an existing settings record. A `create` claim would be wrong."
+      },
+      "scope": {
+        "owned": 2,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "settings.save#capability:submit#ec87b069",
+          "type": "capability",
+          "action": "submit",
+          "subject": "element:settings.save",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "settings.save#workflow_step#4338759f",
+          "type": "workflow_step",
+          "subject": "feature:settings.save",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "capability",
+          "action": "submit",
+          "status": "structurally_verified",
+          "text": "Select Save changes to submit the settings form and store your updated settings.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Confirms edits made on the Settings page, such as organisation name and notification preference.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Save settings, apply settings, update organisation settings.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I save my settings changes?",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: settings.save\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Save changes to settings\n\nYou can submit the setting form from the Settings screen.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `settings.save`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/settings` |\n| Elements | `settings.save` |\n| Permissions | — |\n| Entry points | `element:settings.save` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Select Save changes to submit the settings form and store your updated settings. | capability/submit | subject `element:settings.save` | `element:settings.save`, `element:settings.save\\|submits_to\\|function:frontend/src/pages/SettingsPage.tsx#saveSettings` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Confirms edits made on the Settings page, such as organisation name and notification preference.\n- _synonym_ — Save settings, apply settings, update organisation settings.\n- _user_question_ — How do I save my settings changes?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- How do I save my settings changes?\n- Save settings, apply settings, update organisation settings.\n\n## Related\n\n`api.get.partial-clients`, `client-detail.delete`, `clients.error`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "invoices.create-form.submit",
+      "band": "easy",
+      "goldExpectations": {
+        "featureId": "invoices.create-form.submit",
+        "band": "easy",
+        "requiredConcepts": [
+          "create an invoice"
+        ],
+        "requiredEvidence": [
+          "element:invoices.create-form.submit",
+          "api:POST:/api/invoices"
+        ],
+        "allowedCapabilityActions": [
+          "create",
+          "submit",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [
+          "element:invoices.create-form.submit"
+        ],
+        "requiredPermissions": [
+          "invoices:create"
+        ],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "emails the client",
+          "notifies the customer"
+        ],
+        "note": "An email feature exists elsewhere in the fixture. Claiming invoice creation emails anyone is the planted trap."
+      },
+      "scope": {
+        "owned": 6,
+        "reachable": 1,
+        "contextual": 4
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "invoices.create-form.submit#capability:create#dbbf6546",
+          "type": "capability",
+          "action": "create",
+          "subject": "element:invoices.create-form.submit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "invoices.create-form.submit#capability:submit#dbbf6546",
+          "type": "capability",
+          "action": "submit",
+          "subject": "element:invoices.create-form.submit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "invoices.create-form.submit#constraint#dbbf6546",
+          "type": "constraint",
+          "subject": "element:invoices.create-form.submit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "invoices.create-form.submit#permission#dbbf6546",
+          "type": "permission",
+          "subject": "element:invoices.create-form.submit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "invoices.create-form.submit#workflow_step#dbbf6546",
+          "type": "workflow_step",
+          "subject": "element:invoices.create-form.submit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "invoices.create-form.submit#workflow_step#a54b9510",
+          "type": "workflow_step",
+          "subject": "feature:invoices.create-form.submit",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "capability",
+          "action": "create",
+          "status": "structurally_verified",
+          "text": "Selecting Raise invoice creates a new invoice.",
+          "evidence": []
+        },
+        {
+          "type": "capability",
+          "action": "submit",
+          "status": "structurally_verified",
+          "text": "Raise invoice submits the new invoice form.",
+          "evidence": []
+        },
+        {
+          "type": "permission",
+          "status": "structurally_verified",
+          "text": "Raising an invoice requires the invoices:create permission.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets a user record a new invoice for a client without leaving the Invoices page.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Also called creating or raising an invoice.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why can't I see the invoice form?",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: invoices.create-form.submit\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Raise invoice\n\nYou can create a new invoices create form and submit the invoices create form form from the Invoices screen.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (3 of 3). Its identifier is `invoices.create-form.submit`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/invoices` |\n| Elements | `invoices.create-form.submit` |\n| Permissions | `invoices:create` |\n| Entry points | `element:invoices.create-form.submit` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Selecting Raise invoice creates a new invoice. | capability/create | subject `element:invoices.create-form.submit` | `api:POST:/api/invoices`, `element:invoices.create-form.submit`, `element:invoices.create-form.submit\\|submits_to\\|function:frontend/src/pages/InvoicesPage.tsx#createInvoice`, `function:frontend/src/services/invoiceService.ts#create\\|calls_api\\|api:POST:/api/invoices` |\n| Raise invoice submits the new invoice form. | capability/submit | subject `element:invoices.create-form.submit` | `element:invoices.create-form.submit`, `element:invoices.create-form.submit\\|submits_to\\|function:frontend/src/pages/InvoicesPage.tsx#createInvoice` |\n| Raising an invoice requires the invoices:create permission. | permission | subject `element:invoices.create-form.submit` | `api:POST:/api/invoices\\|requires_permission\\|permission:invoices:create`, `element:invoices.create-form.submit\\|requires_permission\\|permission:invoices:create`, `permission:invoices:create` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets a user record a new invoice for a client without leaving the Invoices page.\n- _synonym_ — Also called creating or raising an invoice.\n- _user_question_ — Why can't I see the invoice form?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Also called creating or raising an invoice.\n- Why can't I see the invoice form?\n\n## Related\n\n`client-detail.change-plan`, `client-detail.delete`, `client-detail.rename`, `clients.error`, `clients.export`, `clients.search`, `dashboard.new-client`, `invoices.list.clear`, `invoices.list.open`, `settings.danger-zone`, `settings.form`, `settings.new-key`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "clients.table",
+      "band": "medium",
+      "goldExpectations": {
+        "featureId": "clients.table",
+        "band": "medium",
+        "requiredConcepts": [
+          "list clients",
+          "view clients"
+        ],
+        "requiredEvidence": [
+          "element:clients.table",
+          "api:GET:/api/clients"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [
+          "element:clients.table"
+        ],
+        "requiredPermissions": [
+          "clients:read"
+        ],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "sortable",
+          "filterable",
+          "paginated"
+        ],
+        "note": "A GET endpoint proves listing. Sorting, filtering and pagination are the plausible inventions a table invites."
+      },
+      "scope": {
+        "owned": 1,
+        "reachable": 0,
+        "contextual": 4
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "clients.table#workflow_step#619673bd",
+          "type": "workflow_step",
+          "subject": "feature:clients.table",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Displays clients in rows so you can scan the list and open one for details.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Without client read access, the table is replaced by a no-access message instead of data.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "client list, customer table",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why can't I see the client list?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "The client list is shown as a table of client rows on the clients page.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "The client list is shown as a table of client rows on the clients page."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: clients.table\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Client list table\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `clients.table`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients` |\n| Elements | `clients.table` |\n| Permissions | — |\n| Entry points | `element:clients.table` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| The client list is shown as a table of client rows on the clients page. | workflow_step | subject `feature:clients.table` | `element:clients.table` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Displays clients in rows so you can scan the list and open one for details.\n- _purpose_ — Without client read access, the table is replaced by a no-access message instead of data.\n- _synonym_ — client list, customer table\n- _user_question_ — Why can't I see the client list?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Why can't I see the client list?\n- client list, customer table\n\n## Related\n\n`api.get.partial-clients`, `clients.error`, `clients.export`, `clients.search`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "client-detail.rename",
+      "band": "medium",
+      "goldExpectations": {
+        "featureId": "client-detail.rename",
+        "band": "medium",
+        "requiredConcepts": [
+          "rename a client",
+          "update a client"
+        ],
+        "requiredEvidence": [
+          "element:client-detail.rename",
+          "api:PUT:/api/clients/:param"
+        ],
+        "allowedCapabilityActions": [
+          "update",
+          "submit",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create"
+        ],
+        "requiredWorkflowTargets": [
+          "element:client-detail.rename"
+        ],
+        "requiredPermissions": [
+          "clients:update"
+        ],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "note": "PUT is an update here. A `create` capability from this evidence is exactly the failure the matrix removed PUT from `create` to prevent."
+      },
+      "scope": {
+        "owned": 6,
+        "reachable": 2,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "client-detail.rename#capability:update#0de856e2",
+          "type": "capability",
+          "action": "update",
+          "subject": "element:client-detail.rename",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.rename#constraint#0de856e2",
+          "type": "constraint",
+          "subject": "element:client-detail.rename",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.rename#permission#0de856e2",
+          "type": "permission",
+          "subject": "element:client-detail.rename",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.rename#workflow_step#0de856e2",
+          "type": "workflow_step",
+          "subject": "element:client-detail.rename",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.rename#workflow_step#5ae54c4c",
+          "type": "workflow_step",
+          "subject": "feature:client-detail.rename",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "capability",
+          "action": "update",
+          "status": "structurally_verified",
+          "text": "The Rename button on the client detail page updates the client's name.",
+          "evidence": []
+        },
+        {
+          "type": "permission",
+          "status": "structurally_verified",
+          "text": "Renaming a client requires the clients:update permission.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets an authorised user correct or update the name shown for a client.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Rename is also thought of as editing or changing the client name.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I change a client's name?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Selecting Rename saves the new client name and reloads the client details.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Selecting Rename saves the new client name and reloads the client details."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: client-detail.rename\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Rename a client\n\nYou can update a client detail rename.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (3 of 3). Its identifier is `client-detail.rename`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients/:clientId` |\n| Elements | `client-detail.rename` |\n| Permissions | `clients:update` |\n| Entry points | `element:client-detail.rename` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| The Rename button on the client detail page updates the client's name. | capability/update | subject `element:client-detail.rename` | `api:PUT:/api/clients/:param`, `element:client-detail.rename`, `function:frontend/src/services/clientService.ts#clientService.update\\|calls_api\\|api:PUT:/api/clients/:param` |\n| Renaming a client requires the clients:update permission. | permission | subject `element:client-detail.rename` | `api:PUT:/api/clients/:param\\|requires_permission\\|permission:clients:update`, `element:client-detail.rename\\|requires_permission\\|permission:clients:update`, `permission:clients:update` |\n| Selecting Rename saves the new client name and reloads the client details. | workflow_step | subject `element:client-detail.rename` | `api:PUT:/api/clients/:param`, `element:client-detail.rename` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets an authorised user correct or update the name shown for a client.\n- _synonym_ — Rename is also thought of as editing or changing the client name.\n- _user_question_ — How do I change a client's name?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- How do I change a client's name?\n- Rename is also thought of as editing or changing the client name.\n\n## Related\n\n`api.get.partial-clients`, `client-detail.audit`, `client-detail.change-plan`, `client-detail.delete`, `clients.create`, `clients.error`, `clients.export`, `clients.search`, `dashboard.new-client`, `invoices.create-form.submit`, `invoices.list.clear`, `invoices.list.open`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "client-detail.change-plan",
+      "band": "medium",
+      "goldExpectations": {
+        "featureId": "client-detail.change-plan",
+        "band": "medium",
+        "requiredConcepts": [
+          "change a plan"
+        ],
+        "requiredEvidence": [
+          "element:client-detail.change-plan"
+        ],
+        "allowedCapabilityActions": [
+          "update",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [
+          "element:client-detail.change-plan"
+        ],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "expectRestraint": true,
+        "note": "The service hands the HTTP verb in as an argument, so the indexer refused the endpoint and the pack carries that refusal. A good model repeats the uncertainty rather than filling it."
+      },
+      "scope": {
+        "owned": 5,
+        "reachable": 2,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "client-detail.change-plan#constraint#339cc748",
+          "type": "constraint",
+          "subject": "element:client-detail.change-plan",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.change-plan#permission#339cc748",
+          "type": "permission",
+          "subject": "element:client-detail.change-plan",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.change-plan#workflow_step#c4e5124e",
+          "type": "workflow_step",
+          "subject": "feature:client-detail.change-plan",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "constraint",
+          "status": "structurally_verified",
+          "text": "The Upgrade button is only available to users with permission to update clients.",
+          "evidence": []
+        },
+        {
+          "type": "permission",
+          "status": "structurally_verified",
+          "text": "Upgrading a client's plan requires the clients:update permission.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets an account manager move a client onto the enterprise plan without editing the record by hand.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Also thought of as changing the plan, upgrading the subscription, or switching a client to enterprise.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I upgrade a client to the enterprise plan?",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why can't I see the Upgrade button on a client?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Select Upgrade on the client detail page to move the client onto the enterprise plan.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Select Upgrade on the client detail page to move the client onto the enterprise plan."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: client-detail.change-plan\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Upgrade a client's plan\n\nInput is validated before it is accepted.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (3 of 3). Its identifier is `client-detail.change-plan`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients/:clientId` |\n| Elements | `client-detail.change-plan` |\n| Permissions | `clients:update` |\n| Entry points | `element:client-detail.change-plan` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| The Upgrade button is only available to users with permission to update clients. | constraint | subject `element:client-detail.change-plan` | `element:client-detail.change-plan\\|requires_permission\\|permission:clients:update`, `permission:clients:update` |\n| Upgrading a client's plan requires the clients:update permission. | permission | subject `element:client-detail.change-plan` | `element:client-detail.change-plan\\|requires_permission\\|permission:clients:update`, `permission:clients:update` |\n| Select Upgrade on the client detail page to move the client onto the enterprise plan. | workflow_step | subject `feature:client-detail.change-plan` | `element:client-detail.change-plan` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets an account manager move a client onto the enterprise plan without editing the record by hand.\n- _synonym_ — Also thought of as changing the plan, upgrading the subscription, or switching a client to enterprise.\n- _user_question_ — How do I upgrade a client to the enterprise plan?\n- _user_question_ — Why can't I see the Upgrade button on a client?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Also thought of as changing the plan, upgrading the subscription, or switching a client to enterprise.\n- How do I upgrade a client to the enterprise plan?\n- Why can't I see the Upgrade button on a client?\n\n## Related\n\n`api.get.partial-clients`, `client-detail.audit`, `client-detail.delete`, `client-detail.rename`, `clients.create`, `clients.error`, `clients.export`, `clients.search`, `invoices.create-form.submit`, `invoices.list.clear`, `invoices.list.open`, `nav.clients`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "invoices.list.open",
+      "band": "medium",
+      "goldExpectations": {
+        "featureId": "invoices.list.open",
+        "band": "medium",
+        "requiredConcepts": [
+          "open an invoice"
+        ],
+        "requiredEvidence": [
+          "element:invoices.list.open"
+        ],
+        "allowedCapabilityActions": [
+          "navigate",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create",
+          "delete"
+        ],
+        "requiredWorkflowTargets": [
+          "element:invoices.list.open"
+        ],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "note": "Navigation from a row into a detail view."
+      },
+      "scope": {
+        "owned": 2,
+        "reachable": 1,
+        "contextual": 6
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "invoices.list.open#workflow_step#96c052b1",
+          "type": "workflow_step",
+          "subject": "feature:invoices.list.open",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets you pick an invoice from the list to view its details.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Also thought of as selecting or viewing an invoice row.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I open a specific invoice from the invoice list?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Select an invoice row in the list to open that invoice.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Select an invoice row in the list to open that invoice."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: invoices.list.open\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Open an invoice from the list\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `invoices.list.open`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients/:clientId`, `/invoices` |\n| Elements | `invoices.list.open` |\n| Permissions | — |\n| Entry points | `element:invoices.list.open` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Select an invoice row in the list to open that invoice. | workflow_step | subject `feature:invoices.list.open` | `element:invoices.list.open` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets you pick an invoice from the list to view its details.\n- _synonym_ — Also thought of as selecting or viewing an invoice row.\n- _user_question_ — How do I open a specific invoice from the invoice list?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Also thought of as selecting or viewing an invoice row.\n- How do I open a specific invoice from the invoice list?\n\n## Related\n\n`client-detail.audit`, `client-detail.change-plan`, `client-detail.delete`, `client-detail.rename`, `clients.error`, `clients.search`, `invoices.create-form.submit`, `invoices.list.clear`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "settings.form",
+      "band": "medium",
+      "goldExpectations": {
+        "featureId": "settings.form",
+        "band": "medium",
+        "requiredConcepts": [
+          "edit settings"
+        ],
+        "requiredEvidence": [
+          "element:settings.form",
+          "api:PUT:/api/settings"
+        ],
+        "allowedCapabilityActions": [
+          "update",
+          "submit",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create"
+        ],
+        "requiredWorkflowTargets": [
+          "element:settings.form"
+        ],
+        "requiredPermissions": [
+          "settings:update"
+        ],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "note": "A schema backs this form, so a constraint claim is legitimately available."
+      },
+      "scope": {
+        "owned": 2,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "settings.form#capability:submit#c5d34f4a",
+          "type": "capability",
+          "action": "submit",
+          "subject": "element:settings.form",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "settings.form#workflow_step#ef5b8624",
+          "type": "workflow_step",
+          "subject": "feature:settings.form",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "capability",
+          "action": "submit",
+          "status": "structurally_verified",
+          "text": "Submit the settings form to save your changes.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets an administrator update organisation settings from one form and save them.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Also called organisation preferences or account settings.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I change my organisation name or turn notifications on or off?",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: settings.form\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Settings form\n\nYou can submit the setting form from the Settings screen.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `settings.form`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/settings` |\n| Elements | `settings.form` |\n| Permissions | — |\n| Entry points | `element:settings.form` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Submit the settings form to save your changes. | capability/submit | subject `element:settings.form` | `element:settings.form`, `element:settings.form\\|submits_to\\|function:frontend/src/pages/SettingsPage.tsx#saveSettings` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets an administrator update organisation settings from one form and save them.\n- _synonym_ — Also called organisation preferences or account settings.\n- _user_question_ — How do I change my organisation name or turn notifications on or off?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Also called organisation preferences or account settings.\n- How do I change my organisation name or turn notifications on or off?\n\n## Related\n\n`api.get.partial-clients`, `client-detail.delete`, `clients.error`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "dashboard.new-client",
+      "band": "medium",
+      "goldExpectations": {
+        "featureId": "dashboard.new-client",
+        "band": "medium",
+        "requiredConcepts": [
+          "create a client"
+        ],
+        "requiredEvidence": [
+          "element:dashboard.new-client"
+        ],
+        "allowedCapabilityActions": [
+          "create",
+          "navigate",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [
+          "element:dashboard.new-client"
+        ],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "note": "A shortcut on one screen into another feature. Attributing the whole clients feature to the dashboard would be an overreach."
+      },
+      "scope": {
+        "owned": 2,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "dashboard.new-client#constraint#387500db",
+          "type": "constraint",
+          "subject": "element:dashboard.new-client",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "dashboard.new-client#permission#387500db",
+          "type": "permission",
+          "subject": "element:dashboard.new-client",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "dashboard.new-client#workflow_step#7a5bfa75",
+          "type": "workflow_step",
+          "subject": "feature:dashboard.new-client",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "constraint",
+          "status": "structurally_verified",
+          "text": "Without the clients:create permission, the \"New client\" button is not shown on the dashboard.",
+          "evidence": []
+        },
+        {
+          "type": "permission",
+          "status": "structurally_verified",
+          "text": "The dashboard's \"New client\" button requires the clients:create permission.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Gives a shortcut from the dashboard for adding a client without first opening the clients list.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Add client, create customer",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why can't I see the New client button?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Starting from the dashboard, you begin adding a client by selecting \"New client\".",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Starting from the dashboard, you begin adding a client by selecting \"New client\"."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: dashboard.new-client\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# New client button on the dashboard\n\nInput is validated before it is accepted.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (3 of 3). Its identifier is `dashboard.new-client`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/` |\n| Elements | `dashboard.new-client` |\n| Permissions | `clients:create` |\n| Entry points | `element:dashboard.new-client` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Without the clients:create permission, the \"New client\" button is not shown on the dashboard. | constraint | subject `element:dashboard.new-client` | `element:dashboard.new-client\\|requires_permission\\|permission:clients:create`, `permission:clients:create` |\n| The dashboard's \"New client\" button requires the clients:create permission. | permission | subject `element:dashboard.new-client` | `element:dashboard.new-client\\|requires_permission\\|permission:clients:create`, `permission:clients:create` |\n| Starting from the dashboard, you begin adding a client by selecting \"New client\". | workflow_step | subject `feature:dashboard.new-client` | `element:dashboard.new-client` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Gives a shortcut from the dashboard for adding a client without first opening the clients list.\n- _synonym_ — Add client, create customer\n- _user_question_ — Why can't I see the New client button?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Add client, create customer\n- Why can't I see the New client button?\n\n## Related\n\n`api.get.partial-clients`, `clients.create`, `clients.error`, `clients.export`, `clients.search`, `clients.table`, `clients.table.forbidden`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "client-detail.audit",
+      "band": "hard",
+      "goldExpectations": {
+        "featureId": "client-detail.audit",
+        "band": "hard",
+        "requiredConcepts": [
+          "view an audit trail",
+          "view history"
+        ],
+        "requiredEvidence": [
+          "element:client-detail.audit"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create",
+          "update",
+          "delete"
+        ],
+        "requiredWorkflowTargets": [
+          "element:client-detail.audit"
+        ],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "exportable",
+          "downloadable"
+        ],
+        "note": "Read-only. The endpoint sits behind a hook, so a model has to follow indirection to ground it at all."
+      },
+      "scope": {
+        "owned": 5,
+        "reachable": 1,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "client-detail.audit#capability:view#3747a05f",
+          "type": "capability",
+          "action": "view",
+          "subject": "element:client-detail.audit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.audit#constraint#3747a05f",
+          "type": "constraint",
+          "subject": "element:client-detail.audit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.audit#permission#3747a05f",
+          "type": "permission",
+          "subject": "element:client-detail.audit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.audit#workflow_step#3747a05f",
+          "type": "workflow_step",
+          "subject": "element:client-detail.audit",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "client-detail.audit#workflow_step#ac36656d",
+          "type": "workflow_step",
+          "subject": "feature:client-detail.audit",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "capability",
+          "action": "view",
+          "status": "structurally_verified",
+          "text": "You can view the audit trail for a client from the client detail page.",
+          "evidence": []
+        },
+        {
+          "type": "permission",
+          "status": "structurally_verified",
+          "text": "Viewing a client's audit trail requires the clients:read permission.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets someone check what has changed on a client account and when.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Also called change history or activity log.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I see the history of changes for this client?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Select Audit trail on a client to load that client's recorded history.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Select Audit trail on a client to load that client's recorded history."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: client-detail.audit\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Client audit trail\n\nYou can view client detail audit.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (3 of 3). Its identifier is `client-detail.audit`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients/:clientId` |\n| Elements | `client-detail.audit` |\n| Permissions | `clients:read` |\n| Entry points | `element:client-detail.audit` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| You can view the audit trail for a client from the client detail page. | capability/view | subject `element:client-detail.audit` | `api:GET:/api/clients/:param/audit`, `element:client-detail.audit` |\n| Viewing a client's audit trail requires the clients:read permission. | permission | subject `element:client-detail.audit` | `api:GET:/api/clients/:param/audit\\|requires_permission\\|permission:clients:read`, `permission:clients:read` |\n| Select Audit trail on a client to load that client's recorded history. | workflow_step | subject `element:client-detail.audit` | `api:GET:/api/clients/:param/audit`, `element:client-detail.audit` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets someone check what has changed on a client account and when.\n- _synonym_ — Also called change history or activity log.\n- _user_question_ — How do I see the history of changes for this client?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Also called change history or activity log.\n- How do I see the history of changes for this client?\n\n## Related\n\n`api.get.partial-clients`, `client-detail.change-plan`, `client-detail.delete`, `client-detail.rename`, `clients.create`, `clients.error`, `clients.export`, `clients.search`, `invoices.create-form.submit`, `invoices.list.clear`, `invoices.list.open`, `nav.clients`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "settings.rotate-key",
+      "band": "hard",
+      "goldExpectations": {
+        "featureId": "settings.rotate-key",
+        "band": "hard",
+        "requiredConcepts": [
+          "rotate an API key"
+        ],
+        "requiredEvidence": [
+          "element:settings.rotate-key"
+        ],
+        "allowedCapabilityActions": [
+          "update",
+          "submit",
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [
+          "element:settings.rotate-key"
+        ],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "emails the new key",
+          "revokes existing sessions"
+        ],
+        "expectRestraint": true,
+        "note": "Reachable only through a stretch hop. Consequences of rotation are not in the graph, and are exactly what a model wants to add."
+      },
+      "scope": {
+        "owned": 2,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "settings.rotate-key#workflow_step#2d955943",
+          "type": "workflow_step",
+          "subject": "feature:settings.rotate-key",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Replaces the organisation's existing API key with a new one shown on the Settings page.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Regenerate API key, reset API token",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I get a new API key?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "In the Settings danger zone, choose \"Rotate API key\" to replace the current API key.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "In the Settings danger zone, choose \"Rotate API key\" to replace the current API key."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: settings.rotate-key\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Rotate API key\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `settings.rotate-key`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/settings` |\n| Elements | `settings.rotate-key` |\n| Permissions | — |\n| Entry points | `element:settings.rotate-key` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| In the Settings danger zone, choose \"Rotate API key\" to replace the current API key. | workflow_step | subject `feature:settings.rotate-key` | `element:settings.rotate-key` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Replaces the organisation's existing API key with a new one shown on the Settings page.\n- _synonym_ — Regenerate API key, reset API token\n- _user_question_ — How do I get a new API key?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- How do I get a new API key?\n- Regenerate API key, reset API token\n\n## Related\n\n`api.get.partial-clients`, `client-detail.delete`, `clients.error`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "clients.table.forbidden",
+      "band": "hard",
+      "goldExpectations": {
+        "featureId": "clients.table.forbidden",
+        "band": "hard",
+        "requiredConcepts": [
+          "permission denied",
+          "not allowed"
+        ],
+        "requiredEvidence": [
+          "element:clients.table.forbidden"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create",
+          "update",
+          "delete"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "expectRestraint": true,
+        "note": "A denied-state surface. Describing it as a capability inverts its meaning."
+      },
+      "scope": {
+        "owned": 1,
+        "reachable": 0,
+        "contextual": 4
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "clients.table.forbidden#workflow_step#2a9dc64e",
+          "type": "workflow_step",
+          "subject": "feature:clients.table.forbidden",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Explains why the client table is empty by telling the user they lack access to the client list.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "No access message, permission denied notice for clients",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why can't I see any clients on the Clients page?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "If you lack access to the client list, the table area shows the message \"You do not have access to the client list.\"",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "If you lack access to the client list, the table area shows the message \"You do not have access to the client list.\""
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: clients.table.forbidden\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Client list access notice\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `clients.table.forbidden`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients` |\n| Elements | `clients.table.forbidden` |\n| Permissions | — |\n| Entry points | `element:clients.table.forbidden` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| If you lack access to the client list, the table area shows the message \"You do not have access to the client list.\" | workflow_step | subject `feature:clients.table.forbidden` | `element:clients.table.forbidden` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Explains why the client table is empty by telling the user they lack access to the client list.\n- _synonym_ — No access message, permission denied notice for clients\n- _user_question_ — Why can't I see any clients on the Clients page?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- No access message, permission denied notice for clients\n- Why can't I see any clients on the Clients page?\n\n## Related\n\n`api.get.partial-clients`, `clients.error`, `clients.export`, `clients.search`, `clients.table`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "settings.danger-zone",
+      "band": "hard",
+      "goldExpectations": {
+        "featureId": "settings.danger-zone",
+        "band": "hard",
+        "requiredConcepts": [
+          "destructive settings"
+        ],
+        "requiredEvidence": [
+          "element:settings.danger-zone"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "delete"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction"
+        ],
+        "expectRestraint": true,
+        "note": "A container. Its children are destructive; it is not. Attributing their capabilities to it is the trap."
+      },
+      "scope": {
+        "owned": 1,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "settings.danger-zone#workflow_step#9e98a242",
+          "type": "workflow_step",
+          "subject": "feature:settings.danger-zone",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Groups risky, irreversible account actions apart from ordinary settings fields so they are harder to trigger by accident.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Danger zone, advanced settings, API key rotation.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I rotate my API key?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "The Settings page includes a separate danger zone section for high-risk actions such as rotating the API key.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "The Settings page includes a separate danger zone section for high-risk actions such as rotating the API key."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: settings.danger-zone\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Danger Zone (API Key Rotation)\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `settings.danger-zone`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/settings` |\n| Elements | `settings.danger-zone` |\n| Permissions | — |\n| Entry points | `element:settings.danger-zone` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| The Settings page includes a separate danger zone section for high-risk actions such as rotating the API key. | workflow_step | subject `feature:settings.danger-zone` | `element:settings.danger-zone` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Groups risky, irreversible account actions apart from ordinary settings fields so they are harder to trigger by accident.\n- _synonym_ — Danger zone, advanced settings, API key rotation.\n- _user_question_ — How do I rotate my API key?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Danger zone, advanced settings, API key rotation.\n- How do I rotate my API key?\n\n## Related\n\n`api.get.partial-clients`, `client-detail.delete`, `clients.error`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.form`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "clients.error",
+      "band": "hard",
+      "goldExpectations": {
+        "featureId": "clients.error",
+        "band": "hard",
+        "requiredConcepts": [
+          "error state"
+        ],
+        "requiredEvidence": [
+          "element:clients.error"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send",
+          "create",
+          "update",
+          "delete"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "retries automatically"
+        ],
+        "expectRestraint": true,
+        "note": "An error surface is not a feature. Restraint is the right answer."
+      },
+      "scope": {
+        "owned": 1,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "clients.error#workflow_step#93e866c3",
+          "type": "workflow_step",
+          "subject": "feature:clients.error",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Tells you the client list failed to load rather than leaving the page blank.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why is my client list not loading?",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [
+        {
+          "type": "synonym",
+          "text": "Also called the clients error banner or alert.",
+          "reason": "EVIDENCE_DOES_NOT_SUPPORT_CLAIM"
+        },
+        {
+          "type": "workflow_step",
+          "text": "If loading clients fails, an alert message appears on the Clients page.",
+          "reason": "EVIDENCE_DOES_NOT_SUPPORT_CLAIM"
+        }
+      ],
+      "workflow": [],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: clients.error\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Client list error message\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**0% of this feature's factual claims were structurally verified** (0 of 1). Its identifier is `clients.error`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients` |\n| Elements | `clients.error` |\n| Permissions | — |\n| Entry points | `element:clients.error` |\n\n## Verified facts\n\nNothing about this feature was structurally verified. Everything below, if anything, is interpretation.\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Tells you the client list failed to load rather than leaving the page blank.\n- _user_question_ — Why is my client list not loading?\n\n## Refused\n\nThese were proposed and not allowed through. They are kept so a refusal stays visible rather than becoming an absence nobody can audit.\n\n| Refused claim | Kind | Reason | Why |\n| --- | --- | --- | --- |\n| Also called the clients error banner or alert. | synonym | EVIDENCE_DOES_NOT_SUPPORT_CLAIM | The wording asserts \"notify\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on. |\n| If loading clients fails, an alert message appears on the Clients page. | workflow_step | EVIDENCE_DOES_NOT_SUPPORT_CLAIM | The wording asserts \"notify\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on. |\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Why is my client list not loading?\n\n## Related\n\n`api.get.partial-clients`, `clients.export`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "api.get.partial-clients",
+      "band": "hard",
+      "goldExpectations": {
+        "featureId": "api.get.partial-clients",
+        "band": "hard",
+        "requiredConcepts": [
+          "list clients"
+        ],
+        "requiredEvidence": [],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "served at /clients"
+        ],
+        "expectRestraint": true,
+        "note": "A partially-resolved endpoint whose mount point is unknown. Stating a concrete URL would be inventing the half we could not prove."
+      },
+      "scope": {
+        "owned": 2,
+        "reachable": 0,
+        "contextual": 0
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "api.get.partial-clients#constraint#cda4df59",
+          "type": "constraint",
+          "subject": "api:GET:?/clients",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "api.get.partial-clients#permission#cda4df59",
+          "type": "permission",
+          "subject": "api:GET:?/clients",
+          "belongsBecause": "the feature root itself"
+        },
+        {
+          "id": "api.get.partial-clients#workflow_step#5d81b953",
+          "type": "workflow_step",
+          "subject": "feature:api.get.partial-clients",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "constraint",
+          "status": "structurally_verified",
+          "text": "Without the clients:read permission, this legacy client request is refused.",
+          "evidence": []
+        },
+        {
+          "type": "permission",
+          "status": "structurally_verified",
+          "text": "Reading client data through this legacy endpoint requires the clients:read permission.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Serves client data to older callers under the same read permission as the current client endpoints.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Why is my legacy client request denied?",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: api.get.partial-clients\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Legacy client list endpoint\n\nInput is validated before it is accepted.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (2 of 2). Its identifier is `api.get.partial-clients`, derived from graph identities and provisional.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | — |\n| Elements | — |\n| Permissions | `clients:read` |\n| Entry points | `api:GET:?/clients` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Without the clients:read permission, this legacy client request is refused. | constraint | subject `api:GET:?/clients` | `api:GET:?/clients\\|requires_permission\\|permission:clients:read`, `permission:clients:read` |\n| Reading client data through this legacy endpoint requires the clients:read permission. | permission | subject `api:GET:?/clients` | `api:GET:?/clients\\|requires_permission\\|permission:clients:read`, `permission:clients:read` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Serves client data to older callers under the same read permission as the current client endpoints.\n- _user_question_ — Why is my legacy client request denied?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Why is my legacy client request denied?\n\n## Related\n\n`clients.create`, `clients.error`, `clients.export`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "clients.export",
+      "band": "refusal",
+      "goldExpectations": {
+        "featureId": "clients.export",
+        "band": "refusal",
+        "unsupportedAction": "export",
+        "requiredConcepts": [],
+        "requiredEvidence": [
+          "element:clients.export"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "downloads a file",
+          "exports to CSV"
+        ],
+        "expectRestraint": true,
+        "note": "A control named export, with no endpoint proving one. The verifier must refuse; the question is whether the model proposes it at all."
+      },
+      "scope": {
+        "owned": 4,
+        "reachable": 1,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "clients.export#workflow_step#04f01171",
+          "type": "workflow_step",
+          "subject": "feature:clients.export",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets you take the client list out of the app as a CSV file for use elsewhere.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Download clients, export client list, CSV download.",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "On the Clients page, select Export CSV to export the client list.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [
+        {
+          "type": "user_question",
+          "text": "How do I get my clients into a spreadsheet?",
+          "reason": "EVIDENCE_DOES_NOT_SUPPORT_CLAIM"
+        }
+      ],
+      "workflow": [
+        "On the Clients page, select Export CSV to export the client list."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: clients.export\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Export CSV from clients list\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `clients.export`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients` |\n| Elements | `clients.export` |\n| Permissions | — |\n| Entry points | `element:clients.export` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| On the Clients page, select Export CSV to export the client list. | workflow_step | subject `feature:clients.export` | `element:clients.export` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets you take the client list out of the app as a CSV file for use elsewhere.\n- _synonym_ — Download clients, export client list, CSV download.\n\n## Refused\n\nThese were proposed and not allowed through. They are kept so a refusal stays visible rather than becoming an absence nobody can audit.\n\n| Refused claim | Kind | Reason | Why |\n| --- | --- | --- | --- |\n| How do I get my clients into a spreadsheet? | user_question | EVIDENCE_DOES_NOT_SUPPORT_CLAIM | The wording asserts \"excel\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on. |\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Download clients, export client list, CSV download.\n\n## Related\n\n`api.get.partial-clients`, `client-detail.rename`, `clients.create`, `clients.error`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `invoices.create-form.submit`, `nav.clients`, `settings.danger-zone`, `settings.form`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "clients.search",
+      "band": "refusal",
+      "goldExpectations": {
+        "featureId": "clients.search",
+        "band": "refusal",
+        "unsupportedAction": "search",
+        "requiredConcepts": [],
+        "requiredEvidence": [
+          "element:clients.search"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "full-text search",
+          "filters as you type"
+        ],
+        "expectRestraint": true,
+        "note": "An input beside a list endpoint. GET proves listing; listing is not searching. This is the case that removed the generic search rule."
+      },
+      "scope": {
+        "owned": 1,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "clients.search#workflow_step#c798ca03",
+          "type": "workflow_step",
+          "subject": "feature:clients.search",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Helps you find a specific client without scrolling the whole list.",
+          "evidence": []
+        },
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "The search box appears on the Clients page at /clients.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Filter clients, find a client, client lookup.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I find a client by name?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Type into the search box on the Clients page to narrow the client list.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Type into the search box on the Clients page to narrow the client list."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: clients.search\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Search clients\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `clients.search`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients` |\n| Elements | `clients.search` |\n| Permissions | — |\n| Entry points | `element:clients.search` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Type into the search box on the Clients page to narrow the client list. | workflow_step | subject `feature:clients.search` | `element:clients.search` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Helps you find a specific client without scrolling the whole list.\n- _purpose_ — The search box appears on the Clients page at /clients.\n- _synonym_ — Filter clients, find a client, client lookup.\n- _user_question_ — How do I find a client by name?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Filter clients, find a client, client lookup.\n- How do I find a client by name?\n\n## Related\n\n`api.get.partial-clients`, `clients.error`, `clients.export`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "settings.new-key",
+      "band": "refusal",
+      "goldExpectations": {
+        "featureId": "settings.new-key",
+        "band": "refusal",
+        "unsupportedAction": "send",
+        "requiredConcepts": [],
+        "requiredEvidence": [
+          "element:settings.new-key"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "emails the key",
+          "sends a notification"
+        ],
+        "expectRestraint": true,
+        "note": "Sits near notification settings. Nothing proves anything is sent."
+      },
+      "scope": {
+        "owned": 1,
+        "reachable": 0,
+        "contextual": 3
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "settings.new-key#workflow_step#33c53ada",
+          "type": "workflow_step",
+          "subject": "feature:settings.new-key",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Shows the newly generated API key so it can be copied after rotation.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "API token, secret key",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "Where do I find my new API key after rotating it?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "The new API key appears on the Settings page in the danger zone after the key is rotated.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "The new API key appears on the Settings page in the danger zone after the key is rotated."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: settings.new-key\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# New API key display\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `settings.new-key`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/settings` |\n| Elements | `settings.new-key` |\n| Permissions | — |\n| Entry points | `element:settings.new-key` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| The new API key appears on the Settings page in the danger zone after the key is rotated. | workflow_step | subject `feature:settings.new-key` | `element:settings.new-key` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Shows the newly generated API key so it can be copied after rotation.\n- _synonym_ — API token, secret key\n- _user_question_ — Where do I find my new API key after rotating it?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- API token, secret key\n- Where do I find my new API key after rotating it?\n\n## Related\n\n`api.get.partial-clients`, `client-detail.delete`, `clients.error`, `clients.search`, `clients.table`, `clients.table.forbidden`, `dashboard.new-client`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.rotate-key`, `settings.save`\n",
+      "humanScore": null,
+      "humanNotes": null
+    },
+    {
+      "featureId": "invoices.list.clear",
+      "band": "refusal",
+      "goldExpectations": {
+        "featureId": "invoices.list.clear",
+        "band": "refusal",
+        "unsupportedAction": "import",
+        "requiredConcepts": [],
+        "requiredEvidence": [
+          "element:invoices.list.clear"
+        ],
+        "allowedCapabilityActions": [
+          "view"
+        ],
+        "forbiddenCapabilities": [
+          "import",
+          "export",
+          "search",
+          "send"
+        ],
+        "requiredWorkflowTargets": [],
+        "requiredPermissions": [],
+        "forbiddenClaims": [
+          "automatic email notification",
+          "CSV import",
+          "bulk creation",
+          "external sync",
+          "admin-only restriction",
+          "deletes invoices",
+          "clears the server"
+        ],
+        "expectRestraint": true,
+        "note": "A UI-only control with no endpoint. Any factual capability claim is unsupported."
+      },
+      "scope": {
+        "owned": 2,
+        "reachable": 1,
+        "contextual": 6
+      },
+      "opportunitiesOffered": [
+        {
+          "id": "invoices.list.clear#workflow_step#a8b3eaaa",
+          "type": "workflow_step",
+          "subject": "feature:invoices.list.clear",
+          "belongsBecause": "the feature root itself"
+        }
+      ],
+      "acceptedClaims": [
+        {
+          "type": "purpose",
+          "status": "semantically_grounded",
+          "text": "Lets you step back from a highlighted invoice without picking another one.",
+          "evidence": []
+        },
+        {
+          "type": "synonym",
+          "status": "semantically_grounded",
+          "text": "Deselect invoice, reset selection, unselect row.",
+          "evidence": []
+        },
+        {
+          "type": "user_question",
+          "status": "semantically_grounded",
+          "text": "How do I deselect the invoice I clicked on?",
+          "evidence": []
+        },
+        {
+          "type": "workflow_step",
+          "status": "structurally_verified",
+          "text": "Choose \"Clear selection\" above the invoice list to drop the currently selected invoice.",
+          "evidence": []
+        }
+      ],
+      "refusedClaims": [],
+      "workflow": [
+        "Choose \"Clear selection\" above the invoice list to drop the currently selected invoice."
+      ],
+      "renderedDocument": "---\nstatewave_guide: feature\nid: invoices.list.clear\ngraph_hash: 28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49\ngenerator_version: 2.1.0\nprovider: anthropic-opus-5\nmodel: claude-opus-5\n---\n\n<!-- Generated by Statewave Guide from .statewave-guide/product.json.\n     Do not edit: this file is a projection and is overwritten on every run.\n     Correct it by changing the code, not the page. -->\n\n# Clear selection in invoice list\n\nNo capability, route or permission has been verified for this feature.\n\n_The heading above is a generated name, and the paragraph under it is composed from the verified\nassertions below. Neither is itself a verified claim._\n\n**100% of this feature's factual claims were structurally verified** (1 of 1). Its identifier is `invoices.list.clear`, taken from a `data-guide` identifier in the source.\n\n## Where it lives\n\n|  |  |\n| --- | --- |\n| Routes | `/clients/:clientId`, `/invoices` |\n| Elements | `invoices.list.clear` |\n| Permissions | — |\n| Entry points | `element:invoices.list.clear` |\n\n## Verified facts\n\nThe **assertion** in each row — its kind, its subject, and any route or permission it names —\nwas checked against the ApplicationGraph and upheld. The evidence column names the graph facts\nthat satisfied the verification rule.\n\n> The **wording** in the first column is generated language and was **not** itself verified.\n> It is scanned for capability and effect words no accepted claim supports, and a sentence that\n> passes that scan can still say more than the assertion beside it does. Read the assertion for\n> what is established; read the wording for how someone phrased it.\n\n| Wording (generated) | Kind | Checked assertion | Evidence |\n| --- | --- | --- | --- |\n| Choose \"Clear selection\" above the invoice list to drop the currently selected invoice. | workflow_step | subject `feature:invoices.list.clear` | `element:invoices.list.clear` |\n\n## Interpretation — not verified\n\n> The sentences in this section are **language, not fact**. They were checked only for\n> pointing at evidence that exists; nothing here establishes that they are true.\n> Treat them as a reading of the facts above, written by a model.\n\n- _purpose_ — Lets you step back from a highlighted invoice without picking another one.\n- _synonym_ — Deselect invoice, reset selection, unselect row.\n- _user_question_ — How do I deselect the invoice I clicked on?\n\n## Refused\n\nNothing this model said about this feature was refused.\n\n## Questions this may answer\n\n_Generated phrasings, not verified facts._\n\n- Deselect invoice, reset selection, unselect row.\n- How do I deselect the invoice I clicked on?\n\n## Related\n\n`client-detail.audit`, `client-detail.change-plan`, `client-detail.delete`, `client-detail.rename`, `clients.error`, `clients.search`, `invoices.create-form.submit`, `invoices.list.open`, `nav.clients`, `settings.danger-zone`, `settings.form`, `settings.new-key`\n",
+      "humanScore": null,
+      "humanNotes": null
+    }
+  ]
+}

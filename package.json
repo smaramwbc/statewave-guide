@@ -32,7 +32,9 @@
     "test:indexer-perf": "node scripts/indexer-perf.mjs",
     "test:indexer-quality:diff": "node scripts/benchmark-diff.mjs docs/benchmarks/pre-fix.json docs/benchmarks/post-fix.json",
     "test:semantic-quality": "node scripts/semantic-quality.mjs",
-    "benchmark:providers": "node scripts/benchmark-providers.mjs"
+    "benchmark:providers": "node scripts/benchmark-providers.mjs",
+    "benchmark:human-review": "node scripts/human-review-import.mjs",
+    "benchmark:build-human-review": "node scripts/build-human-review.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

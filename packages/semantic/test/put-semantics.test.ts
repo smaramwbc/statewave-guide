@@ -188,7 +188,9 @@ describe('search is unsupported until an application proves it', () => {
 
   it('lets a registered domain verifier support search on explicit evidence', () => {
     // Proves the registry can carry `capability:search` later, once an
-    // application has a real search signal to point at.
+    // application has a real search signal to point at. Filed under the search
+    // box, which owns `GET /clients` through its own handler, so the only thing
+    // standing between the claim and acceptance is the missing rule.
     const registry = createClaimVerifierRegistry();
     registry.register({
       type: 'capability',
@@ -204,14 +206,14 @@ describe('search is unsupported until an application proves it', () => {
     });
 
     const result = verifyFixture({
-      featureId: 'clients.list',
+      featureId: 'clients.search',
       registry,
       factualClaims: [
         factual({
           type: 'capability',
           action: 'search',
-          subjectRef: ID.list,
-          targets: [ID.list, ID.get],
+          subjectRef: ID.search,
+          targets: [ID.search, ID.get],
         }),
       ],
     });
