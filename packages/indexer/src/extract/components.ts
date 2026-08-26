@@ -7,6 +7,11 @@
  * shares the convention, and it keeps the indexer working on a checkout whose
  * `node_modules` is empty.
  *
+ * A component wrapped in a call is still a component: `forwardRef(function
+ * TextField(…))`, `memo(() => …)` and `observer(…)` all declare one. The
+ * wrapper is not inspected or named — only the function argument that contains
+ * the JSX is, which is why the rule holds for wrappers nobody has written yet.
+ *
  * Only top-level declarations are considered. A component defined inside
  * another function is an implementation detail of its parent, and hoisting it
  * into the graph would give it an id that no import could ever resolve.
@@ -17,6 +22,7 @@
 import { Node } from 'ts-morph';
 import type { SourceFile } from 'ts-morph';
 import type { ComponentNode } from '../graph.js';
+import { componentId } from '../node-id.js';
 import { nodeProvenance } from '../provenance.js';
 import { containsJsx } from './jsx.js';
 
@@ -51,7 +57,7 @@ export function extractComponents(
     body: Node,
   ): void => {
     if (!isPascalCase(name) || !containsJsx(body)) return;
-    const id = `${relativePath}#${name}`;
+    const id = componentId(relativePath, name);
     if (seen.has(id)) return;
     seen.add(id);
     components.push({
@@ -61,7 +67,6 @@ export function extractComponents(
         name,
         exported,
         isDefaultExport,
-        elementIds: [],
         provenance: nodeProvenance(declaration, relativePath, name),
       },
       functionStart: body.getStart(),
@@ -75,19 +80,39 @@ export function extractComponents(
     add(name, declaration.isExported(), declaration.isDefaultExport(), declaration, declaration);
   }
 
-  // `const Clients = () => …` and `const Settings = function () { … }`
+  // `const Clients = () => …`, `const Settings = function () { … }` and
+  // `const TextField = forwardRef(function TextField(…) { … })`.
   for (const declaration of sourceFile.getVariableDeclarations()) {
     const initializer = declaration.getInitializer();
     if (!initializer) continue;
-    if (!Node.isArrowFunction(initializer) && !Node.isFunctionExpression(initializer)) continue;
+    const body = functionBody(initializer);
+    if (!body) continue;
     add(
       declaration.getName(),
       declaration.isExported(),
       declaration.isDefaultExport(),
       declaration,
-      initializer,
+      body,
     );
   }
 
   return components;
+}
+
+/**
+ * The function an initialiser declares, unwrapping one layer of wrapper call.
+ *
+ * Only one layer, and only a function passed as a direct argument: following
+ * further would mean guessing which of an arbitrary expression's parts is the
+ * component.
+ */
+function functionBody(initializer: Node): Node | undefined {
+  if (Node.isArrowFunction(initializer) || Node.isFunctionExpression(initializer)) {
+    return initializer;
+  }
+  if (!Node.isCallExpression(initializer)) return undefined;
+  for (const argument of initializer.getArguments()) {
+    if (Node.isArrowFunction(argument) || Node.isFunctionExpression(argument)) return argument;
+  }
+  return undefined;
 }

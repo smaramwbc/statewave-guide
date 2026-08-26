@@ -7,6 +7,7 @@ import { Clients } from './pages/Clients';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
 import { GuideDemoPanel } from './guide/GuideDemoPanel';
+import { Inspector } from './guide/Inspector';
 import { guide } from './guide/runtime';
 
 /**
@@ -46,6 +47,7 @@ export function App() {
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
+      <Inspector />
       <GuideDemoPanel />
     </StatewaveGuideProvider>
   );

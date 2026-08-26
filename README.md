@@ -19,15 +19,19 @@ Explain • Navigate • Highlight • Guide • Act
 
 > ### ⚠️ Early development
 >
-> This is the **Day 0 foundation**: clean architecture, strong types, and a
-> working end-to-end path from a `data-guide` attribute in source code to a
-> spotlight on the live DOM.
+> **Day 0** proved the first loop: a `data-guide` attribute in source code →
+> application graph → runtime registry → a spotlight on the live DOM.
 >
-> There is **no AI in this repository yet** — no model SDK, no prompts, no chat.
-> There is no Statewave dependency yet either. What exists is the substrate those
-> things will be built on. See the [roadmap](#roadmap) for what is coming and the
-> [what is not built yet](#what-is-not-built-yet) section for what is honestly
-> missing.
+> **Day 1** is the second loop: understanding what a feature _does_. The indexer
+> now resolves symbols across files, builds a call graph, and joins the frontend
+> to the backend at the endpoint they share — so a button can be traced to the
+> controller that answers it.
+>
+> There is **no AI in this repository yet** — no model SDK, no prompts, no chat,
+> no embeddings. There is no Statewave dependency yet either. That ordering is
+> deliberate and the reasoning is in
+> [ADR 0004](docs/adr/0004-deterministic-code-understanding-before-ai-enrichment.md).
+> See [what is not built yet](#what-is-not-built-yet) for what is honestly missing.
 
 ---
 
@@ -106,11 +110,12 @@ hands out an `HTMLElement`; the highlight engine is the only code that ever hold
 one. An agent's entire vocabulary is the set of registered element ids and the set
 of registered action names.
 
-(One seam, stated plainly: `createElementRegistry()` is exported for hosts wiring
-the engine themselves, and what it returns does structurally carry a node
-resolver. That is reachable only by host code which already has `document` — never
-through a hook, the provider, or anything an agent can name. See
-[docs/architecture.md](docs/architecture.md#the-dom-boundary).)
+The node resolver is private at _runtime_, not merely absent from the types: it
+lives behind a module-private `WeakMap`, so the object `createElementRegistry()`
+returns does not carry it at all — not as an own property, not on its prototype,
+and not anywhere React's fiber tree can reach. That is verified by test rather
+than asserted by documentation. See
+[ADR 0002](docs/adr/0002-private-dom-node-resolver.md).
 
 Actions also declare how consequential they are:
 
@@ -122,6 +127,92 @@ Actions also declare how consequential they are:
 
 Day 0 enforces the classification. The confirmation UI is roadmap work — see
 [docs/architecture.md](docs/architecture.md#actions).
+
+---
+
+## Knowing where a button is, versus knowing what it does
+
+A product tour knows there is a control at a position. That is not the same as
+understanding the product.
+
+Take a button called **New Client**. What a guide actually needs to know is:
+
+```
+element:clients.create
+    ↓ invokes        openCreateClient
+    ↓ opens          NewClientDialog
+    ↓ renders        ClientForm
+    ↓ submits_to     submitClient
+    ↓ calls          clientService.create
+    ↓ calls_api      POST /api/clients
+    ↓ invokes        backend createClient
+```
+
+The indexer reconstructs that chain from source alone. No manual, no annotations
+beyond the one `data-guide` attribute, no model.
+
+Two rules make it trustworthy.
+
+**The DOM is runtime evidence. The source graph is product knowledge.** The React
+registry knows what is mounted and visible right now — a fact about this browser
+tab. The source graph knows what the application can do at all. Neither
+substitutes for the other.
+
+**Unknown is better than wrong.** Every relationship carries evidence: a file, a
+line, a symbol, and for an inference, the named rule that produced it. If static
+analysis cannot prove a link, the graph does not record one — it records a
+diagnostic saying why. This is enforced rather than documented:
+`createRelationship()` throws when handed an empty evidence list.
+
+Confidence is one of exactly three values — `1.0` direct syntax, `0.95` resolved
+symbol, `0.9` named static inference. There is no 0.5 tier: if we would have to
+write one, we write a diagnostic instead. Full catalogue, including what each
+rule _refuses_ to fire on, in [docs/confidence.md](docs/confidence.md).
+
+So the indexer will **not**:
+
+- link `CreateClientButton` to `POST /clients` because the names look alike
+- resolve `api[method](path)` where the method is a runtime value
+- map `modal.open('create-client')` to a component without a real registry
+- pick between two candidate declarations when resolution is ambiguous
+
+Each of those produces a diagnostic, so what the system does not know is
+observable rather than silently filled in. The full catalogue — every pattern we
+refuse, why the obvious inference is wrong, and the diagnostic emitted instead —
+is in [docs/refusals.md](docs/refusals.md).
+
+### One graph, both tiers
+
+A frontend HTTP call and a backend route registration for the same normalised
+method and path become **one node**:
+
+```
+clientService.create  --calls_api-->  api:POST:/api/clients  --invokes-->  createClient
+```
+
+The endpoint is the join because it is the only thing both tiers name
+independently. Joining on anything else means matching on names, and names are
+evidence of intent, not evidence of connection —
+[ADR 0005](docs/adr/0005-unified-frontend-backend-application-graph.md).
+
+A useful side effect: an endpoint seen on only one side is a finding. A
+`calls_api` with no route is a dead client call or an unresolved prefix; a route
+nothing calls is dead server code. Both are reported in the graph health output.
+
+### Asking the graph
+
+```ts
+import { createGraphQuery } from '@statewavedev/guide-indexer';
+
+const graph = createGraphQuery(applicationGraph);
+
+graph.resolveFeaturePath('clients.create');
+// { start, container, routes, permissions, path: [...], gap: {...} }
+```
+
+`gap` reports where the chain stopped and which diagnostics were recorded there.
+A path that stops short is a result, not a failure — and showing the gap honestly
+is the difference between a graph you can trust and one you cannot.
 
 ---
 
@@ -336,18 +427,19 @@ build step.
 
 ## Roadmap
 
-Statewave Guide is being built in public, in stages. Everything below is **not yet
-implemented**.
+Statewave Guide is being built in public, in stages. Day 0 and Day 1 are done;
+everything below them is **not yet implemented**.
 
-|           | Milestone                        | What it adds                                                                                               |
-| --------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Day 1** | Product Model generation         | Turn the structural application graph into a product-shaped model of features                              |
-| **Day 2** | React + Node relationship graph  | Connect UI elements to the handlers, endpoints and data they touch                                         |
-| **Day 3** | OpenAPI, Zod and route ingestion | Extract capabilities and shapes from API contracts and schemas                                             |
-| **Day 4** | AI semantic enrichment           | Explain and describe extracted facts, keeping enriched claims distinguishable from deterministic ones      |
-| **Day 5** | Statewave memory adapter         | A `MemoryProvider` backed by Statewave, as a separate package                                              |
-| **Day 6** | Conversational runtime           | Wire a `ModelProvider` in; a model returns _action requests_, which the registry still validates and gates |
-| **Day 7** | Dynamic multi-step guidance      | Sequences composed at request time rather than authored in advance                                         |
+|           | Milestone                             | Status                                                                         |
+| --------- | ------------------------------------- | ------------------------------------------------------------------------------ |
+| **Day 0** | Semantic elements and guidance engine | ✅ Source → graph → registry → highlight, end to end                           |
+| **Day 1** | Application understanding             | ✅ Symbol resolution, call graph, services, HTTP, backend join, evidence model |
+| **Day 2** | Product Model generation              | Turn the structural graph into a product-shaped model of features              |
+| **Day 3** | OpenAPI and schema ingestion          | Extract capabilities and shapes from API contracts                             |
+| **Day 4** | AI semantic enrichment                | Explain extracted facts, with enriched claims kept distinguishable             |
+| **Day 5** | Statewave memory adapter              | A `MemoryProvider` backed by Statewave, as a separate package                  |
+| **Day 6** | Conversational runtime                | A `ModelProvider` returns _action requests_; the registry still validates them |
+| **Day 7** | Dynamic multi-step guidance           | Sequences composed at request time rather than authored in advance             |
 
 ### Later
 
@@ -365,12 +457,18 @@ implemented**.
 
 Stated plainly, so nothing above is mistaken for a promise:
 
-- **No AI.** No model SDK, no prompt templates, no conversational loop. The
-  `ModelProvider` interface exists and is deliberately unused.
+- **No AI.** No model SDK, no prompt templates, no conversational loop, no
+  embeddings. The `ModelProvider` interface exists and is deliberately unused.
 - **No Statewave integration.** The memory port is designed so Statewave can
   implement it. It does not yet.
-- **No Product Model generation.** The indexer produces a structural application
-  graph; converting it into features is Day 1.
+- **No Product Model generation.** The indexer produces an application graph of
+  nodes and relationships; turning that into a product-shaped model of _features_
+  is Day 2.
+- **An incomplete graph, on purpose.** Dynamic dispatch, runtime modal registries
+  and computed paths do not resolve, and we do not guess at them. See the
+  per-relationship precision and recall in
+  [docs/quality.md](docs/quality.md) and the diagnostics the indexer emits where
+  it declines.
 - **No confirmation UI.** The risk model is enforced — `confirm` and `restricted`
   actions are refused for agents — but nothing asks the user yet.
 - **No multi-step guidance.** `startGuide` is in the action vocabulary; the engine

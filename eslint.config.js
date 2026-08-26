@@ -39,5 +39,19 @@ export default tseslint.config(
     files: ['**/*.config.{ts,js}', '**/test/**/*.{ts,tsx}'],
     rules: { '@typescript-eslint/no-explicit-any': 'off' },
   },
+  {
+    // Repo-level Node CLI programs: they talk to a terminal by design.
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly',
+        Buffer: 'readonly',
+        globalThis: 'readonly',
+        URL: 'readonly',
+      },
+    },
+    rules: { 'no-console': 'off' },
+  },
   prettier,
 );

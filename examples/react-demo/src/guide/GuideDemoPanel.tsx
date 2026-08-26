@@ -9,6 +9,11 @@ import { useGuide, useGuideContext } from '@statewavedev/guide-react';
  * runtime and prints the raw result. There is no AI here — the point is to show
  * that a semantic identifier, an action registry, the React element registry and
  * our own highlight engine already work end to end.
+ *
+ * The failure buttons are the interesting half. Each one fails for a different
+ * reason, and each reason arrives as a different `GuideErrorCode` — which is
+ * what a caller, human or model, is meant to branch on. The code is therefore
+ * shown on its own line, above the raw JSON, rather than buried in it.
  */
 export function GuideDemoPanel() {
   const { executeAction, elements, activeHighlightId, clearHighlight, availableActions } =
@@ -69,7 +74,26 @@ export function GuideDemoPanel() {
             })
           }
         >
-          Try a CSS selector (refused)
+          Try a CSS selector → invalid_input
+        </button>
+
+        {/*
+          A perfectly well-formed id that nothing is registered under. It used
+          to come back as `execution_failed`; the guidance handlers now rethrow
+          the engine's classified error, so the caller is told precisely that
+          the target does not exist.
+        */}
+        <button
+          className="danger"
+          onClick={() =>
+            run({
+              action: 'highlight',
+              input: { elementId: 'ghost.element' },
+              source: 'agent',
+            })
+          }
+        >
+          Highlight a ghost id → target_not_found
         </button>
 
         {/* Nothing is registered under this name, so the runtime says so. */}
@@ -77,7 +101,7 @@ export function GuideDemoPanel() {
           className="danger"
           onClick={() => run({ action: 'deleteEverything', source: 'agent' })}
         >
-          Try an unknown action (refused)
+          Try an unknown action → action_not_found
         </button>
       </div>
 
@@ -101,15 +125,24 @@ export function GuideDemoPanel() {
       </dl>
 
       {result && (
-        <pre className={result.ok ? 'guide-panel__result ok' : 'guide-panel__result err'}>
-          {JSON.stringify(
-            result.ok
-              ? { ok: true, action: result.action }
-              : { ok: false, action: result.action, error: result.error },
-            null,
-            2,
-          )}
-        </pre>
+        <div className="guide-panel__outcome">
+          <p className={result.success ? 'guide-panel__code ok' : 'guide-panel__code err'}>
+            <span className="guide-panel__code-label">
+              {result.success ? 'success' : 'error.code'}
+            </span>
+            <code>{result.success ? result.action : result.error.code}</code>
+          </p>
+          {!result.success && <p className="guide-panel__message">{result.error.message}</p>}
+          <pre className={result.success ? 'guide-panel__result ok' : 'guide-panel__result err'}>
+            {JSON.stringify(
+              result.success
+                ? { success: true, action: result.action, data: result.data }
+                : { success: false, action: result.action, error: result.error },
+              null,
+              2,
+            )}
+          </pre>
+        </div>
       )}
     </div>
   );

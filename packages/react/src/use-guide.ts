@@ -14,7 +14,7 @@ import type {
   GuideActionResult,
 } from '@statewavedev/guide-shared';
 import type { GuideRuntime } from '@statewavedev/guide-core';
-import type { RegisteredElement } from './element-registry.js';
+import type { GuideElementState } from './element-registry.js';
 import type {
   HighlightOptions,
   HighlightResult,
@@ -29,7 +29,7 @@ export interface UseGuideResult {
   /** The guide runtime. */
   runtime: GuideRuntime;
   /** Every registered guide element, sorted by id. Re-renders on change. */
-  elements: readonly RegisteredElement[];
+  elements: readonly GuideElementState[];
   /** The semantic id currently highlighted, or `null`. Re-renders on change. */
   activeHighlightId: string | null;
   /** Highlights an element by semantic id. Never throws. */

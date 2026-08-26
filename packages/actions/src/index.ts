@@ -24,6 +24,6 @@ export type {
 export { defaultActionPolicy } from './policy.js';
 export type { ActionPolicy, ActionPolicyDecision, ActionPolicyInput } from './policy.js';
 
-export { ActionRegistrationError, actionError } from './errors.js';
+export { ActionFailure, ActionRegistrationError, actionError } from './errors.js';
 
-export { toGuideActionIssues } from './issues.js';
+export { toGuideErrorIssues } from './issues.js';

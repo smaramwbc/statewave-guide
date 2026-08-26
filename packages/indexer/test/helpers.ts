@@ -3,9 +3,11 @@ import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ApplicationGraph } from '../src/graph.js';
+import type { ApplicationGraph, ApplicationNode } from '../src/graph.js';
 import { createProjectIndexer } from '../src/indexer.js';
 import type { IndexResult } from '../src/indexer.js';
+import type { ApplicationNodeKind } from '../src/node-id.js';
+import type { Relationship, RelationshipType } from '../src/relationships.js';
 
 /** Absolute path of the checked-in fixture application. */
 export const SAMPLE_APP_ROOT = fileURLToPath(new URL('./fixtures/sample-app', import.meta.url));
@@ -50,7 +52,54 @@ export function removeTempProject(root: string): Promise<void> {
   return rm(root, { recursive: true, force: true });
 }
 
-/** Every element in `graph` declared in `file`. */
+/** Indexes a throwaway project and cleans up after itself. */
+export async function indexProject(files: Record<string, string>): Promise<ApplicationGraph> {
+  const root = await createTempProject(files);
+  try {
+    return (await createProjectIndexer({ root }).index()).graph;
+  } finally {
+    await removeTempProject(root);
+  }
+}
+
+/** Every node of a kind, in graph order. */
+export function nodesOfKind<K extends ApplicationNodeKind>(
+  graph: ApplicationGraph,
+  kind: K,
+): Extract<ApplicationNode, { kind: K }>[] {
+  return graph.nodes.filter(
+    (node): node is Extract<ApplicationNode, { kind: K }> => node.kind === kind,
+  );
+}
+
+/** A node by canonical id. */
+export function nodeById(graph: ApplicationGraph, id: string): ApplicationNode | undefined {
+  return graph.nodes.find((node) => node.id === id);
+}
+
+/** The relationship for a triple, when the graph holds one. */
+export function edge(
+  graph: ApplicationGraph,
+  source: string,
+  type: RelationshipType,
+  target: string,
+): Relationship | undefined {
+  return graph.relationships.find(
+    (relationship) =>
+      relationship.source === source &&
+      relationship.type === type &&
+      relationship.target === target,
+  );
+}
+
+/** Every edge of a type, as `source -> target` strings. */
+export function edgesOfType(graph: ApplicationGraph, type: RelationshipType): string[] {
+  return graph.relationships
+    .filter((relationship) => relationship.type === type)
+    .map((relationship) => `${relationship.source} -> ${relationship.target}`);
+}
+
+/** Every element node in `graph` declared in `file`. */
 export function elementsIn(graph: ApplicationGraph, file: string) {
-  return graph.elements.filter((element) => element.provenance.file === file);
+  return nodesOfKind(graph, 'element').filter((element) => element.provenance.file === file);
 }

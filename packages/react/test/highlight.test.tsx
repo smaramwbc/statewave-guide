@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { useEffect, type ReactNode } from 'react';
-import { createElementRegistry, type InternalElementRegistry } from '../src/element-registry.js';
+import { createElementRegistry, type GuideElementRegistry } from '../src/element-registry.js';
+import { internalsOf, type ElementRegistryInternals } from '../src/registry-internals.js';
 import {
   createHighlightController,
   type HighlightController,
@@ -11,10 +12,15 @@ import { StatewaveGuideProvider } from '../src/provider.js';
 import { useGuide } from '../src/use-guide.js';
 import { stubRect } from './setup.js';
 
-function engine(): { registry: InternalElementRegistry; controller: HighlightController } {
+function engine(): {
+  registry: GuideElementRegistry & ElementRegistryInternals;
+  controller: HighlightController;
+} {
   const registry = createElementRegistry();
   const controller = createHighlightController({ registry });
-  return { registry, controller };
+  // The controller takes the public registry and finds the private half
+  // itself; the test keeps both, the way the provider does.
+  return { registry: { ...registry, ...internalsOf(registry) }, controller };
 }
 
 function mountedButton(id: string): HTMLButtonElement {
@@ -22,6 +28,32 @@ function mountedButton(id: string): HTMLButtonElement {
   node.setAttribute('data-guide', id);
   document.body.appendChild(node);
   return node;
+}
+
+/**
+ * Gives a node a rect that moves on every read.
+ *
+ * The settle probe looks for two consecutive frames with an unchanged rect, so
+ * this is a target the page never stops moving — a CSS animation, a spinner
+ * shifting layout, a lazy image landing. It keeps a scroll wait genuinely
+ * in-flight for as long as a test needs it.
+ */
+function neverSettles(node: Element): void {
+  let top = 0;
+  node.getBoundingClientRect = () => {
+    top += 7;
+    const rect = {
+      x: 0,
+      y: top,
+      top,
+      left: 0,
+      right: 120,
+      bottom: top + 24,
+      width: 120,
+      height: 24,
+    };
+    return { ...rect, toJSON: () => rect } as DOMRect;
+  };
 }
 
 function overlayNodes(): { root: Element | null; dimmers: number; rings: number } {
@@ -46,7 +78,7 @@ describe('highlight controller', () => {
       scrollIntoView: false,
     });
 
-    expect(result).toEqual({ ok: true, id: 'clients.create' });
+    expect(result).toEqual({ success: true, id: 'clients.create' });
     expect(controller.activeId).toBe('clients.create');
 
     const overlay = overlayNodes();
@@ -89,9 +121,12 @@ describe('highlight controller', () => {
 
     const result = await controller.highlight('clients.create');
 
-    expect(result).toMatchObject({ ok: false, id: 'clients.create', reason: 'not-registered' });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.message).toContain('clients.create');
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.code).toBe('target_not_found');
+      expect(result.error.details).toEqual({ elementId: 'clients.create' });
+      expect(result.error.message).toContain('clients.create');
+    }
     expect(overlayNodes().root).toBeNull();
     expect(document.querySelectorAll('.sw-guide-dim')).toHaveLength(0);
     expect(controller.activeId).toBeNull();
@@ -105,7 +140,11 @@ describe('highlight controller', () => {
 
     const result = await controller.highlight('clients.create');
 
-    expect(result).toMatchObject({ ok: false, reason: 'not-mounted' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.code).toBe('target_not_mounted');
+      expect(result.error.details).toEqual({ elementId: 'clients.create' });
+    }
     expect(overlayNodes().root).toBeNull();
     controller.destroy();
   });
@@ -173,11 +212,11 @@ describe('highlight controller', () => {
     registry.setNode('clients.create', node);
 
     await expect(controller.scrollTo('clients.create')).resolves.toEqual({
-      ok: true,
+      success: true,
       id: 'clients.create',
     });
     await expect(controller.highlight('clients.create')).resolves.toEqual({
-      ok: true,
+      success: true,
       id: 'clients.create',
     });
 
@@ -253,12 +292,12 @@ describe('highlight controller', () => {
     // on the action schemas an agent goes through.
     const injected = 'x"], input[type="password';
     await expect(controller.highlight(injected, { scrollIntoView: false })).resolves.toMatchObject({
-      ok: false,
-      reason: 'not-registered',
+      success: false,
+      error: { code: 'invalid_input', details: { elementId: injected } },
     });
     await expect(controller.scrollTo(injected)).resolves.toMatchObject({
-      ok: false,
-      reason: 'not-registered',
+      success: false,
+      error: { code: 'invalid_input', details: { elementId: injected } },
     });
     expect(overlayNodes().root).toBeNull();
     expect(controller.activeId).toBeNull();
@@ -276,11 +315,178 @@ describe('highlight controller', () => {
 
       const pending = controller.highlight('clients.create', { scrollIntoView: true });
       controller.destroy();
-      await pending;
+      const result = await pending;
+
+      // A destroyed controller did not fail to find the element — it was told
+      // to stop. That is `cancelled`, and it is distinguishable from every
+      // other reason a highlight can come back unsuccessful.
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe('cancelled');
+        expect(result.error.details).toEqual({ elementId: 'clients.create' });
+      }
 
       // `waitForScrollEnd` owns a timeout and a self-perpetuating frame loop.
       // Left running they keep measuring a node the host has already unmounted.
       expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('reports a target that left the document mid-scroll as target_not_mounted', async () => {
+    const { registry, controller } = engine();
+    const node = mountedButton('clients.create');
+    neverSettles(node);
+    registry.register({ id: 'clients.create' });
+    registry.setNode('clients.create', node);
+
+    const pending = controller.highlight('clients.create', { scrollIntoView: true });
+    node.remove();
+    const result = await pending;
+
+    // The mutation observer aborts the settle wait the moment the target
+    // disconnects, so this arrives as an aborted wait exactly like a `clear()`
+    // does — and the two must not be reported as the same thing. A caller that
+    // retries a cancelled operation would retry forever against an element
+    // that has gone.
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.code).toBe('target_not_mounted');
+      expect(result.error.details).toEqual({ elementId: 'clients.create' });
+    }
+    expect(overlayNodes().root).toBeNull();
+    expect(controller.activeId).toBeNull();
+
+    controller.destroy();
+  });
+
+  it('still reports a caller-initiated clear() mid-scroll as cancelled', async () => {
+    const { registry, controller } = engine();
+    const node = mountedButton('clients.create');
+    neverSettles(node);
+    registry.register({ id: 'clients.create' });
+    registry.setNode('clients.create', node);
+
+    const pending = controller.highlight('clients.create', { scrollIntoView: true });
+    controller.clear();
+    const result = await pending;
+
+    // Same aborted wait, node still in the document: this one really was a
+    // cancel, and it stays one.
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.code).toBe('cancelled');
+    expect(node.isConnected).toBe(true);
+
+    controller.destroy();
+  });
+
+  it('honours an AbortSignal, and takes the spotlight back down with it', async () => {
+    const { registry, controller } = engine();
+    const node = mountedButton('clients.create');
+    neverSettles(node);
+    registry.register({ id: 'clients.create' });
+    registry.setNode('clients.create', node);
+
+    const abort = new AbortController();
+    const pending = controller.highlight('clients.create', {
+      scrollIntoView: true,
+      signal: abort.signal,
+    });
+    // The spotlight goes up before the scroll is awaited, so there is something
+    // to be left holding if a cancel is not honoured.
+    expect(controller.activeId).toBe('clients.create');
+    abort.abort();
+    const result = await pending;
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.code).toBe('cancelled');
+      expect(result.error.details).toEqual({ elementId: 'clients.create' });
+    }
+    // A caller that cancelled is not left looking at an overlay.
+    expect(controller.activeId).toBeNull();
+    expect(overlayNodes().root).toBeNull();
+
+    controller.destroy();
+  });
+
+  it('refuses an already-aborted signal without drawing anything', async () => {
+    const { registry, controller } = engine();
+    const node = mountedButton('clients.create');
+    registry.register({ id: 'clients.create' });
+    registry.setNode('clients.create', node);
+
+    const abort = new AbortController();
+    abort.abort();
+    const result = await controller.highlight('clients.create', { signal: abort.signal });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.code).toBe('cancelled');
+    expect(overlayNodes().root).toBeNull();
+    expect(controller.activeId).toBeNull();
+
+    controller.destroy();
+  });
+
+  it('keeps a highlight whose scroll never settles, and warns instead of failing', async () => {
+    vi.useFakeTimers();
+    try {
+      const warnings: string[] = [];
+      const registry = createElementRegistry();
+      const controller = createHighlightController({
+        registry,
+        onWarning: (message) => warnings.push(message),
+      });
+      const internals = internalsOf(registry);
+      const node = mountedButton('clients.create');
+      neverSettles(node);
+      internals.register({ id: 'clients.create' });
+      internals.setNode('clients.create', node);
+
+      const pending = controller.highlight('clients.create', { title: 'Here' });
+      await vi.advanceTimersByTimeAsync(1200);
+      const result = await pending;
+
+      // `scrollIntoView` defaults to true, so this is the default path for any
+      // target sitting next to an animation, a spinner or a lazy image. The
+      // element was found, the spotlight is on it and the listeners keep it
+      // there: failing here would have contradicted the promise that a failure
+      // leaves nothing behind, and would have made those targets permanently
+      // un-highlightable.
+      expect(result).toEqual({ success: true, id: 'clients.create' });
+      expect(controller.activeId).toBe('clients.create');
+      expect(overlayNodes().root).not.toBeNull();
+      expect(warnings.some((message) => message.includes('did not settle'))).toBe(true);
+
+      controller.destroy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does report a scrollTo that never settles as timeout', async () => {
+    vi.useFakeTimers();
+    try {
+      const { registry, controller } = engine();
+      const node = mountedButton('clients.create');
+      neverSettles(node);
+      registry.register({ id: 'clients.create' });
+      registry.setNode('clients.create', node);
+
+      const pending = controller.scrollTo('clients.create');
+      await vi.advanceTimersByTimeAsync(1200);
+      const result = await pending;
+
+      // Scrolling was the entire job here, and nothing was left behind that the
+      // caller could still use — so unlike `highlight`, this one is a failure.
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe('timeout');
+        expect(result.error.details).toEqual({ elementId: 'clients.create' });
+      }
+
+      controller.destroy();
     } finally {
       vi.useRealTimers();
     }
@@ -296,7 +502,7 @@ describe('highlight controller', () => {
 
     await expect(
       controller.highlight('clients.export', { scrollIntoView: false }),
-    ).resolves.toEqual({ ok: true, id: 'clients.export' });
+    ).resolves.toEqual({ success: true, id: 'clients.export' });
 
     controller.destroy();
   });
@@ -313,7 +519,7 @@ describe('highlight controller', () => {
     expect(overlayNodes().root).toBeNull();
     await expect(
       controller.highlight('clients.create', { scrollIntoView: false }),
-    ).resolves.toEqual({ ok: true, id: 'clients.create' });
+    ).resolves.toEqual({ success: true, id: 'clients.create' });
 
     controller.destroy();
   });

@@ -61,7 +61,8 @@ mounted yet, or has just unmounted; the sequence may be revised mid-flight. Tour
 libraries reasonably optimise for the authored case and treat a missing target as
 a configuration error. We need a missing target to be an ordinary, well-typed
 outcome — which is why `highlight()` returns
-`{ ok: false, reason: 'not-mounted' }` instead of throwing or logging.
+`{ success: false, error: { code: 'target_not_mounted' } }` instead of throwing or
+logging.
 
 ### We need to own the element lifecycle
 

@@ -11,6 +11,7 @@
 
 import type { Node, SourceFile } from 'ts-morph';
 import type { TypeNode } from '../graph.js';
+import { typeId } from '../node-id.js';
 import { nodeProvenance } from '../provenance.js';
 
 /** Every exported type declaration in `sourceFile`. */
@@ -19,7 +20,7 @@ export function extractTypes(sourceFile: SourceFile, relativePath: string): Type
   const seen = new Set<string>();
 
   const add = (name: string, typeKind: TypeNode['typeKind'], declaration: Node): void => {
-    const id = `${relativePath}#${name}`;
+    const id = typeId(relativePath, name);
     if (seen.has(id)) return;
     seen.add(id);
     types.push({

@@ -17,8 +17,8 @@
 
 import type {
   AppContext,
-  GuideActionError,
   GuideActionSource,
+  GuideError,
   RegisteredGuideAction,
 } from '@statewavedev/guide-shared';
 import { actionError } from './errors.js';
@@ -40,10 +40,10 @@ export interface ActionPolicyInput {
 /**
  * A policy decision.
  *
- * Returning `undefined` allows the action. Returning a {@link GuideActionError}
+ * Returning `undefined` allows the action. Returning a {@link GuideError}
  * refuses it, and that error is handed back to the caller unchanged.
  */
-export type ActionPolicyDecision = GuideActionError | undefined;
+export type ActionPolicyDecision = GuideError | undefined;
 
 /** Decides whether a requested action may run. May be async. */
 export type ActionPolicy = (
@@ -57,7 +57,7 @@ export type ActionPolicy = (
  * - `confirm` — allowed for `user` and `system` callers, who are already acting
  *   deliberately. Refused for `agent` with `confirmation_required`, because
  *   nothing has asked the human yet.
- * - `restricted` — refused for `agent` with `not_permitted`. These actions exist
+ * - `restricted` — refused for `agent` with `permission_denied`. These actions exist
  *   for host code that calls the registry directly and are never part of the
  *   vocabulary a model sees.
  */
@@ -74,7 +74,7 @@ export const defaultActionPolicy: ActionPolicy = ({ action, source }) => {
   }
 
   return actionError(
-    'not_permitted',
+    'permission_denied',
     `"${action.name}" is restricted and cannot be run by an agent.`,
   );
 };

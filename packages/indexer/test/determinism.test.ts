@@ -8,6 +8,7 @@ import {
   SAMPLE_APP_ROOT,
   createTempProject,
   indexSampleApp,
+  nodesOfKind,
   removeTempProject,
 } from './helpers.js';
 
@@ -64,6 +65,71 @@ describe('determinism', () => {
     }
   });
 
+  it('produces the same graph from every working directory', async () => {
+    const root = await createTempProject({
+      'tsconfig.json': '{ "compilerOptions": { "jsx": "react-jsx" } }\n',
+      'package.json': '{ "name": "anywhere" }\n',
+      'src/Page.tsx':
+        'export function Page() {\n  return <button data-guide="page.save">Save</button>;\n}\n',
+      'src/deep/nested.ts': 'export const nested = 1;\n',
+      'src/Page.test.tsx': 'export const spec = 1;\n',
+    });
+
+    try {
+      const from = async (cwd: string): Promise<string> => {
+        const previous = process.cwd();
+        process.chdir(cwd);
+        try {
+          return serializeApplicationGraph((await createProjectIndexer({ root }).index()).graph);
+        } finally {
+          process.chdir(previous);
+        }
+      };
+
+      // The matcher underneath used to resolve patterns against `process.cwd()`,
+      // which made the file set a property of the shell: running from a
+      // subdirectory dropped `src/deep/nested.ts` and re-admitted the excluded
+      // test file, so one unchanged tree produced three different graphs.
+      const expected = await from(root);
+      expect(expected).toContain('src/deep/nested.ts');
+      expect(expected).not.toContain('src/Page.test.tsx');
+
+      for (const directory of [
+        path.join(root, 'src'),
+        path.join(root, 'src', 'deep'),
+        path.parse(root).root,
+      ]) {
+        expect(await from(directory)).toBe(expected);
+      }
+    } finally {
+      await removeTempProject(root);
+    }
+  });
+
+  it('composes a file name however the filesystem decomposed it', async () => {
+    // git stores NFC and HFS+ hands back NFD, so the same checkout on two
+    // machines produced different `file:` ids and a different sort order.
+    const composed = 'caf\u00e9.ts';
+    const decomposed = 'cafe\u0301.ts';
+
+    const idsFor = async (name: string): Promise<string[]> => {
+      const root = await createTempProject({
+        'tsconfig.json': '{}\n',
+        'package.json': '{ "name": "unicode" }\n',
+        [`src/${name}`]: 'export const value = 1;\n',
+      });
+      try {
+        const { graph } = await createProjectIndexer({ root }).index();
+        return nodesOfKind(graph, 'file').map((node) => node.id);
+      } finally {
+        await removeTempProject(root);
+      }
+    };
+
+    expect(await idsFor(decomposed)).toEqual([`file:src/${composed}`]);
+    expect(await idsFor(composed)).toEqual([`file:src/${composed}`]);
+  });
+
   it('honours a custom outDir', async () => {
     const root = await createTempProject({
       'tsconfig.json': '{}\n',
@@ -74,7 +140,7 @@ describe('determinism', () => {
       const { graph } = await createProjectIndexer({ root }).index();
       const written = await writeApplicationGraph(graph, { root, outDir: 'build/graph' });
       expect(written.relativePath).toBe('build/graph/application.json');
-      await expect(readFile(written.path, 'utf8')).resolves.toContain('"version": 1');
+      await expect(readFile(written.path, 'utf8')).resolves.toContain('"version": 2');
     } finally {
       await removeTempProject(root);
     }
@@ -87,43 +153,70 @@ describe('serialised shape', () => {
     const serialised = serializeApplicationGraph(graph);
 
     expect(serialised.endsWith('}\n')).toBe(true);
-    expect(serialised).toContain('\n  "version": 1,');
+    expect(serialised).toContain('\n  "version": 2,');
   });
 
-  it('sorts every array by its documented key', async () => {
+  it('sorts nodes, relationships and diagnostics by their documented key', async () => {
     const { graph } = await indexSampleApp();
 
-    expect(isSorted(graph.files.map((file) => file.id))).toBe(true);
-    expect(isSorted(graph.components.map((component) => component.id))).toBe(true);
-    expect(isSorted(graph.functions.map((fn) => fn.id))).toBe(true);
-    expect(isSorted(graph.types.map((type) => type.id))).toBe(true);
-    expect(isSorted(graph.routes.map((route) => route.path))).toBe(true);
+    expect(isSorted(graph.nodes.map((node) => node.id))).toBe(true);
+    expect(isSorted(graph.relationships.map((relationship) => relationship.id))).toBe(true);
     expect(isSorted(graph.diagnostics.map((diagnostic) => diagnostic.code))).toBe(true);
 
-    // Elements share ids, so they sort by id, then provenance file, then line.
-    // Comparing field by field rather than by a joined key, because a separator
-    // character would itself take part in the comparison.
-    const outOfOrder = graph.elements.filter((element, index) => {
-      const previous = graph.elements[index - 1];
-      if (index === 0 || previous === undefined) return false;
-      const byId = compareStrings(previous.id, element.id);
-      if (byId !== 0) return byId > 0;
-      const byFile = compareStrings(previous.provenance.file ?? '', element.provenance.file ?? '');
-      if (byFile !== 0) return byFile > 0;
-      return (previous.provenance.line ?? 0) > (element.provenance.line ?? 0);
-    });
-    expect(outOfOrder).toEqual([]);
+    // Evidence within a relationship is sorted too, so a rule discovered in a
+    // different order still serialises to the same bytes.
+    for (const relationship of graph.relationships) {
+      const keys = relationship.evidence.map(
+        (evidence) => `${evidence.file}:${String(evidence.line).padStart(6, '0')}`,
+      );
+      expect(isSorted(keys)).toBe(true);
+    }
+  });
+
+  it('keeps every array of ids sorted and unique', async () => {
+    const { graph } = await indexSampleApp();
+    for (const node of nodesOfKind(graph, 'service')) {
+      expect(isSorted(node.memberIds)).toBe(true);
+    }
+    for (const node of nodesOfKind(graph, 'api')) {
+      expect(isSorted(node.observedOn)).toBe(true);
+    }
   });
 
   it('omits optional keys rather than serialising them as undefined', async () => {
     const { graph } = await indexSampleApp();
 
-    const withoutLabel = graph.elements.find((element) => element.id === 'clients.detail');
+    const withoutLabel = graph.nodes.find((node) => node.id === 'element:clients.detail');
     expect(withoutLabel).toBeDefined();
-    expect(Object.keys(withoutLabel ?? {})).not.toContain('label');
+    expect(Object.keys(JSON.parse(JSON.stringify(withoutLabel)) as object)).not.toContain('label');
 
-    const withoutSymbol = graph.routes.find((route) => route.path === '/clients');
+    const withoutSymbol = graph.nodes.find((node) => node.id === 'route:/clients');
     expect(Object.keys(withoutSymbol?.provenance ?? {})).not.toContain('symbol');
+  });
+
+  it('serialises every node with the key order serialize.ts declares', async () => {
+    const { graph } = await indexSampleApp();
+    const parsed = JSON.parse(serializeApplicationGraph(graph)) as {
+      nodes: Record<string, unknown>[];
+      relationships: Record<string, unknown>[];
+    };
+
+    for (const node of parsed.nodes) {
+      const keys = Object.keys(node);
+      expect(keys[0]).toBe('kind');
+      expect(keys[1]).toBe('id');
+      expect(keys[keys.length - 1]).toBe('provenance');
+    }
+    for (const relationship of parsed.relationships) {
+      expect(Object.keys(relationship)).toEqual([
+        'id',
+        'type',
+        'source',
+        'target',
+        'confidence',
+        'evidence',
+      ]);
+    }
   });
 
   it('holds no timestamp, absolute path or machine-specific value', async () => {

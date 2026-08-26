@@ -11,8 +11,23 @@
  * jsdom, where nothing scrolls at all, it settles in a couple of frames rather
  * than hanging a test suite.
  *
+ * It reports *which* route it took, because the three mean different things to
+ * the controller: settling is success, the hard timeout says the page is still
+ * moving, and an abort says somebody asked it to stop. Collapsing them into
+ * `void` left the controller unable to tell a cancelled highlight from a target
+ * that had vanished underneath it.
+ *
  * @packageDocumentation
  */
+
+/**
+ * How a settle wait ended.
+ *
+ * - `settled` — the page stopped moving (or never started).
+ * - `timeout` — the hard time budget ran out first.
+ * - `cancelled` — the caller aborted the wait.
+ */
+export type ScrollSettleOutcome = 'settled' | 'timeout' | 'cancelled';
 
 /** Options for {@link scrollElementIntoView}. */
 export interface ScrollElementOptions {
@@ -33,10 +48,11 @@ export interface WaitForScrollEndOptions {
   /**
    * Cancels the wait.
    *
-   * The promise resolves immediately when the signal aborts, and the timer and
-   * the frame loop are torn down with it. Without this a controller that was
-   * destroyed mid-scroll keeps a self-perpetuating `requestAnimationFrame` loop
-   * measuring a node that may already be detached, for as long as `timeoutMs`.
+   * The promise resolves with `cancelled` immediately when the signal aborts,
+   * and the timer and the frame loop are torn down with it. Without this a
+   * controller that was destroyed mid-scroll keeps a self-perpetuating
+   * `requestAnimationFrame` loop measuring a node that may already be
+   * detached, for as long as `timeoutMs`.
    */
   signal?: AbortSignal;
 }
@@ -61,18 +77,18 @@ export function scrollElementIntoView(node: Element, options: ScrollElementOptio
   }
 }
 
-/** Resolves once scrolling has settled. Never rejects, never hangs. */
+/** Resolves once scrolling has settled, timed out or was cancelled. Never rejects, never hangs. */
 export function waitForScrollEnd(
   win: Window,
   options: WaitForScrollEndOptions = {},
-): Promise<void> {
+): Promise<ScrollSettleOutcome> {
   const timeoutMs = options.timeoutMs ?? 1000;
   const stableFrames = options.stableFrames ?? 2;
 
   const signal = options.signal;
-  if (signal?.aborted === true) return Promise.resolve();
+  if (signal?.aborted === true) return Promise.resolve('cancelled');
 
-  return new Promise<void>((resolve) => {
+  return new Promise<ScrollSettleOutcome>((resolve) => {
     const requestFrame =
       typeof win.requestAnimationFrame === 'function' ? win.requestAnimationFrame.bind(win) : null;
     const cancelFrame =
@@ -83,30 +99,32 @@ export function waitForScrollEnd(
     let frame: number | null = null;
     let timer: ReturnType<typeof setTimeout> | null = null;
 
-    const finish = (): void => {
+    const onScrollEnd = (): void => {
+      finish('settled');
+    };
+    const onAbort = (): void => {
+      finish('cancelled');
+    };
+
+    const finish = (outcome: ScrollSettleOutcome): void => {
       if (settled) return;
       settled = true;
       if (frame !== null) cancelFrame?.(frame);
       if (timer !== null) clearTimeout(timer);
-      if (supportsScrollEnd) win.removeEventListener('scrollend', finish, true);
-      signal?.removeEventListener('abort', finish);
-      resolve();
+      if (supportsScrollEnd) win.removeEventListener('scrollend', onScrollEnd, true);
+      signal?.removeEventListener('abort', onAbort);
+      resolve(outcome);
     };
 
-    const probe = (): string => {
-      const rect = options.node?.getBoundingClientRect();
-      const x = rect ? rect.left : (win.scrollX ?? 0);
-      const y = rect ? rect.top : (win.scrollY ?? 0);
-      return `${Math.round(x)}:${Math.round(y)}:${Math.round(win.scrollX ?? 0)}:${Math.round(win.scrollY ?? 0)}`;
-    };
-
-    timer = setTimeout(finish, timeoutMs);
+    timer = setTimeout(() => {
+      finish('timeout');
+    }, timeoutMs);
     // Capture, so a scroll that ends inside a nested container is heard too.
-    if (supportsScrollEnd) win.addEventListener('scrollend', finish, true);
-    signal?.addEventListener('abort', finish, { once: true });
+    if (supportsScrollEnd) win.addEventListener('scrollend', onScrollEnd, true);
+    signal?.addEventListener('abort', onAbort, { once: true });
 
     if (!requestFrame) {
-      finish();
+      finish('settled');
       return;
     }
 
@@ -118,7 +136,7 @@ export function waitForScrollEnd(
       if (next === previous) {
         stable += 1;
         if (stable >= stableFrames) {
-          finish();
+          finish('settled');
           return;
         }
       } else {
@@ -128,5 +146,12 @@ export function waitForScrollEnd(
       frame = requestFrame(step);
     };
     frame = requestFrame(step);
+
+    function probe(): string {
+      const rect = options.node?.getBoundingClientRect();
+      const x = rect ? rect.left : (win.scrollX ?? 0);
+      const y = rect ? rect.top : (win.scrollY ?? 0);
+      return `${Math.round(x)}:${Math.round(y)}:${Math.round(win.scrollX ?? 0)}:${Math.round(win.scrollY ?? 0)}`;
+    }
   });
 }

@@ -1,0 +1,3753 @@
+{
+  "version": 2,
+  "application": "@statewavedev/guide-react-demo",
+  "nodes": [
+    {
+      "kind": "api",
+      "id": "api:DELETE:/api/clients/:param",
+      "method": "DELETE",
+      "path": "/api/clients/:clientId",
+      "observedOn": [
+        "backend"
+      ],
+      "provenances": [
+        {
+          "source": "source-code",
+          "file": "backend/src/routes/clients.ts",
+          "symbol": "clientsRouter",
+          "line": 12,
+          "column": 1
+        }
+      ],
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/routes/clients.ts",
+        "symbol": "clientsRouter",
+        "line": 12,
+        "column": 1
+      }
+    },
+    {
+      "kind": "api",
+      "id": "api:GET:/api/clients",
+      "method": "GET",
+      "path": "/api/clients",
+      "observedOn": [
+        "backend",
+        "frontend"
+      ],
+      "provenances": [
+        {
+          "source": "source-code",
+          "file": "backend/src/routes/clients.ts",
+          "symbol": "clientsRouter",
+          "line": 10,
+          "column": 1
+        },
+        {
+          "source": "source-code",
+          "file": "src/services/clientService.ts",
+          "symbol": "clientService.list",
+          "line": 30,
+          "column": 28
+        }
+      ],
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/routes/clients.ts",
+        "symbol": "clientsRouter",
+        "line": 10,
+        "column": 1
+      }
+    },
+    {
+      "kind": "api",
+      "id": "api:POST:/api/clients",
+      "method": "POST",
+      "path": "/api/clients",
+      "observedOn": [
+        "backend",
+        "frontend"
+      ],
+      "provenances": [
+        {
+          "source": "source-code",
+          "file": "backend/src/routes/clients.ts",
+          "symbol": "clientsRouter",
+          "line": 11,
+          "column": 1
+        },
+        {
+          "source": "source-code",
+          "file": "src/services/clientService.ts",
+          "symbol": "clientService.create",
+          "line": 35,
+          "column": 28
+        }
+      ],
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/routes/clients.ts",
+        "symbol": "clientsRouter",
+        "line": 11,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/App.tsx#App",
+      "name": "App",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "symbol": "App",
+        "line": 29,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "name": "NewClientDialog",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialog",
+        "line": 17,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel",
+      "name": "GuideDemoPanel",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/GuideDemoPanel.tsx",
+        "symbol": "GuideDemoPanel",
+        "line": 18,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/guide/Inspector.tsx#EvidenceList",
+      "name": "EvidenceList",
+      "exported": false,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "symbol": "EvidenceList",
+        "line": 42,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/guide/Inspector.tsx#Hop",
+      "name": "Hop",
+      "exported": false,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "symbol": "Hop",
+        "line": 58,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/guide/Inspector.tsx#Inspector",
+      "name": "Inspector",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "symbol": "Inspector",
+        "line": 90,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/layout/Sidebar.tsx#Sidebar",
+      "name": "Sidebar",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/layout/Sidebar.tsx",
+        "symbol": "Sidebar",
+        "line": 11,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "name": "ClientDetails",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "symbol": "ClientDetails",
+        "line": 4,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/pages/Clients.tsx#Clients",
+      "name": "Clients",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "symbol": "Clients",
+        "line": 25,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/pages/Dashboard.tsx#Dashboard",
+      "name": "Dashboard",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Dashboard.tsx",
+        "symbol": "Dashboard",
+        "line": 8,
+        "column": 1
+      }
+    },
+    {
+      "kind": "component",
+      "id": "component:src/pages/Settings.tsx#Settings",
+      "name": "Settings",
+      "exported": true,
+      "isDefaultExport": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 13,
+        "column": 1
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients",
+      "elementId": "clients",
+      "type": "section",
+      "attribute": "data-guide",
+      "tagName": "main",
+      "featureId": "clients",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "symbol": "Clients",
+        "line": 46,
+        "column": 5
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.create",
+      "elementId": "clients.create",
+      "type": "button",
+      "label": "New Client",
+      "attribute": "data-guide",
+      "tagName": "button",
+      "featureId": "clients",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "symbol": "Clients",
+        "line": 58,
+        "column": 13
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.create-dialog",
+      "elementId": "clients.create-dialog",
+      "type": "dialog",
+      "attribute": "data-guide",
+      "tagName": "dialog",
+      "featureId": "clients",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialog",
+        "line": 42,
+        "column": 5
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.create-form",
+      "elementId": "clients.create-form",
+      "type": "form",
+      "attribute": "data-guide",
+      "tagName": "form",
+      "featureId": "clients",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialog",
+        "line": 44,
+        "column": 7
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.create-form.cancel",
+      "elementId": "clients.create-form.cancel",
+      "type": "button",
+      "label": "Cancel",
+      "attribute": "data-guide",
+      "tagName": "button",
+      "featureId": "clients.create-form",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialog",
+        "line": 75,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.create-form.industry",
+      "elementId": "clients.create-form.industry",
+      "type": "input",
+      "attribute": "data-guide",
+      "tagName": "input",
+      "featureId": "clients.create-form",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialog",
+        "line": 63,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.create-form.name",
+      "elementId": "clients.create-form.name",
+      "type": "input",
+      "attribute": "data-guide",
+      "tagName": "input",
+      "featureId": "clients.create-form",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialog",
+        "line": 53,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.create-form.submit",
+      "elementId": "clients.create-form.submit",
+      "type": "button",
+      "label": "Create client",
+      "attribute": "data-guide",
+      "tagName": "button",
+      "featureId": "clients.create-form",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialog",
+        "line": 72,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.detail",
+      "elementId": "clients.detail",
+      "type": "section",
+      "attribute": "data-guide",
+      "tagName": "main",
+      "featureId": "clients",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "symbol": "ClientDetails",
+        "line": 20,
+        "column": 5
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.detail.back",
+      "elementId": "clients.detail.back",
+      "type": "link",
+      "label": "Back to clients",
+      "attribute": "data-guide",
+      "tagName": "Link",
+      "featureId": "clients.detail",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "symbol": "ClientDetails",
+        "line": 49,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.detail.edit",
+      "elementId": "clients.detail.edit",
+      "type": "button",
+      "label": "Edit client",
+      "attribute": "data-guide",
+      "tagName": "button",
+      "featureId": "clients.detail",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "symbol": "ClientDetails",
+        "line": 48,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.detail.missing",
+      "elementId": "clients.detail.missing",
+      "type": "section",
+      "attribute": "data-guide",
+      "tagName": "main",
+      "featureId": "clients.detail",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "symbol": "ClientDetails",
+        "line": 10,
+        "column": 7
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.detail.table",
+      "elementId": "clients.detail.table",
+      "type": "table",
+      "label": "Client details",
+      "attribute": "data-guide",
+      "tagName": "table",
+      "featureId": "clients.detail",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "symbol": "ClientDetails",
+        "line": 28,
+        "column": 9
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.export",
+      "elementId": "clients.export",
+      "type": "button",
+      "label": "Export",
+      "attribute": "data-guide",
+      "tagName": "button",
+      "featureId": "clients",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "symbol": "Clients",
+        "line": 62,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:clients.table",
+      "elementId": "clients.table",
+      "type": "table",
+      "label": "Client list",
+      "attribute": "data-guide",
+      "tagName": "table",
+      "featureId": "clients",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "symbol": "Clients",
+        "line": 71,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:dashboard",
+      "elementId": "dashboard",
+      "type": "section",
+      "attribute": "data-guide",
+      "tagName": "main",
+      "featureId": "dashboard",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Dashboard.tsx",
+        "symbol": "Dashboard",
+        "line": 10,
+        "column": 5
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:dashboard.summary",
+      "elementId": "dashboard.summary",
+      "type": "table",
+      "label": "Workspace summary",
+      "attribute": "data-guide",
+      "tagName": "table",
+      "featureId": "dashboard",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Dashboard.tsx",
+        "symbol": "Dashboard",
+        "line": 19,
+        "column": 9
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:nav",
+      "elementId": "nav",
+      "type": "menu",
+      "attribute": "data-guide",
+      "tagName": "aside",
+      "featureId": "nav",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/layout/Sidebar.tsx",
+        "symbol": "Sidebar",
+        "line": 13,
+        "column": 5
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:nav.clients",
+      "elementId": "nav.clients",
+      "type": "link",
+      "label": "Clients",
+      "attribute": "data-guide",
+      "tagName": "NavLink",
+      "featureId": "nav",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/layout/Sidebar.tsx",
+        "symbol": "Sidebar",
+        "line": 26,
+        "column": 9
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:nav.dashboard",
+      "elementId": "nav.dashboard",
+      "type": "link",
+      "label": "Dashboard",
+      "attribute": "data-guide",
+      "tagName": "NavLink",
+      "featureId": "nav",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/layout/Sidebar.tsx",
+        "symbol": "Sidebar",
+        "line": 17,
+        "column": 9
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:nav.settings",
+      "elementId": "nav.settings",
+      "type": "link",
+      "label": "Settings",
+      "attribute": "data-guide",
+      "tagName": "NavLink",
+      "featureId": "nav",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/layout/Sidebar.tsx",
+        "symbol": "Sidebar",
+        "line": 34,
+        "column": 9
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:settings",
+      "elementId": "settings",
+      "type": "section",
+      "attribute": "data-guide",
+      "tagName": "main",
+      "featureId": "settings",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 29,
+        "column": 5
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:settings.form",
+      "elementId": "settings.form",
+      "type": "form",
+      "attribute": "data-guide",
+      "tagName": "form",
+      "featureId": "settings",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 35,
+        "column": 9
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:settings.form.name",
+      "elementId": "settings.form.name",
+      "type": "input",
+      "attribute": "data-guide",
+      "tagName": "input",
+      "featureId": "settings.form",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 38,
+        "column": 13
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:settings.form.owner",
+      "elementId": "settings.form.owner",
+      "type": "input",
+      "attribute": "data-guide",
+      "tagName": "input",
+      "featureId": "settings.form",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 42,
+        "column": 13
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:settings.form.save",
+      "elementId": "settings.form.save",
+      "type": "button",
+      "label": "Save changes",
+      "attribute": "data-guide",
+      "tagName": "button",
+      "featureId": "settings.form",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 44,
+        "column": 11
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:settings.notifications",
+      "elementId": "settings.notifications",
+      "type": "section",
+      "label": "Notification settings",
+      "attribute": "data-guide",
+      "tagName": "section",
+      "featureId": "settings",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 53,
+        "column": 7
+      }
+    },
+    {
+      "kind": "element",
+      "id": "element:settings.notifications.digest",
+      "elementId": "settings.notifications.digest",
+      "type": "input",
+      "attribute": "data-guide",
+      "tagName": "select",
+      "featureId": "settings.notifications",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "Settings",
+        "line": 61,
+        "column": 11
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:backend/src/controllers/clientController.ts",
+      "path": "backend/src/controllers/clientController.ts",
+      "side": "backend",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/controllers/clientController.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:backend/src/middleware/requirePermission.ts",
+      "path": "backend/src/middleware/requirePermission.ts",
+      "side": "backend",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/middleware/requirePermission.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:backend/src/routes/clients.ts",
+      "path": "backend/src/routes/clients.ts",
+      "side": "backend",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/routes/clients.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:backend/src/server.ts",
+      "path": "backend/src/server.ts",
+      "side": "backend",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/server.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:backend/src/services/clientService.ts",
+      "path": "backend/src/services/clientService.ts",
+      "side": "backend",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/services/clientService.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:backend/src/validation/clientSchemas.ts",
+      "path": "backend/src/validation/clientSchemas.ts",
+      "side": "backend",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/validation/clientSchemas.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/App.tsx",
+      "path": "src/App.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/components/NewClientDialog.tsx",
+      "path": "src/components/NewClientDialog.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/data/clients.ts",
+      "path": "src/data/clients.ts",
+      "side": "shared",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/data/clients.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/guide/GuideDemoPanel.tsx",
+      "path": "src/guide/GuideDemoPanel.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/GuideDemoPanel.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/guide/Inspector.tsx",
+      "path": "src/guide/Inspector.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/guide/application-graph.ts",
+      "path": "src/guide/application-graph.ts",
+      "side": "shared",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/application-graph.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/guide/runtime.ts",
+      "path": "src/guide/runtime.ts",
+      "side": "shared",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/runtime.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/layout/Sidebar.tsx",
+      "path": "src/layout/Sidebar.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/layout/Sidebar.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/lib/api.ts",
+      "path": "src/lib/api.ts",
+      "side": "shared",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/lib/api.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/main.tsx",
+      "path": "src/main.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/main.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/pages/ClientDetails.tsx",
+      "path": "src/pages/ClientDetails.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/pages/Clients.tsx",
+      "path": "src/pages/Clients.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/pages/Dashboard.tsx",
+      "path": "src/pages/Dashboard.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Dashboard.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/pages/Settings.tsx",
+      "path": "src/pages/Settings.tsx",
+      "side": "frontend",
+      "hasJsx": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "file",
+      "id": "file:src/services/clientService.ts",
+      "path": "src/services/clientService.ts",
+      "side": "shared",
+      "hasJsx": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/services/clientService.ts",
+        "line": 1,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/controllers/clientController.ts#createClient",
+      "name": "createClient",
+      "form": "declaration",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 2,
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/controllers/clientController.ts",
+        "symbol": "createClient",
+        "line": 11,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/controllers/clientController.ts#deleteClient",
+      "name": "deleteClient",
+      "form": "declaration",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 2,
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/controllers/clientController.ts",
+        "symbol": "deleteClient",
+        "line": 21,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/controllers/clientController.ts#listClients",
+      "name": "listClients",
+      "form": "declaration",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 2,
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/controllers/clientController.ts",
+        "symbol": "listClients",
+        "line": 6,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/middleware/requirePermission.ts#requirePermission",
+      "name": "requirePermission",
+      "form": "declaration",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 1,
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/middleware/requirePermission.ts",
+        "symbol": "requirePermission",
+        "line": 11,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/services/clientService.ts#clientService.create",
+      "name": "clientService.create",
+      "form": "method",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 1,
+      "ownerId": "service:backend/src/services/clientService.ts#clientService",
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/services/clientService.ts",
+        "symbol": "clientService.create",
+        "line": 24,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/services/clientService.ts#clientService.list",
+      "name": "clientService.list",
+      "form": "method",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 0,
+      "ownerId": "service:backend/src/services/clientService.ts#clientService",
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/services/clientService.ts",
+        "symbol": "clientService.list",
+        "line": 20,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/services/clientService.ts#clientService.remove",
+      "name": "clientService.remove",
+      "form": "method",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 1,
+      "ownerId": "service:backend/src/services/clientService.ts#clientService",
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/services/clientService.ts",
+        "symbol": "clientService.remove",
+        "line": 30,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:backend/src/services/clientService.ts#index",
+      "name": "index",
+      "form": "arrow",
+      "exported": false,
+      "isAsync": false,
+      "parameterCount": 1,
+      "side": "backend",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/services/clientService.ts",
+        "symbol": "index",
+        "line": 31,
+        "column": 11
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/App.tsx#RouteSync",
+      "name": "RouteSync",
+      "form": "declaration",
+      "exported": false,
+      "isAsync": false,
+      "parameterCount": 0,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "symbol": "RouteSync",
+        "line": 19,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/components/NewClientDialog.tsx#submitClient",
+      "name": "submitClient",
+      "form": "declaration",
+      "exported": false,
+      "isAsync": true,
+      "parameterCount": 0,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "submitClient",
+        "line": 30,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/data/clients.ts#findClient",
+      "name": "findClient",
+      "form": "declaration",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 1,
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/data/clients.ts",
+        "symbol": "findClient",
+        "line": 17,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/guide/GuideDemoPanel.tsx#run",
+      "name": "run",
+      "form": "declaration",
+      "exported": false,
+      "isAsync": true,
+      "parameterCount": 1,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/GuideDemoPanel.tsx",
+        "symbol": "run",
+        "line": 24,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/guide/Inspector.tsx#feature",
+      "name": "feature",
+      "form": "arrow",
+      "exported": false,
+      "isAsync": false,
+      "parameterCount": 0,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "symbol": "feature",
+        "line": 94,
+        "column": 9
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/guide/Inspector.tsx#live",
+      "name": "live",
+      "form": "arrow",
+      "exported": false,
+      "isAsync": false,
+      "parameterCount": 1,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "symbol": "live",
+        "line": 96,
+        "column": 9
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/guide/Inspector.tsx#nodeLabel",
+      "name": "nodeLabel",
+      "form": "declaration",
+      "exported": false,
+      "isAsync": false,
+      "parameterCount": 2,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "symbol": "nodeLabel",
+        "line": 20,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/lib/api.ts#api.delete",
+      "name": "api.delete",
+      "form": "arrow",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 1,
+      "ownerId": "service:src/lib/api.ts#api",
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/lib/api.ts",
+        "symbol": "api.delete",
+        "line": 31,
+        "column": 11
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/lib/api.ts#api.get",
+      "name": "api.get",
+      "form": "arrow",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 1,
+      "ownerId": "service:src/lib/api.ts#api",
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/lib/api.ts",
+        "symbol": "api.get",
+        "line": 28,
+        "column": 8
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/lib/api.ts#api.post",
+      "name": "api.post",
+      "form": "arrow",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 2,
+      "ownerId": "service:src/lib/api.ts#api",
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/lib/api.ts",
+        "symbol": "api.post",
+        "line": 29,
+        "column": 9
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/lib/api.ts#api.put",
+      "name": "api.put",
+      "form": "arrow",
+      "exported": true,
+      "isAsync": false,
+      "parameterCount": 2,
+      "ownerId": "service:src/lib/api.ts#api",
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/lib/api.ts",
+        "symbol": "api.put",
+        "line": 30,
+        "column": 8
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/lib/api.ts#request",
+      "name": "request",
+      "form": "declaration",
+      "exported": false,
+      "isAsync": true,
+      "parameterCount": 2,
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/lib/api.ts",
+        "symbol": "request",
+        "line": 17,
+        "column": 1
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/pages/Clients.tsx#closeCreateClient",
+      "name": "closeCreateClient",
+      "form": "declaration",
+      "exported": false,
+      "isAsync": false,
+      "parameterCount": 0,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "symbol": "closeCreateClient",
+        "line": 41,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/pages/Clients.tsx#openCreateClient",
+      "name": "openCreateClient",
+      "form": "declaration",
+      "exported": false,
+      "isAsync": false,
+      "parameterCount": 0,
+      "side": "frontend",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Clients.tsx",
+        "symbol": "openCreateClient",
+        "line": 37,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/services/clientService.ts#clientService.create",
+      "name": "clientService.create",
+      "form": "method",
+      "exported": true,
+      "isAsync": true,
+      "parameterCount": 1,
+      "ownerId": "service:src/services/clientService.ts#clientService",
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/services/clientService.ts",
+        "symbol": "clientService.create",
+        "line": 34,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/services/clientService.ts#clientService.list",
+      "name": "clientService.list",
+      "form": "method",
+      "exported": true,
+      "isAsync": true,
+      "parameterCount": 0,
+      "ownerId": "service:src/services/clientService.ts#clientService",
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/services/clientService.ts",
+        "symbol": "clientService.list",
+        "line": 29,
+        "column": 3
+      }
+    },
+    {
+      "kind": "function",
+      "id": "function:src/services/clientService.ts#clientService.remove",
+      "name": "clientService.remove",
+      "form": "method",
+      "exported": true,
+      "isAsync": true,
+      "parameterCount": 1,
+      "ownerId": "service:src/services/clientService.ts#clientService",
+      "side": "shared",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/services/clientService.ts",
+        "symbol": "clientService.remove",
+        "line": 45,
+        "column": 3
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:@statewavedev/guide-react#useGuide",
+      "name": "useGuide",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/GuideDemoPanel.tsx",
+        "symbol": "useGuide",
+        "line": 20,
+        "column": 5
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:@statewavedev/guide-react#useGuideContext",
+      "name": "useGuideContext",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/GuideDemoPanel.tsx",
+        "symbol": "useGuideContext",
+        "line": 21,
+        "column": 23
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:@statewavedev/guide-react#useGuideElement",
+      "name": "useGuideElement",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/Settings.tsx",
+        "symbol": "useGuideElement",
+        "line": 14,
+        "column": 28
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:react#useEffect",
+      "name": "useEffect",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "symbol": "useEffect",
+        "line": 22,
+        "column": 3
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:react#useMemo",
+      "name": "useMemo",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/Inspector.tsx",
+        "symbol": "useMemo",
+        "line": 94,
+        "column": 19
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:react#useRef",
+      "name": "useRef",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "useRef",
+        "line": 18,
+        "column": 21
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:react#useState",
+      "name": "useState",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "useState",
+        "line": 19,
+        "column": 27
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:react-router-dom#useLocation",
+      "name": "useLocation",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "symbol": "useLocation",
+        "line": 20,
+        "column": 24
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:react-router-dom#useNavigate",
+      "name": "useNavigate",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "symbol": "useNavigate",
+        "line": 30,
+        "column": 20
+      }
+    },
+    {
+      "kind": "hook",
+      "id": "hook:react-router-dom#useParams",
+      "name": "useParams",
+      "builtin": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/pages/ClientDetails.tsx",
+        "symbol": "useParams",
+        "line": 5,
+        "column": 24
+      }
+    },
+    {
+      "kind": "permission",
+      "id": "permission:clients:create",
+      "permission": "clients:create",
+      "provenances": [
+        {
+          "source": "source-code",
+          "file": "backend/src/routes/clients.ts",
+          "line": 11,
+          "column": 32
+        }
+      ],
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/routes/clients.ts",
+        "line": 11,
+        "column": 32
+      }
+    },
+    {
+      "kind": "permission",
+      "id": "permission:clients:delete",
+      "permission": "clients:delete",
+      "provenances": [
+        {
+          "source": "source-code",
+          "file": "backend/src/routes/clients.ts",
+          "line": 12,
+          "column": 44
+        }
+      ],
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/routes/clients.ts",
+        "line": 12,
+        "column": 44
+      }
+    },
+    {
+      "kind": "permission",
+      "id": "permission:clients:read",
+      "permission": "clients:read",
+      "provenances": [
+        {
+          "source": "source-code",
+          "file": "backend/src/routes/clients.ts",
+          "line": 10,
+          "column": 31
+        }
+      ],
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/routes/clients.ts",
+        "line": 10,
+        "column": 31
+      }
+    },
+    {
+      "kind": "route",
+      "id": "route:/",
+      "path": "/",
+      "componentName": "Dashboard",
+      "detectedFrom": "jsx-route",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "line": 44,
+        "column": 11
+      }
+    },
+    {
+      "kind": "route",
+      "id": "route:/clients",
+      "path": "/clients",
+      "componentName": "Clients",
+      "detectedFrom": "jsx-route",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "line": 45,
+        "column": 11
+      }
+    },
+    {
+      "kind": "route",
+      "id": "route:/clients/:clientId",
+      "path": "/clients/:clientId",
+      "componentName": "ClientDetails",
+      "detectedFrom": "jsx-route",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "line": 46,
+        "column": 11
+      }
+    },
+    {
+      "kind": "route",
+      "id": "route:/settings",
+      "path": "/settings",
+      "componentName": "Settings",
+      "detectedFrom": "jsx-route",
+      "provenance": {
+        "source": "source-code",
+        "file": "src/App.tsx",
+        "line": 47,
+        "column": 11
+      }
+    },
+    {
+      "kind": "schema",
+      "id": "schema:backend/src/validation/clientSchemas.ts#createClientSchema",
+      "name": "createClientSchema",
+      "library": "zod",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/validation/clientSchemas.ts",
+        "symbol": "createClientSchema",
+        "line": 4,
+        "column": 14
+      }
+    },
+    {
+      "kind": "schema",
+      "id": "schema:backend/src/validation/clientSchemas.ts#updateClientSchema",
+      "name": "updateClientSchema",
+      "library": "zod",
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/validation/clientSchemas.ts",
+        "symbol": "updateClientSchema",
+        "line": 10,
+        "column": 14
+      }
+    },
+    {
+      "kind": "service",
+      "id": "service:backend/src/services/clientService.ts#clientService",
+      "name": "clientService",
+      "memberIds": [
+        "function:backend/src/services/clientService.ts#clientService.create",
+        "function:backend/src/services/clientService.ts#clientService.list",
+        "function:backend/src/services/clientService.ts#clientService.remove"
+      ],
+      "detectedFrom": "object-literal",
+      "nameSuggestsService": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/services/clientService.ts",
+        "symbol": "clientService",
+        "line": 19,
+        "column": 14
+      }
+    },
+    {
+      "kind": "service",
+      "id": "service:src/lib/api.ts#api",
+      "name": "api",
+      "memberIds": [
+        "function:src/lib/api.ts#api.delete",
+        "function:src/lib/api.ts#api.get",
+        "function:src/lib/api.ts#api.post",
+        "function:src/lib/api.ts#api.put"
+      ],
+      "detectedFrom": "object-literal",
+      "nameSuggestsService": false,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/lib/api.ts",
+        "symbol": "api",
+        "line": 27,
+        "column": 14
+      }
+    },
+    {
+      "kind": "service",
+      "id": "service:src/services/clientService.ts#clientService",
+      "name": "clientService",
+      "memberIds": [
+        "function:src/services/clientService.ts#clientService.create",
+        "function:src/services/clientService.ts#clientService.list",
+        "function:src/services/clientService.ts#clientService.remove"
+      ],
+      "detectedFrom": "object-literal",
+      "nameSuggestsService": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/services/clientService.ts",
+        "symbol": "clientService",
+        "line": 28,
+        "column": 14
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:backend/src/services/clientService.ts#Client",
+      "name": "Client",
+      "typeKind": "interface",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/services/clientService.ts",
+        "symbol": "Client",
+        "line": 3,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:backend/src/validation/clientSchemas.ts#CreateClientInput",
+      "name": "CreateClientInput",
+      "typeKind": "type-alias",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "backend/src/validation/clientSchemas.ts",
+        "symbol": "CreateClientInput",
+        "line": 12,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/components/NewClientDialog.tsx#NewClientDialogProps",
+      "name": "NewClientDialogProps",
+      "typeKind": "interface",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/components/NewClientDialog.tsx",
+        "symbol": "NewClientDialogProps",
+        "line": 4,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/data/clients.ts#Client",
+      "name": "Client",
+      "typeKind": "interface",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/data/clients.ts",
+        "symbol": "Client",
+        "line": 2,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/guide/application-graph.ts#ApplicationNode",
+      "name": "ApplicationNode",
+      "typeKind": "type-alias",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/application-graph.ts",
+        "symbol": "ApplicationNode",
+        "line": 10,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/guide/application-graph.ts#Evidence",
+      "name": "Evidence",
+      "typeKind": "type-alias",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/application-graph.ts",
+        "symbol": "Evidence",
+        "line": 13,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/guide/application-graph.ts#FeaturePath",
+      "name": "FeaturePath",
+      "typeKind": "type-alias",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/application-graph.ts",
+        "symbol": "FeaturePath",
+        "line": 11,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/guide/application-graph.ts#GraphQuery",
+      "name": "GraphQuery",
+      "typeKind": "type-alias",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/application-graph.ts",
+        "symbol": "GraphQuery",
+        "line": 9,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/guide/application-graph.ts#PathStep",
+      "name": "PathStep",
+      "typeKind": "type-alias",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/guide/application-graph.ts",
+        "symbol": "PathStep",
+        "line": 12,
+        "column": 1
+      }
+    },
+    {
+      "kind": "type",
+      "id": "type:src/services/clientService.ts#CreateClientInput",
+      "name": "CreateClientInput",
+      "typeKind": "interface",
+      "exported": true,
+      "provenance": {
+        "source": "source-code",
+        "file": "src/services/clientService.ts",
+        "symbol": "CreateClientInput",
+        "line": 6,
+        "column": 1
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "api:DELETE:/api/clients/:param|invokes|function:backend/src/controllers/clientController.ts#deleteClient",
+      "type": "invokes",
+      "source": "api:DELETE:/api/clients/:param",
+      "target": "function:backend/src/controllers/clientController.ts#deleteClient",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/routes/clients.ts",
+          "line": 12,
+          "column": 81,
+          "symbol": "clientsRouter",
+          "excerpt": "deleteClient",
+          "rule": "router-handler-identifier"
+        }
+      ]
+    },
+    {
+      "id": "api:DELETE:/api/clients/:param|requires_permission|permission:clients:delete",
+      "type": "requires_permission",
+      "source": "api:DELETE:/api/clients/:param",
+      "target": "permission:clients:delete",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/routes/clients.ts",
+          "line": 12,
+          "column": 44,
+          "symbol": "clientsRouter",
+          "excerpt": "requirePermission('clients:delete')",
+          "rule": "configured-permission-recogniser"
+        }
+      ]
+    },
+    {
+      "id": "api:GET:/api/clients|invokes|function:backend/src/controllers/clientController.ts#listClients",
+      "type": "invokes",
+      "source": "api:GET:/api/clients",
+      "target": "function:backend/src/controllers/clientController.ts#listClients",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/routes/clients.ts",
+          "line": 10,
+          "column": 66,
+          "symbol": "clientsRouter",
+          "excerpt": "listClients",
+          "rule": "router-handler-identifier"
+        }
+      ]
+    },
+    {
+      "id": "api:GET:/api/clients|requires_permission|permission:clients:read",
+      "type": "requires_permission",
+      "source": "api:GET:/api/clients",
+      "target": "permission:clients:read",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/routes/clients.ts",
+          "line": 10,
+          "column": 31,
+          "symbol": "clientsRouter",
+          "excerpt": "requirePermission('clients:read')",
+          "rule": "configured-permission-recogniser"
+        }
+      ]
+    },
+    {
+      "id": "api:POST:/api/clients|invokes|function:backend/src/controllers/clientController.ts#createClient",
+      "type": "invokes",
+      "source": "api:POST:/api/clients",
+      "target": "function:backend/src/controllers/clientController.ts#createClient",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/routes/clients.ts",
+          "line": 11,
+          "column": 69,
+          "symbol": "clientsRouter",
+          "excerpt": "createClient",
+          "rule": "router-handler-identifier"
+        }
+      ]
+    },
+    {
+      "id": "api:POST:/api/clients|requires_permission|permission:clients:create",
+      "type": "requires_permission",
+      "source": "api:POST:/api/clients",
+      "target": "permission:clients:create",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/routes/clients.ts",
+          "line": 11,
+          "column": 32,
+          "symbol": "clientsRouter",
+          "excerpt": "requirePermission('clients:create')",
+          "rule": "configured-permission-recogniser"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|renders|component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel",
+      "type": "renders",
+      "source": "component:src/App.tsx#App",
+      "target": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 51,
+          "column": 8,
+          "symbol": "App",
+          "excerpt": "GuideDemoPanel",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|renders|component:src/guide/Inspector.tsx#Inspector",
+      "type": "renders",
+      "source": "component:src/App.tsx#App",
+      "target": "component:src/guide/Inspector.tsx#Inspector",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 50,
+          "column": 8,
+          "symbol": "App",
+          "excerpt": "Inspector",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|renders|component:src/layout/Sidebar.tsx#Sidebar",
+      "type": "renders",
+      "source": "component:src/App.tsx#App",
+      "target": "component:src/layout/Sidebar.tsx#Sidebar",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 42,
+          "column": 10,
+          "symbol": "App",
+          "excerpt": "Sidebar",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|renders|component:src/pages/ClientDetails.tsx#ClientDetails",
+      "type": "renders",
+      "source": "component:src/App.tsx#App",
+      "target": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 46,
+          "column": 54,
+          "symbol": "App",
+          "excerpt": "ClientDetails",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|renders|component:src/pages/Clients.tsx#Clients",
+      "type": "renders",
+      "source": "component:src/App.tsx#App",
+      "target": "component:src/pages/Clients.tsx#Clients",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 45,
+          "column": 44,
+          "symbol": "App",
+          "excerpt": "Clients",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|renders|component:src/pages/Dashboard.tsx#Dashboard",
+      "type": "renders",
+      "source": "component:src/App.tsx#App",
+      "target": "component:src/pages/Dashboard.tsx#Dashboard",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 44,
+          "column": 37,
+          "symbol": "App",
+          "excerpt": "Dashboard",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|renders|component:src/pages/Settings.tsx#Settings",
+      "type": "renders",
+      "source": "component:src/App.tsx#App",
+      "target": "component:src/pages/Settings.tsx#Settings",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 47,
+          "column": 45,
+          "symbol": "App",
+          "excerpt": "Settings",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/App.tsx#App|uses_hook|hook:react-router-dom#useNavigate",
+      "type": "uses_hook",
+      "source": "component:src/App.tsx#App",
+      "target": "hook:react-router-dom#useNavigate",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 30,
+          "column": 20,
+          "symbol": "App",
+          "excerpt": "useNavigate",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|calls|function:src/components/NewClientDialog.tsx#submitClient",
+      "type": "calls",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "function:src/components/NewClientDialog.tsx#submitClient",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 48,
+          "column": 16,
+          "symbol": "NewClientDialog",
+          "excerpt": "submitClient"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|contains|element:clients.create-dialog",
+      "type": "contains",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "element:clients.create-dialog",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 42,
+          "column": 5,
+          "symbol": "clients.create-dialog",
+          "excerpt": "<dialog ref={dialogRef} data-guide=\"clients.create-dialog\" onClose={onClose}>"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|contains|element:clients.create-form",
+      "type": "contains",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "element:clients.create-form",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 44,
+          "column": 7,
+          "symbol": "clients.create-form",
+          "excerpt": "<form data-guide=\"clients.create-form\" onSubmit={(event) => { event.preventDefault(); void submitClient(); }} >"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|contains|element:clients.create-form.cancel",
+      "type": "contains",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "element:clients.create-form.cancel",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 75,
+          "column": 11,
+          "symbol": "clients.create-form.cancel",
+          "excerpt": "<button type=\"button\" onClick={onClose} data-guide=\"clients.create-form.cancel\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|contains|element:clients.create-form.industry",
+      "type": "contains",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "element:clients.create-form.industry",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 63,
+          "column": 11,
+          "symbol": "clients.create-form.industry",
+          "excerpt": "<input data-guide=\"clients.create-form.industry\" placeholder=\"Logistics\" value={industry} onChange={(event) => setIndus…"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|contains|element:clients.create-form.name",
+      "type": "contains",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "element:clients.create-form.name",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 53,
+          "column": 11,
+          "symbol": "clients.create-form.name",
+          "excerpt": "<input data-guide=\"clients.create-form.name\" placeholder=\"Northwind Trading\" value={name} onChange={(event) => setName(…"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|contains|element:clients.create-form.submit",
+      "type": "contains",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "element:clients.create-form.submit",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 72,
+          "column": 11,
+          "symbol": "clients.create-form.submit",
+          "excerpt": "<button className=\"primary\" type=\"submit\" data-guide=\"clients.create-form.submit\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|submits_to|function:src/components/NewClientDialog.tsx#submitClient",
+      "type": "submits_to",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "function:src/components/NewClientDialog.tsx#submitClient",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 48,
+          "column": 16,
+          "symbol": "NewClientDialog",
+          "excerpt": "submitClient",
+          "rule": "jsx-handler-identifier"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|uses_hook|hook:react#useEffect",
+      "type": "uses_hook",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "hook:react#useEffect",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 23,
+          "column": 3,
+          "symbol": "NewClientDialog",
+          "excerpt": "useEffect",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|uses_hook|hook:react#useRef",
+      "type": "uses_hook",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "hook:react#useRef",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 18,
+          "column": 21,
+          "symbol": "NewClientDialog",
+          "excerpt": "useRef",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/components/NewClientDialog.tsx#NewClientDialog|uses_hook|hook:react#useState",
+      "type": "uses_hook",
+      "source": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "target": "hook:react#useState",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 19,
+          "column": 27,
+          "symbol": "NewClientDialog",
+          "excerpt": "useState",
+          "rule": "import-symbol-resolution"
+        },
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 20,
+          "column": 35,
+          "symbol": "NewClientDialog",
+          "excerpt": "useState",
+          "rule": "import-symbol-resolution"
+        },
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 21,
+          "column": 29,
+          "symbol": "NewClientDialog",
+          "excerpt": "useState",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel|calls|function:src/guide/GuideDemoPanel.tsx#run",
+      "type": "calls",
+      "source": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel",
+      "target": "function:src/guide/GuideDemoPanel.tsx#run",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 35,
+          "column": 13,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "run"
+        },
+        {
+          "type": "source",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 48,
+          "column": 32,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "run"
+        },
+        {
+          "type": "source",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 53,
+          "column": 26,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "run"
+        },
+        {
+          "type": "source",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 70,
+          "column": 13,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "run"
+        },
+        {
+          "type": "source",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 89,
+          "column": 13,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "run"
+        },
+        {
+          "type": "source",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 102,
+          "column": 26,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "run"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel|uses_hook|hook:@statewavedev/guide-react#useGuide",
+      "type": "uses_hook",
+      "source": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel",
+      "target": "hook:@statewavedev/guide-react#useGuide",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 20,
+          "column": 5,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "useGuide",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel|uses_hook|hook:@statewavedev/guide-react#useGuideContext",
+      "type": "uses_hook",
+      "source": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel",
+      "target": "hook:@statewavedev/guide-react#useGuideContext",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 21,
+          "column": 23,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "useGuideContext",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel|uses_hook|hook:react#useState",
+      "type": "uses_hook",
+      "source": "component:src/guide/GuideDemoPanel.tsx#GuideDemoPanel",
+      "target": "hook:react#useState",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/guide/GuideDemoPanel.tsx",
+          "line": 22,
+          "column": 31,
+          "symbol": "GuideDemoPanel",
+          "excerpt": "useState",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Hop|calls|function:src/guide/Inspector.tsx#nodeLabel",
+      "type": "calls",
+      "source": "component:src/guide/Inspector.tsx#Hop",
+      "target": "function:src/guide/Inspector.tsx#nodeLabel",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/guide/Inspector.tsx",
+          "line": 69,
+          "column": 46,
+          "symbol": "Hop",
+          "excerpt": "nodeLabel"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Hop|renders|component:src/guide/Inspector.tsx#EvidenceList",
+      "type": "renders",
+      "source": "component:src/guide/Inspector.tsx#Hop",
+      "target": "component:src/guide/Inspector.tsx#EvidenceList",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/guide/Inspector.tsx",
+          "line": 72,
+          "column": 17,
+          "symbol": "Hop",
+          "excerpt": "EvidenceList"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Hop|uses_hook|hook:react#useState",
+      "type": "uses_hook",
+      "source": "component:src/guide/Inspector.tsx#Hop",
+      "target": "hook:react#useState",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/guide/Inspector.tsx",
+          "line": 59,
+          "column": 27,
+          "symbol": "Hop",
+          "excerpt": "useState",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Inspector|calls|function:src/guide/Inspector.tsx#nodeLabel",
+      "type": "calls",
+      "source": "component:src/guide/Inspector.tsx#Inspector",
+      "target": "function:src/guide/Inspector.tsx#nodeLabel",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/guide/Inspector.tsx",
+          "line": 135,
+          "column": 17,
+          "symbol": "Inspector",
+          "excerpt": "nodeLabel"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Inspector|renders|component:src/guide/Inspector.tsx#Hop",
+      "type": "renders",
+      "source": "component:src/guide/Inspector.tsx#Inspector",
+      "target": "component:src/guide/Inspector.tsx#Hop",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/guide/Inspector.tsx",
+          "line": 169,
+          "column": 16,
+          "symbol": "Inspector",
+          "excerpt": "Hop"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Inspector|uses_hook|hook:@statewavedev/guide-react#useGuide",
+      "type": "uses_hook",
+      "source": "component:src/guide/Inspector.tsx#Inspector",
+      "target": "hook:@statewavedev/guide-react#useGuide",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/guide/Inspector.tsx",
+          "line": 91,
+          "column": 42,
+          "symbol": "Inspector",
+          "excerpt": "useGuide",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Inspector|uses_hook|hook:react#useMemo",
+      "type": "uses_hook",
+      "source": "component:src/guide/Inspector.tsx#Inspector",
+      "target": "hook:react#useMemo",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/guide/Inspector.tsx",
+          "line": 94,
+          "column": 19,
+          "symbol": "Inspector",
+          "excerpt": "useMemo",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/guide/Inspector.tsx#Inspector|uses_hook|hook:react#useState",
+      "type": "uses_hook",
+      "source": "component:src/guide/Inspector.tsx#Inspector",
+      "target": "hook:react#useState",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/guide/Inspector.tsx",
+          "line": 92,
+          "column": 35,
+          "symbol": "Inspector",
+          "excerpt": "useState",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/layout/Sidebar.tsx#Sidebar|contains|element:nav",
+      "type": "contains",
+      "source": "component:src/layout/Sidebar.tsx#Sidebar",
+      "target": "element:nav",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/layout/Sidebar.tsx",
+          "line": 13,
+          "column": 5,
+          "symbol": "nav",
+          "excerpt": "<aside className=\"sidebar\" data-guide=\"nav\" data-guide-type=\"menu\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/layout/Sidebar.tsx#Sidebar|contains|element:nav.clients",
+      "type": "contains",
+      "source": "component:src/layout/Sidebar.tsx#Sidebar",
+      "target": "element:nav.clients",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/layout/Sidebar.tsx",
+          "line": 26,
+          "column": 9,
+          "symbol": "nav.clients",
+          "excerpt": "<NavLink to=\"/clients\" data-guide=\"nav.clients\" data-guide-type=\"link\" className={({ isActive }) => (isActive ? 'active…"
+        }
+      ]
+    },
+    {
+      "id": "component:src/layout/Sidebar.tsx#Sidebar|contains|element:nav.dashboard",
+      "type": "contains",
+      "source": "component:src/layout/Sidebar.tsx#Sidebar",
+      "target": "element:nav.dashboard",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/layout/Sidebar.tsx",
+          "line": 17,
+          "column": 9,
+          "symbol": "nav.dashboard",
+          "excerpt": "<NavLink to=\"/\" end data-guide=\"nav.dashboard\" data-guide-type=\"link\" className={({ isActive }) => (isActive ? 'active'…"
+        }
+      ]
+    },
+    {
+      "id": "component:src/layout/Sidebar.tsx#Sidebar|contains|element:nav.settings",
+      "type": "contains",
+      "source": "component:src/layout/Sidebar.tsx#Sidebar",
+      "target": "element:nav.settings",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/layout/Sidebar.tsx",
+          "line": 34,
+          "column": 9,
+          "symbol": "nav.settings",
+          "excerpt": "<NavLink to=\"/settings\" data-guide=\"nav.settings\" data-guide-type=\"link\" className={({ isActive }) => (isActive ? 'acti…"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|calls|function:src/data/clients.ts#findClient",
+      "type": "calls",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "function:src/data/clients.ts#findClient",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 6,
+          "column": 29,
+          "symbol": "ClientDetails",
+          "excerpt": "findClient",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|contains|element:clients.detail",
+      "type": "contains",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "element:clients.detail",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 20,
+          "column": 5,
+          "symbol": "clients.detail",
+          "excerpt": "<main data-guide=\"clients.detail\" data-guide-type=\"section\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|contains|element:clients.detail.back",
+      "type": "contains",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "element:clients.detail.back",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 49,
+          "column": 11,
+          "symbol": "clients.detail.back",
+          "excerpt": "<Link to=\"/clients\" data-guide=\"clients.detail.back\" data-guide-type=\"link\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|contains|element:clients.detail.edit",
+      "type": "contains",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "element:clients.detail.edit",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 48,
+          "column": 11,
+          "symbol": "clients.detail.edit",
+          "excerpt": "<button data-guide=\"clients.detail.edit\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|contains|element:clients.detail.missing",
+      "type": "contains",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "element:clients.detail.missing",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 10,
+          "column": 7,
+          "symbol": "clients.detail.missing",
+          "excerpt": "<main data-guide=\"clients.detail.missing\" data-guide-type=\"section\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|contains|element:clients.detail.table",
+      "type": "contains",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "element:clients.detail.table",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 28,
+          "column": 9,
+          "symbol": "clients.detail.table",
+          "excerpt": "<table data-guide=\"clients.detail.table\" data-guide-label=\"Client details\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|navigates_to|route:/clients",
+      "type": "navigates_to",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "route:/clients",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 13,
+          "column": 20,
+          "symbol": "ClientDetails",
+          "excerpt": "\"/clients\""
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/ClientDetails.tsx#ClientDetails|uses_hook|hook:react-router-dom#useParams",
+      "type": "uses_hook",
+      "source": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "target": "hook:react-router-dom#useParams",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 5,
+          "column": 24,
+          "symbol": "ClientDetails",
+          "excerpt": "useParams",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Clients.tsx#Clients|contains|element:clients",
+      "type": "contains",
+      "source": "component:src/pages/Clients.tsx#Clients",
+      "target": "element:clients",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Clients.tsx",
+          "line": 46,
+          "column": 5,
+          "symbol": "clients",
+          "excerpt": "<main data-guide=\"clients\" data-guide-type=\"section\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Clients.tsx#Clients|contains|element:clients.create",
+      "type": "contains",
+      "source": "component:src/pages/Clients.tsx#Clients",
+      "target": "element:clients.create",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Clients.tsx",
+          "line": 58,
+          "column": 13,
+          "symbol": "clients.create",
+          "excerpt": "<button className=\"primary\" data-guide=\"clients.create\" onClick={openCreateClient}>"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Clients.tsx#Clients|contains|element:clients.export",
+      "type": "contains",
+      "source": "component:src/pages/Clients.tsx#Clients",
+      "target": "element:clients.export",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Clients.tsx",
+          "line": 62,
+          "column": 11,
+          "symbol": "clients.export",
+          "excerpt": "<button data-guide=\"clients.export\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Clients.tsx#Clients|contains|element:clients.table",
+      "type": "contains",
+      "source": "component:src/pages/Clients.tsx#Clients",
+      "target": "element:clients.table",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Clients.tsx",
+          "line": 71,
+          "column": 11,
+          "symbol": "clients.table",
+          "excerpt": "<table data-guide=\"clients.table\" data-guide-label=\"Client list\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Clients.tsx#Clients|renders|component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "type": "renders",
+      "source": "component:src/pages/Clients.tsx#Clients",
+      "target": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/pages/Clients.tsx",
+          "line": 96,
+          "column": 8,
+          "symbol": "Clients",
+          "excerpt": "NewClientDialog",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Clients.tsx#Clients|uses_hook|hook:react#useState",
+      "type": "uses_hook",
+      "source": "component:src/pages/Clients.tsx#Clients",
+      "target": "hook:react#useState",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/pages/Clients.tsx",
+          "line": 26,
+          "column": 39,
+          "symbol": "Clients",
+          "excerpt": "useState",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Dashboard.tsx#Dashboard|contains|element:dashboard",
+      "type": "contains",
+      "source": "component:src/pages/Dashboard.tsx#Dashboard",
+      "target": "element:dashboard",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Dashboard.tsx",
+          "line": 10,
+          "column": 5,
+          "symbol": "dashboard",
+          "excerpt": "<main data-guide=\"dashboard\" data-guide-type=\"section\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Dashboard.tsx#Dashboard|contains|element:dashboard.summary",
+      "type": "contains",
+      "source": "component:src/pages/Dashboard.tsx#Dashboard",
+      "target": "element:dashboard.summary",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Dashboard.tsx",
+          "line": 19,
+          "column": 9,
+          "symbol": "dashboard.summary",
+          "excerpt": "<table data-guide=\"dashboard.summary\" data-guide-label=\"Workspace summary\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|contains|element:settings",
+      "type": "contains",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "element:settings",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Settings.tsx",
+          "line": 29,
+          "column": 5,
+          "symbol": "settings",
+          "excerpt": "<main data-guide=\"settings\" data-guide-type=\"section\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|contains|element:settings.form",
+      "type": "contains",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "element:settings.form",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Settings.tsx",
+          "line": 35,
+          "column": 9,
+          "symbol": "settings.form",
+          "excerpt": "<form data-guide=\"settings.form\" onSubmit={(event) => event.preventDefault()}>"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|contains|element:settings.form.name",
+      "type": "contains",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "element:settings.form.name",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Settings.tsx",
+          "line": 38,
+          "column": 13,
+          "symbol": "settings.form.name",
+          "excerpt": "<input data-guide=\"settings.form.name\" defaultValue=\"Acme Consulting\" />"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|contains|element:settings.form.owner",
+      "type": "contains",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "element:settings.form.owner",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Settings.tsx",
+          "line": 42,
+          "column": 13,
+          "symbol": "settings.form.owner",
+          "excerpt": "<input data-guide=\"settings.form.owner\" defaultValue=\"Ada\" />"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|contains|element:settings.form.save",
+      "type": "contains",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "element:settings.form.save",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Settings.tsx",
+          "line": 44,
+          "column": 11,
+          "symbol": "settings.form.save",
+          "excerpt": "<button ref={saveRef} className=\"primary\" data-guide=\"settings.form.save\" type=\"submit\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|contains|element:settings.notifications",
+      "type": "contains",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "element:settings.notifications",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Settings.tsx",
+          "line": 53,
+          "column": 7,
+          "symbol": "settings.notifications",
+          "excerpt": "<section ref={notificationsRef} data-guide=\"settings.notifications\" data-guide-label=\"Notification settings\" >"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|contains|element:settings.notifications.digest",
+      "type": "contains",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "element:settings.notifications.digest",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/Settings.tsx",
+          "line": 61,
+          "column": 11,
+          "symbol": "settings.notifications.digest",
+          "excerpt": "<select data-guide=\"settings.notifications.digest\" defaultValue=\"weekly\">"
+        }
+      ]
+    },
+    {
+      "id": "component:src/pages/Settings.tsx#Settings|uses_hook|hook:@statewavedev/guide-react#useGuideElement",
+      "type": "uses_hook",
+      "source": "component:src/pages/Settings.tsx#Settings",
+      "target": "hook:@statewavedev/guide-react#useGuideElement",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/pages/Settings.tsx",
+          "line": 14,
+          "column": 28,
+          "symbol": "Settings",
+          "excerpt": "useGuideElement",
+          "rule": "import-symbol-resolution"
+        },
+        {
+          "type": "static-inference",
+          "file": "src/pages/Settings.tsx",
+          "line": 21,
+          "column": 19,
+          "symbol": "Settings",
+          "excerpt": "useGuideElement",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "element:clients.create-form|submits_to|function:src/components/NewClientDialog.tsx#submitClient",
+      "type": "submits_to",
+      "source": "element:clients.create-form",
+      "target": "function:src/components/NewClientDialog.tsx#submitClient",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 48,
+          "column": 16,
+          "symbol": "NewClientDialog",
+          "excerpt": "submitClient",
+          "rule": "jsx-handler-identifier"
+        }
+      ]
+    },
+    {
+      "id": "element:clients.create|invokes|function:src/pages/Clients.tsx#openCreateClient",
+      "type": "invokes",
+      "source": "element:clients.create",
+      "target": "function:src/pages/Clients.tsx#openCreateClient",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/pages/Clients.tsx",
+          "line": 58,
+          "column": 78,
+          "symbol": "Clients",
+          "excerpt": "openCreateClient",
+          "rule": "jsx-handler-identifier"
+        }
+      ]
+    },
+    {
+      "id": "element:clients.detail.back|navigates_to|route:/clients",
+      "type": "navigates_to",
+      "source": "element:clients.detail.back",
+      "target": "route:/clients",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/pages/ClientDetails.tsx",
+          "line": 49,
+          "column": 20,
+          "excerpt": "\"/clients\""
+        }
+      ]
+    },
+    {
+      "id": "element:nav.clients|navigates_to|route:/clients",
+      "type": "navigates_to",
+      "source": "element:nav.clients",
+      "target": "route:/clients",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/layout/Sidebar.tsx",
+          "line": 27,
+          "column": 14,
+          "excerpt": "\"/clients\""
+        }
+      ]
+    },
+    {
+      "id": "element:nav.dashboard|navigates_to|route:/",
+      "type": "navigates_to",
+      "source": "element:nav.dashboard",
+      "target": "route:/",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/layout/Sidebar.tsx",
+          "line": 18,
+          "column": 14,
+          "excerpt": "\"/\""
+        }
+      ]
+    },
+    {
+      "id": "element:nav.settings|navigates_to|route:/settings",
+      "type": "navigates_to",
+      "source": "element:nav.settings",
+      "target": "route:/settings",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/layout/Sidebar.tsx",
+          "line": 35,
+          "column": 14,
+          "excerpt": "\"/settings\""
+        }
+      ]
+    },
+    {
+      "id": "function:backend/src/controllers/clientController.ts#createClient|calls|function:backend/src/services/clientService.ts#clientService.create",
+      "type": "calls",
+      "source": "function:backend/src/controllers/clientController.ts#createClient",
+      "target": "function:backend/src/services/clientService.ts#clientService.create",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/controllers/clientController.ts",
+          "line": 17,
+          "column": 24,
+          "symbol": "createClient",
+          "excerpt": "clientService.create",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:backend/src/controllers/clientController.ts#createClient|uses_service|service:backend/src/services/clientService.ts#clientService",
+      "type": "uses_service",
+      "source": "function:backend/src/controllers/clientController.ts#createClient",
+      "target": "service:backend/src/services/clientService.ts#clientService",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/controllers/clientController.ts",
+          "line": 17,
+          "column": 24,
+          "symbol": "createClient",
+          "excerpt": "clientService.create",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:backend/src/controllers/clientController.ts#createClient|validates_with|schema:backend/src/validation/clientSchemas.ts#createClientSchema",
+      "type": "validates_with",
+      "source": "function:backend/src/controllers/clientController.ts#createClient",
+      "target": "schema:backend/src/validation/clientSchemas.ts#createClientSchema",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/controllers/clientController.ts",
+          "line": 12,
+          "column": 18,
+          "symbol": "createClient",
+          "excerpt": "createClientSchema",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:backend/src/controllers/clientController.ts#deleteClient|calls|function:backend/src/services/clientService.ts#clientService.remove",
+      "type": "calls",
+      "source": "function:backend/src/controllers/clientController.ts#deleteClient",
+      "target": "function:backend/src/services/clientService.ts#clientService.remove",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/controllers/clientController.ts",
+          "line": 25,
+          "column": 19,
+          "symbol": "deleteClient",
+          "excerpt": "clientService.remove",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:backend/src/controllers/clientController.ts#deleteClient|uses_service|service:backend/src/services/clientService.ts#clientService",
+      "type": "uses_service",
+      "source": "function:backend/src/controllers/clientController.ts#deleteClient",
+      "target": "service:backend/src/services/clientService.ts#clientService",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/controllers/clientController.ts",
+          "line": 25,
+          "column": 19,
+          "symbol": "deleteClient",
+          "excerpt": "clientService.remove",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:backend/src/controllers/clientController.ts#listClients|calls|function:backend/src/services/clientService.ts#clientService.list",
+      "type": "calls",
+      "source": "function:backend/src/controllers/clientController.ts#listClients",
+      "target": "function:backend/src/services/clientService.ts#clientService.list",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/controllers/clientController.ts",
+          "line": 7,
+          "column": 12,
+          "symbol": "listClients",
+          "excerpt": "clientService.list",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:backend/src/controllers/clientController.ts#listClients|uses_service|service:backend/src/services/clientService.ts#clientService",
+      "type": "uses_service",
+      "source": "function:backend/src/controllers/clientController.ts#listClients",
+      "target": "service:backend/src/services/clientService.ts#clientService",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "backend/src/controllers/clientController.ts",
+          "line": 7,
+          "column": 12,
+          "symbol": "listClients",
+          "excerpt": "clientService.list",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:src/App.tsx#RouteSync|uses_hook|hook:react#useEffect",
+      "type": "uses_hook",
+      "source": "function:src/App.tsx#RouteSync",
+      "target": "hook:react#useEffect",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 22,
+          "column": 3,
+          "symbol": "RouteSync",
+          "excerpt": "useEffect",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:src/App.tsx#RouteSync|uses_hook|hook:react-router-dom#useLocation",
+      "type": "uses_hook",
+      "source": "function:src/App.tsx#RouteSync",
+      "target": "hook:react-router-dom#useLocation",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 20,
+          "column": 24,
+          "symbol": "RouteSync",
+          "excerpt": "useLocation",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:src/components/NewClientDialog.tsx#submitClient|calls|function:src/services/clientService.ts#clientService.create",
+      "type": "calls",
+      "source": "function:src/components/NewClientDialog.tsx#submitClient",
+      "target": "function:src/services/clientService.ts#clientService.create",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 33,
+          "column": 13,
+          "symbol": "submitClient",
+          "excerpt": "clientService.create",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:src/components/NewClientDialog.tsx#submitClient|uses_service|service:src/services/clientService.ts#clientService",
+      "type": "uses_service",
+      "source": "function:src/components/NewClientDialog.tsx#submitClient",
+      "target": "service:src/services/clientService.ts#clientService",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/components/NewClientDialog.tsx",
+          "line": 33,
+          "column": 13,
+          "symbol": "submitClient",
+          "excerpt": "clientService.create",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:src/lib/api.ts#api.delete|calls|function:src/lib/api.ts#request",
+      "type": "calls",
+      "source": "function:src/lib/api.ts#api.delete",
+      "target": "function:src/lib/api.ts#request",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/lib/api.ts",
+          "line": 31,
+          "column": 32,
+          "symbol": "api.delete",
+          "excerpt": "request"
+        }
+      ]
+    },
+    {
+      "id": "function:src/lib/api.ts#api.get|calls|function:src/lib/api.ts#request",
+      "type": "calls",
+      "source": "function:src/lib/api.ts#api.get",
+      "target": "function:src/lib/api.ts#request",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/lib/api.ts",
+          "line": 28,
+          "column": 29,
+          "symbol": "api.get",
+          "excerpt": "request"
+        }
+      ]
+    },
+    {
+      "id": "function:src/lib/api.ts#api.post|calls|function:src/lib/api.ts#request",
+      "type": "calls",
+      "source": "function:src/lib/api.ts#api.post",
+      "target": "function:src/lib/api.ts#request",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/lib/api.ts",
+          "line": 29,
+          "column": 45,
+          "symbol": "api.post",
+          "excerpt": "request"
+        }
+      ]
+    },
+    {
+      "id": "function:src/lib/api.ts#api.put|calls|function:src/lib/api.ts#request",
+      "type": "calls",
+      "source": "function:src/lib/api.ts#api.put",
+      "target": "function:src/lib/api.ts#request",
+      "confidence": 1,
+      "evidence": [
+        {
+          "type": "source",
+          "file": "src/lib/api.ts",
+          "line": 30,
+          "column": 44,
+          "symbol": "api.put",
+          "excerpt": "request"
+        }
+      ]
+    },
+    {
+      "id": "function:src/pages/Clients.tsx#openCreateClient|opens|component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "type": "opens",
+      "source": "function:src/pages/Clients.tsx#openCreateClient",
+      "target": "component:src/components/NewClientDialog.tsx#NewClientDialog",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/pages/Clients.tsx",
+          "line": 38,
+          "column": 5,
+          "symbol": "openCreateClient",
+          "excerpt": "setCreateOpen(true)",
+          "rule": "state-flag-gates-element"
+        },
+        {
+          "type": "static-inference",
+          "file": "src/pages/Clients.tsx",
+          "line": 96,
+          "column": 8,
+          "symbol": "Clients",
+          "excerpt": "NewClientDialog",
+          "rule": "state-flag-gates-element"
+        }
+      ]
+    },
+    {
+      "id": "function:src/services/clientService.ts#clientService.create|calls_api|api:POST:/api/clients",
+      "type": "calls_api",
+      "source": "function:src/services/clientService.ts#clientService.create",
+      "target": "api:POST:/api/clients",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/services/clientService.ts",
+          "line": 35,
+          "column": 28,
+          "symbol": "clientService.create",
+          "excerpt": "fetch(`${API_BASE_URL}/clients`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringif…",
+          "rule": "module-constant-string"
+        }
+      ]
+    },
+    {
+      "id": "function:src/services/clientService.ts#clientService.list|calls_api|api:GET:/api/clients",
+      "type": "calls_api",
+      "source": "function:src/services/clientService.ts#clientService.list",
+      "target": "api:GET:/api/clients",
+      "confidence": 0.9,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/services/clientService.ts",
+          "line": 30,
+          "column": 28,
+          "symbol": "clientService.list",
+          "excerpt": "fetch(`${API_BASE_URL}/clients`, { method: 'GET' })",
+          "rule": "module-constant-string"
+        }
+      ]
+    },
+    {
+      "id": "function:src/services/clientService.ts#clientService.remove|calls|function:src/lib/api.ts#api.delete",
+      "type": "calls",
+      "source": "function:src/services/clientService.ts#clientService.remove",
+      "target": "function:src/lib/api.ts#api.delete",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/services/clientService.ts",
+          "line": 46,
+          "column": 12,
+          "symbol": "clientService.remove",
+          "excerpt": "api.delete",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "function:src/services/clientService.ts#clientService.remove|uses_service|service:src/lib/api.ts#api",
+      "type": "uses_service",
+      "source": "function:src/services/clientService.ts#clientService.remove",
+      "target": "service:src/lib/api.ts#api",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/services/clientService.ts",
+          "line": 46,
+          "column": 12,
+          "symbol": "clientService.remove",
+          "excerpt": "api.delete",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "route:/clients/:clientId|renders|component:src/pages/ClientDetails.tsx#ClientDetails",
+      "type": "renders",
+      "source": "route:/clients/:clientId",
+      "target": "component:src/pages/ClientDetails.tsx#ClientDetails",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 46,
+          "column": 54,
+          "excerpt": "ClientDetails",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "route:/clients|renders|component:src/pages/Clients.tsx#Clients",
+      "type": "renders",
+      "source": "route:/clients",
+      "target": "component:src/pages/Clients.tsx#Clients",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 45,
+          "column": 44,
+          "excerpt": "Clients",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "route:/settings|renders|component:src/pages/Settings.tsx#Settings",
+      "type": "renders",
+      "source": "route:/settings",
+      "target": "component:src/pages/Settings.tsx#Settings",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 47,
+          "column": 45,
+          "excerpt": "Settings",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    },
+    {
+      "id": "route:/|renders|component:src/pages/Dashboard.tsx#Dashboard",
+      "type": "renders",
+      "source": "route:/",
+      "target": "component:src/pages/Dashboard.tsx#Dashboard",
+      "confidence": 0.95,
+      "evidence": [
+        {
+          "type": "static-inference",
+          "file": "src/App.tsx",
+          "line": 44,
+          "column": 37,
+          "excerpt": "Dashboard",
+          "rule": "import-symbol-resolution"
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "nodes": 120,
+    "relationships": 95,
+    "byKind": {
+      "file": 21,
+      "route": 4,
+      "component": 11,
+      "element": 28,
+      "function": 25,
+      "hook": 10,
+      "service": 3,
+      "api": 3,
+      "schema": 2,
+      "permission": 3,
+      "type": 10
+    },
+    "byRelationship": {
+      "renders": 14,
+      "contains": 28,
+      "invokes": 4,
+      "opens": 1,
+      "navigates_to": 5,
+      "calls": 14,
+      "submits_to": 2,
+      "uses_hook": 16,
+      "uses_service": 5,
+      "calls_api": 2,
+      "requires_permission": 3,
+      "validates_with": 1
+    }
+  },
+  "health": {
+    "resolvedCalls": 19,
+    "unresolvedCalls": 3,
+    "resolvedApiPaths": 5,
+    "unresolvedApiPaths": 1,
+    "joinedEndpoints": 2,
+    "frontendOnlyEndpoints": 0,
+    "backendOnlyEndpoints": 1,
+    "integrity": "PASS",
+    "danglingRelationships": []
+  },
+  "diagnostics": [
+    {
+      "code": "UNRESOLVED_API_PATH",
+      "severity": "info",
+      "message": "No endpoint was recorded for this request because its HTTP method is not a literal.",
+      "file": "src/lib/api.ts",
+      "line": 18,
+      "excerpt": "fetch(`${API_BASE_URL}${path}`, { method: options.method, headers: { 'content-type': 'application/json' }, ...(options.b"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_CALL",
+      "severity": "info",
+      "message": "This call was not added to the call graph because the callee is a parameter.",
+      "file": "backend/src/middleware/requirePermission.ts",
+      "line": 18,
+      "excerpt": "next()"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_CALL",
+      "severity": "info",
+      "message": "This call was not added to the call graph because the callee is a value assembled at runtime.",
+      "file": "src/App.tsx",
+      "line": 38,
+      "excerpt": "navigate(route, { replace: replace ?? false })"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_CALL",
+      "severity": "info",
+      "message": "This call was not added to the call graph because the callee is a parameter.",
+      "file": "src/components/NewClientDialog.tsx",
+      "line": 34,
+      "excerpt": "onClose()"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_CALL",
+      "severity": "info",
+      "message": "This handler prop was not added to the graph because the handler is a prop of this component, so its value is chosen by whichever parent renders it.",
+      "file": "src/components/NewClientDialog.tsx",
+      "line": 42,
+      "excerpt": "onClose={onClose}"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_CALL",
+      "severity": "info",
+      "message": "This handler prop was not added to the graph because the handler is destructured out of a value this file does not declare.",
+      "file": "src/components/NewClientDialog.tsx",
+      "line": 57,
+      "excerpt": "onChange={(event) => setName(event.target.value)}"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_CALL",
+      "severity": "info",
+      "message": "This handler prop was not added to the graph because the handler is destructured out of a value this file does not declare.",
+      "file": "src/components/NewClientDialog.tsx",
+      "line": 67,
+      "excerpt": "onChange={(event) => setIndustry(event.target.value)}"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_CALL",
+      "severity": "info",
+      "message": "This handler prop was not added to the graph because the handler is a prop of this component, so its value is chosen by whichever parent renders it.",
+      "file": "src/components/NewClientDialog.tsx",
+      "line": 75,
+      "excerpt": "onClick={onClose}"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_ROUTE",
+      "severity": "warning",
+      "message": "This destination was not linked to a route because it runs inside a component rather than inside a named function or an addressable element, so there is nothing for the edge to leave from.",
+      "file": "src/App.tsx",
+      "line": 38,
+      "excerpt": "navigate(route, { replace: replace ?? false })"
+    },
+    {
+      "code": "UNRESOLVED_DYNAMIC_ROUTE",
+      "severity": "warning",
+      "message": "This destination was not linked to a route because it is not a statically known path.",
+      "file": "src/pages/Clients.tsx",
+      "line": 84,
+      "excerpt": "to={`/clients/${client.id}`}"
+    },
+    {
+      "code": "UNSUPPORTED_FORM_PATTERN",
+      "severity": "info",
+      "message": "This form's submit handler was not traced because the handler is a prop of this component, so its value is chosen by whichever parent renders it.",
+      "file": "src/pages/Settings.tsx",
+      "line": 35,
+      "excerpt": "onSubmit={(event) => event.preventDefault()}"
+    }
+  ]
+}

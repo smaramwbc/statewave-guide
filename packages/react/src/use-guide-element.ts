@@ -18,6 +18,7 @@ import {
   guideElementNamespace,
 } from '@statewavedev/guide-shared';
 import type { RegisterElementInput } from './element-registry.js';
+import { internalsOf } from './registry-internals.js';
 import { useGuideInternals } from './internal-context.js';
 
 /**
@@ -96,11 +97,23 @@ export function useGuideElement<T extends HTMLElement = HTMLElement>(
 
   const setRef = useCallback<RefCallback<T>>(
     (node) => {
+      // Registering an element and attaching its node are package-private
+      // capabilities: the registry on the context is read-only by type *and* by
+      // construction, so this hook asks the friend table for the other half.
+      //
+      // Asked for here, on each call, rather than memoised into a `useMemo`.
+      // React stores hook state on the fiber and links the fiber from the DOM
+      // node, so a memoised `ElementRegistryInternals` — or one sitting in a
+      // dependency array — is reachable from the page through
+      // `node.__reactFiber$…`, and with it `resolveNode`. A WeakMap lookup made
+      // inside a closure leaves nothing on the fiber to find, and costs a hash
+      // probe on a path that runs when a node mounts, not on every render.
+      const registryInternals = internalsOf(registry);
       if (node) {
         nodeRef.current = node;
-        disposeRef.current ??= registry.register(latest.current);
+        disposeRef.current ??= registryInternals.register(latest.current);
         ownsAttributeRef.current = applyGuideAttribute(node, id, onWarning);
-        registry.setNode(id, node);
+        registryInternals.setNode(id, node);
       } else {
         const previous = nodeRef.current;
         nodeRef.current = null;
@@ -118,6 +131,8 @@ export function useGuideElement<T extends HTMLElement = HTMLElement>(
       // Returns nothing on purpose: React 19 treats a value returned from a ref
       // callback as a cleanup function.
     },
+    // `registry` is created once by the provider and never changes identity, so
+    // this callback keeps the stable identity the ref contract depends on.
     [registry, id, onWarning],
   );
 
@@ -125,6 +140,7 @@ export function useGuideElement<T extends HTMLElement = HTMLElement>(
     const node = nodeRef.current;
     if (!node) return;
 
+    const registryInternals = internalsOf(registry);
     const current = registry.get(id);
     // `update()` ignores `undefined` fields by contract, so a metadata prop that
     // went away cannot be cleared through it — the registration would keep
@@ -139,7 +155,7 @@ export function useGuideElement<T extends HTMLElement = HTMLElement>(
     if (current !== undefined && !mustClear) {
       // Metadata changed. Update the registration rather than replacing it, so
       // the element never briefly disappears from `useGuide().elements`.
-      registry.update(id, {
+      registryInternals.update(id, {
         type: type ?? 'other',
         label,
         description,
@@ -153,8 +169,8 @@ export function useGuideElement<T extends HTMLElement = HTMLElement>(
     // registry — while our node stayed attached. Both are rare, which is why
     // re-registering (and so re-observing) is an acceptable price here.
     disposeRef.current?.();
-    disposeRef.current = registry.register(latest.current);
-    registry.setNode(id, node);
+    disposeRef.current = registryInternals.register(latest.current);
+    registryInternals.setNode(id, node);
   }, [registry, id, type, label, description, featureId]);
 
   useEffect(() => {

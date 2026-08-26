@@ -16,6 +16,11 @@ import { readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ts } from 'ts-morph';
+import { DEFAULT_HTTP_CLIENTS } from './extract/http.js';
+import {
+  DEFAULT_PERMISSION_COMPONENTS,
+  DEFAULT_PERMISSION_FUNCTIONS,
+} from './extract/permissions.js';
 import { toRelativePosix } from './paths.js';
 
 /** User-facing configuration. Every field is optional. */
@@ -31,6 +36,28 @@ export interface StatewaveGuideConfig {
   tsconfig?: string;
   /** Directory the graph is written to, relative to the project root. Default: `.statewave-guide` */
   outDir?: string;
+  /**
+   * Glob prefixes that identify backend source, used only when a file's own
+   * structure is ambiguous — it renders no JSX and imports no framework.
+   *
+   * Default: `['backend/**', 'server/**', 'api/**']`
+   */
+  backend?: string[];
+  /**
+   * Names that turn a call or a component into a permission gate.
+   *
+   * Nothing is recognised by shape: a permission enters the graph only because
+   * a recogniser named here matched. Default recognisers cover the common
+   * spellings — see {@link DEFAULT_PERMISSION_FUNCTIONS}.
+   */
+  permissions?: { functions?: string[]; components?: string[] };
+  /**
+   * Names of HTTP client bindings, e.g. `['api', 'http', 'client']`.
+   *
+   * A binding created by `axios.create(…)` is recognised whatever it is called;
+   * this list is for clients the indexer cannot see being built.
+   */
+  httpClients?: string[];
 }
 
 /** Files analysed when the config says nothing. */
@@ -56,6 +83,9 @@ export const DEFAULT_OUT_DIR = '.statewave-guide';
 
 /** Tsconfig looked for when the config says nothing. */
 export const DEFAULT_TSCONFIG = 'tsconfig.json';
+
+/** Backend globs used when the config says nothing. */
+export const DEFAULT_BACKEND: readonly string[] = ['backend/**', 'server/**', 'api/**'];
 
 /** Config file names, in the order they are looked for. */
 export const CONFIG_FILE_NAMES: readonly string[] = [
@@ -86,6 +116,12 @@ export function defaultConfig(): StatewaveGuideConfig {
     include: [...DEFAULT_INCLUDE],
     exclude: [...DEFAULT_EXCLUDE],
     outDir: DEFAULT_OUT_DIR,
+    backend: [...DEFAULT_BACKEND],
+    permissions: {
+      functions: [...DEFAULT_PERMISSION_FUNCTIONS],
+      components: [...DEFAULT_PERMISSION_COMPONENTS],
+    },
+    httpClients: [...DEFAULT_HTTP_CLIENTS],
   };
 }
 
@@ -118,6 +154,23 @@ function readString(value: unknown, label: string): string | undefined {
   return value;
 }
 
+function readPermissions(
+  value: unknown,
+  label: string,
+): StatewaveGuideConfig['permissions'] | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    throw new Error(`${label} must be an object, received ${describeValue(value)}.`);
+  }
+  const record = value as Record<string, unknown>;
+  const functions = readStringArray(record.functions, `${label}.functions`);
+  const components = readStringArray(record.components, `${label}.components`);
+  return {
+    ...(functions !== undefined ? { functions } : {}),
+    ...(components !== undefined ? { components } : {}),
+  };
+}
+
 /**
  * Narrows an arbitrary loaded value to a {@link StatewaveGuideConfig}.
  *
@@ -136,12 +189,18 @@ export function parseConfig(value: unknown, source: string): StatewaveGuideConfi
   const exclude = readStringArray(record.exclude, `${source}: "exclude"`);
   const tsconfig = readString(record.tsconfig, `${source}: "tsconfig"`);
   const outDir = readString(record.outDir, `${source}: "outDir"`);
+  const backend = readStringArray(record.backend, `${source}: "backend"`);
+  const httpClients = readStringArray(record.httpClients, `${source}: "httpClients"`);
+  const permissions = readPermissions(record.permissions, `${source}: "permissions"`);
 
   return {
     ...(include !== undefined ? { include } : {}),
     ...(exclude !== undefined ? { exclude } : {}),
     ...(tsconfig !== undefined ? { tsconfig } : {}),
     ...(outDir !== undefined ? { outDir } : {}),
+    ...(backend !== undefined ? { backend } : {}),
+    ...(permissions !== undefined ? { permissions } : {}),
+    ...(httpClients !== undefined ? { httpClients } : {}),
   };
 }
 

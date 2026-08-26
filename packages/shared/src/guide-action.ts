@@ -15,6 +15,7 @@
 
 import type { z } from 'zod';
 import type { AppContext } from './app-context.js';
+import type { GuideError } from './guide-error.js';
 
 /**
  * The built-in action vocabulary shipped by Statewave Guide.
@@ -181,57 +182,23 @@ export interface GuideActionRequest<TInput = unknown> {
   signal?: AbortSignal;
 }
 
-/** Why an action failed. */
-export type GuideActionErrorCode =
-  /** No action is registered under that name. */
-  | 'unknown_action'
-  /** The input did not satisfy the action's schema. */
-  | 'invalid_input'
-  /** The handler threw or rejected. */
-  | 'execution_failed'
-  /** The action's risk level forbids this caller from running it. */
-  | 'not_permitted'
-  /** The action requires human confirmation that has not been given. */
-  | 'confirmation_required'
-  /** The action ran but its target does not exist, e.g. an unmounted element. */
-  | 'target_not_found'
-  /** The action was cancelled before or during execution. */
-  | 'cancelled';
-
-/** A single schema validation problem. */
-export interface GuideActionIssue {
-  /** Property path into the input, e.g. `['route']`. */
-  path: (string | number)[];
-  /** Human-readable description of the problem. */
-  message: string;
-}
-
-/** A structured failure. Never an exception. */
-export interface GuideActionError {
-  code: GuideActionErrorCode;
-  message: string;
-  /** Present when `code` is `invalid_input`. */
-  issues?: GuideActionIssue[];
-  /** The original thrown value, when `code` is `execution_failed`. */
-  cause?: unknown;
-}
-
 /**
  * The outcome of an execution.
  *
- * A discriminated union on `ok`, so callers narrow with a single check and the
- * compiler stops them reading `data` off a failure.
+ * A discriminated union on `success`, so callers narrow with a single check and
+ * the compiler stops them reading `data` off a failure. Failures carry a
+ * {@link GuideErrorCode}, never a message to be parsed.
  */
 export type GuideActionResult<TData = unknown> =
   | {
-      ok: true;
+      success: true;
       action: GuideActionName;
       requestId: string;
       data: TData;
     }
   | {
-      ok: false;
+      success: false;
       action: GuideActionName;
       requestId: string;
-      error: GuideActionError;
+      error: GuideError;
     };

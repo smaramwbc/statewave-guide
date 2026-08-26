@@ -17,3 +17,9 @@ pnpm-debug.log*
 # committing it gives you reviewable diffs of your product model — see the
 # README for that trade-off.
 .statewave-guide/
+
+# ...except the demo's, which the Inspector reads. Committing it is also the
+# workflow this project recommends: a deterministic graph gives reviewable diffs
+# of your product model.
+!examples/react-demo/.statewave-guide/
+!examples/react-demo/.statewave-guide/application.json

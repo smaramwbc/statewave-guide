@@ -1,11 +1,12 @@
 /**
  * The single React context every hook in this package reads.
  *
- * It carries the runtime, the live element registry *typed as the DOM-free
- * {@link GuideElementRegistry}*, the highlight controller and the warning sink.
- * The provider creates an {@link import('./element-registry.js').InternalElementRegistry},
- * but it is stored under the narrower type: nothing a component can reach
- * through this context exposes `resolveNode`, so raw DOM access stops at the
+ * It carries the runtime, the live element registry, the highlight controller
+ * and the warning sink. The registry on here is the object
+ * `createElementRegistry()` returned, and that object has no node access at
+ * all — not hidden by a type, absent. Registration and node attachment live in
+ * the friend table in `./registry-internals.js`, which `useGuideElement` and
+ * the provider reach and a host component cannot. Raw DOM access stops at the
  * highlight engine.
  *
  * @packageDocumentation
@@ -20,7 +21,7 @@ import type { HighlightController } from './highlight/controller.js';
 export interface GuideContextValue {
   /** The guide runtime: context, actions, knowledge, memory. */
   runtime: GuideRuntime;
-  /** The live registry of mounted guide elements. DOM-free by type. */
+  /** The live registry of mounted guide elements. Read-only, and DOM-free. */
   registry: GuideElementRegistry;
   /** The built-in guidance engine. */
   highlight: HighlightController;

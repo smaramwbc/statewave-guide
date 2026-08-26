@@ -23,7 +23,24 @@ import { clients } from '../data/clients';
  * the Product Model. Using both is what makes the two views agree.
  */
 export function Clients() {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+
+  /**
+   * A named handler, not an inline arrow.
+   *
+   * This is the first hop of the behaviour chain the Inspector reconstructs.
+   * It is also what the `state-flag-gates-element` rule needs: it calls
+   * `setCreateOpen(true)`, and the same `createOpen` binding gates
+   * `<NewClientDialog>` below. All three facts must be present for the indexer
+   * to record `openCreateClient --opens--> NewClientDialog`.
+   */
+  function openCreateClient() {
+    setCreateOpen(true);
+  }
+
+  function closeCreateClient() {
+    setCreateOpen(false);
+  }
 
   return (
     <main data-guide="clients" data-guide-type="section">
@@ -38,11 +55,7 @@ export function Clients() {
             label="New Client"
             description="Opens the form for creating a new client in this workspace."
           >
-            <button
-              className="primary"
-              data-guide="clients.create"
-              onClick={() => setDialogOpen(true)}
-            >
+            <button className="primary" data-guide="clients.create" onClick={openCreateClient}>
               New Client
             </button>
           </GuideElement>
@@ -80,7 +93,7 @@ export function Clients() {
         </GuideElement>
       </section>
 
-      <NewClientDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
+      <NewClientDialog open={createOpen} onClose={closeCreateClient} />
     </main>
   );
 }

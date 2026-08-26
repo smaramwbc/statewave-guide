@@ -13,7 +13,6 @@ import type {
   AppContext,
   GuideActionDefinition,
   GuideActionDescriptor,
-  GuideActionError,
   GuideActionExecutionContext,
   GuideActionName,
   GuideActionRequest,
@@ -21,11 +20,19 @@ import type {
   GuideActionRisk,
   GuideActionSchema,
   GuideActionSource,
+  GuideError,
   RegisteredGuideAction,
 } from '@statewavedev/guide-shared';
-import { ActionRegistrationError, actionError, describeThrown, isAbortError } from './errors.js';
+import {
+  ActionFailure,
+  ActionRegistrationError,
+  actionError,
+  describeThrown,
+  isAbortError,
+  isTimeoutError,
+} from './errors.js';
 import { defaultActionPolicy, type ActionPolicy } from './policy.js';
-import { toGuideActionIssues } from './issues.js';
+import { toGuideErrorIssues } from './issues.js';
 
 /**
  * A registered action erased to its most general form.
@@ -239,10 +246,10 @@ export function createActionRegistry(options: ActionRegistryOptions = {}): Actio
   function fail(
     request: GuideActionRequest,
     requestId: string,
-    error: GuideActionError,
+    error: GuideError,
   ): GuideActionResult<never> {
     const result: GuideActionResult<never> = {
-      ok: false,
+      success: false,
       action: request.action,
       requestId,
       error,
@@ -265,8 +272,9 @@ export function createActionRegistry(options: ActionRegistryOptions = {}): Actio
           request,
           requestId,
           actionError(
-            'unknown_action',
+            'action_not_found',
             `No action named "${request.action}" is registered. Known actions: ${known}.`,
+            { details: { action: request.action, knownActions: [...actions.keys()].sort() } },
           ),
         );
       }
@@ -292,7 +300,8 @@ export function createActionRegistry(options: ActionRegistryOptions = {}): Actio
           request,
           requestId,
           actionError('invalid_input', `Invalid input for "${action.name}".`, {
-            issues: toGuideActionIssues(parsed.error.issues),
+            issues: toGuideErrorIssues(parsed.error.issues),
+            details: { action: action.name },
           }),
         );
       }
@@ -307,7 +316,7 @@ export function createActionRegistry(options: ActionRegistryOptions = {}): Actio
       const data = (await action.execute(parsed.data, executionContext)) as TData;
 
       const result: GuideActionResult<TData> = {
-        ok: true,
+        success: true,
         action: action.name,
         requestId,
         data,
@@ -317,6 +326,18 @@ export function createActionRegistry(options: ActionRegistryOptions = {}): Actio
     } catch (thrown) {
       // A handler may throw anything. Nothing escapes this boundary: callers of
       // `execute` are often not in a position to catch.
+      // A handler that knows *why* it failed says so by throwing ActionFailure;
+      // its code is passed through untouched rather than flattened.
+      if (thrown instanceof ActionFailure) {
+        return fail(request, requestId, thrown.toGuideError());
+      }
+      if (isTimeoutError(thrown)) {
+        return fail(
+          request,
+          requestId,
+          actionError('timeout', 'The action timed out.', { cause: thrown }),
+        );
+      }
       if (isAbortError(thrown) || request.signal?.aborted) {
         return fail(
           request,

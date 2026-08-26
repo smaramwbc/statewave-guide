@@ -102,6 +102,155 @@ dependency with the guide itself.
 
 ---
 
+## Application Understanding
+
+_Closed Loop #2. This is where the indexer stops describing structure and starts describing
+behaviour._
+
+Knowing that a button exists is not the same as understanding what an application does. A product
+tour knows there is a control at a position. What a guide needs to know is what pressing it causes:
+
+```
+New Client
+    ↓ opens NewClientDialog
+    ↓ contains ClientForm
+    ↓ submitClient()
+    ↓ clientService.create()
+    ↓ POST /api/clients
+    ↓ backend createClient()
+```
+
+That is the difference between a graph of _things_ and a graph of _behaviour_, and it is the whole
+point of this layer.
+
+### Two kinds of evidence, deliberately kept apart
+
+> **The DOM is runtime evidence. The source graph is product knowledge.**
+
+The React registry knows what is mounted and visible _right now_. That is real, and it is what makes
+highlighting possible — but it is a fact about this browser tab at this moment, not a fact about the
+product. The source graph knows what the application can do at all, whether or not anything is
+currently rendered.
+
+Neither substitutes for the other. Runtime evidence cannot tell you that a button submits to
+`POST /api/clients`; the source graph cannot tell you that the button is currently off-screen.
+
+### The pipeline
+
+```
+Syntactic facts          what the source literally says
+      ↓
+Symbol resolution        which declaration an identifier refers to
+      ↓
+Relationship graph       how those declarations connect
+      ↓
+Behaviour graph          what a user action causes
+      ↓
+Semantic enrichment      what it means, in a person's words   ← planned; AI enters only here
+```
+
+Each layer consumes the one above and may not skip it. The reasoning is in
+[ADR 0004](adr/0004-deterministic-code-understanding-before-ai-enrichment.md); the short version is
+that a hallucination originating in the substrate is far more dangerous than one originating in a
+model, because it arrives wearing the authority of static analysis.
+
+### Nodes
+
+Version 2 of the graph replaces per-kind arrays with one typed node union. A route, a component, a
+UI element, a function, a service and an HTTP endpoint are all nodes, addressed by a canonical id:
+
+| Kind           | Canonical id                        | Example                                                       |
+| -------------- | ----------------------------------- | ------------------------------------------------------------- |
+| `route`        | `route:<path>`                      | `route:/clients/:clientId`                                    |
+| `component`    | `component:<file>#<name>`           | `component:src/pages/Clients.tsx#Clients`                     |
+| `element`      | `element:<semantic id>`             | `element:clients.create`                                      |
+| `function`     | `function:<file>#<name>`            | `function:src/services/clientService.ts#clientService.create` |
+| `hook`         | `hook:<file>#<name>`                | `hook:src/hooks/useClients.ts#useClients`                     |
+| `service`      | `service:<file>#<name>`             | `service:src/services/clientService.ts#clientService`         |
+| `api`          | `api:<METHOD>:<path>`               | `api:POST:/api/clients`                                       |
+| `schema`       | `schema:<file>#<name>`              | `schema:src/validation/client.ts#createClientSchema`          |
+| `permission`   | `permission:<value>`                | `permission:clients:create`                                   |
+| `file`, `type` | `file:<path>`, `type:<file>#<name>` |                                                               |
+
+Two of these ids are deliberately location-free. `element:clients.create` and
+`permission:clients:create` identify a _thing in the product_, not a place in the source, so the same
+element referenced from two files is one node. Everything else is location-bearing, because two
+functions with the same name in different files are two functions.
+
+### Relationships
+
+Twelve types, each answering a question someone might actually ask:
+
+| Relationship                 | Question it answers                       |
+| ---------------------------- | ----------------------------------------- |
+| `contains`                   | What is on this screen?                   |
+| `renders`                    | What does this component put on the page? |
+| `invokes`                    | What happens when I press this?           |
+| `opens`                      | What appears?                             |
+| `submits_to`                 | Where does this form go?                  |
+| `calls`                      | What does this function do?               |
+| `uses_service` / `uses_hook` | What does this depend on?                 |
+| `calls_api`                  | What request does this make?              |
+| `navigates_to`               | Where does this take me?                  |
+| `requires_permission`        | Who is allowed to do this?                |
+| `validates_with`             | What shape must the input be?             |
+
+Every relationship carries at least one piece of evidence — file, line, symbol, excerpt, and for an
+inference, the named rule that produced it. This is enforced rather than documented:
+`createRelationship()` throws when handed an empty evidence list.
+
+Confidence is one of exactly three values — `1.0` direct syntax, `0.95` resolved symbol, `0.9` named
+static inference. There is no 0.5 tier: if we would have to write one, we write a diagnostic instead.
+The full catalogue, including what each rule _refuses_ to fire on, is in
+[docs/confidence.md](confidence.md).
+
+### The frontend/backend join
+
+The headline capability of this layer. A frontend HTTP call and a backend route registration for the
+same normalised method and path become **one** node:
+
+```
+function:…#clientService.create  --calls_api-->  api:POST:/api/clients
+                                                 api:POST:/api/clients  --invokes-->  function:…#createClient
+```
+
+The endpoint is the join because it is the only thing both tiers name independently. Joining on
+anything else means matching on names, and names are evidence of intent, not evidence of connection.
+Reasoning in [ADR 0005](adr/0005-unified-frontend-backend-application-graph.md).
+
+A useful side effect: an endpoint observed on only one side is a finding. A `calls_api` with no route
+is a dead client call or an unresolved prefix; a route nothing calls is dead server code. Both are
+reported in the graph health section.
+
+### Traversal
+
+`createGraphQuery(graph)` provides `getNode`, `getOutgoing`, `getIncoming`, `neighbors`, `findPath`
+and `explainPath`. `explainPath` returns structured evidence records, never prose — turning those
+into a sentence is a presentation decision, and baking one in would make the output impossible to
+render any other way.
+
+`resolveFeaturePath('clients.create')` walks the behaviour chain from a UI element, preferring
+`invokes` → `opens` → `renders` → `submits_to` → `calls` → `calls_api`. The order is deliberate: from
+a button the interesting question is what pressing it does, and a walk that preferred `calls` would
+dive into utility functions and never reach the dialog.
+
+It returns a `gap` describing where the chain stopped and which diagnostics were recorded in that
+file. A path that stops short is a result, not a failure — and showing the gap honestly is the
+difference between a graph you can trust and one you cannot.
+
+### What this layer will not do
+
+- It will not link `CreateClientButton` to `POST /clients` because the names look alike.
+- It will not resolve `api[method](path)` where the method is a runtime value.
+- It will not map `modal.open('create-client')` to a component unless a deterministic registry exists.
+- It will not follow dynamic `import()`.
+- It will not pick between two candidate declarations when resolution is ambiguous.
+
+Each of these produces a diagnostic instead, so what the system does not know is observable rather
+than silently filled in. The complete list is in [docs/refusals.md](refusals.md).
+
+---
+
 ## Product Model
 
 **`@statewavedev/guide-shared` — the vocabulary everything agrees on.**
@@ -145,7 +294,7 @@ Two properties matter more than the rest.
 
 **Execution never throws.** Every failure — unknown action, invalid input, a
 handler that rejected, a policy refusal, a cancellation — comes back as
-`{ ok: false, error: { code, message } }`. The caller of an action is frequently
+`{ success: false, error: { code, message } }`. The caller of an action is frequently
 not a human and must be able to _read_ a failure rather than catch it.
 
 **Risk is declared, and enforced separately from execution.**
@@ -246,18 +395,28 @@ own routing, and refuses to guess at it.
 This is the load-bearing rule of the whole system, so it is worth stating
 precisely.
 
-The registry exposes two interfaces. The public `GuideElementRegistry` has no
-method that returns an `HTMLElement`. `InternalElementRegistry` adds
-`resolveNode(id)`, is used only by the highlight engine, and its type is **not
-exported from the package index**. The React context stores the registry typed as
-the public interface, so no hook and no component can reach a node.
+The public `GuideElementRegistry` is read-only state — `has`, `get`, `list`,
+`visibleIds`, `subscribe`, `getSnapshot`. It has no method that mutates anything
+and no method that returns a DOM node.
 
-Being precise about the one seam: `createElementRegistry()` is exported, and what
-it returns does structurally carry `resolveNode` — the highlight engine has to be
-able to compose with it. That capability is therefore reachable by host code which
-constructs its own registry and already has `document` anyway. It is not reachable
-through a hook, the provider, an action result, or anything an agent can name, and
-that is the boundary that matters.
+The capabilities that must not escape — `resolveNode`, `register`, `setNode`,
+`update`, `unregister`, `destroy` — live on a separate object associated with the
+facade through a module-private `WeakMap`. The provider, the hooks and the
+highlight engine reach them through `internalsOf()`. Nothing outside the package
+can, because the map is not reachable from any export.
+
+This is a _runtime_ boundary, not a type-level one, and the difference matters. A
+type-level boundary can only be checked by grepping declarations. A runtime
+boundary can be checked directly — `'resolveNode' in registry` is `false`,
+including up the prototype chain.
+
+That distinction earned its keep during review. The first implementation was
+type-clean but leaked anyway: the provider parked the internals in `useState` and
+`useGuideElement` memoised them into a dependency array, so React's own fiber tree
+held a reference and a fiber walk from any rendered node found them — five
+separate paths. The fix was to call `internalsOf()` inside the closure that needs
+it and never store the result. A test now walks the fiber tree to depth 12 and
+duck-types for the internals; it fails if the memo is put back.
 
 So:
 
@@ -267,7 +426,7 @@ So:
   ids and the set of registered action names.
 
 The worst thing a compromised or confused model can do is name an element that
-does not exist, and get back `{ ok: false, reason: 'not-registered' }`.
+does not exist, and get back `{ success: false, error: { code: 'target_not_found' } }`.
 
 ---
 

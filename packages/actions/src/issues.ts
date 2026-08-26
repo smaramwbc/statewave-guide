@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { GuideActionIssue } from '@statewavedev/guide-shared';
+import type { GuideErrorIssue } from '@statewavedev/guide-shared';
 import type { z } from 'zod';
 
 /** Zod paths may contain symbols; the wire format may not. */
@@ -19,8 +19,8 @@ function normaliseSegment(segment: PropertyKey): string | number {
   return segment.toString();
 }
 
-/** Converts Zod issues into {@link GuideActionIssue} values. */
-export function toGuideActionIssues(issues: readonly z.core.$ZodIssue[]): GuideActionIssue[] {
+/** Converts Zod issues into {@link GuideErrorIssue} values. */
+export function toGuideErrorIssues(issues: readonly z.core.$ZodIssue[]): GuideErrorIssue[] {
   return issues.map((issue) => ({
     path: issue.path.map(normaliseSegment),
     message: issue.message,
