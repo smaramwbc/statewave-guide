@@ -21,13 +21,11 @@ import { featureConfidence } from '../src/verifier.js';
 import { verifyEnrichment } from '../src/verifier.js';
 import { enrichment, ATTRIBUTION, PROVENANCE } from './helpers.js';
 
-const SUBMIT_EDGE = `${ID.form}|submits_to|${ID.handleCreate}`;
-
 describe('positive controls, one per claim type', () => {
   it('upholds a create capability backed by a POST endpoint the subject reaches', () => {
     const result = verifyFixture({
       factualClaims: [
-        factual({ type: 'capability', action: 'create', targets: [ID.post, ID.form] }),
+        factual({ type: 'capability', action: 'create', targets: [ID.post, ID.create] }),
       ],
     });
     const claim = onlyClaim(result);
@@ -40,12 +38,13 @@ describe('positive controls, one per claim type', () => {
 
   it('upholds a view capability backed by a GET endpoint', () => {
     const result = verifyFixture({
+      featureId: 'clients.search',
       factualClaims: [
         factual({
           type: 'capability',
           action: 'view',
-          subjectRef: ID.list,
-          targets: [ID.list, ID.get],
+          subjectRef: ID.search,
+          targets: [ID.get],
         }),
       ],
     });
@@ -54,6 +53,7 @@ describe('positive controls, one per claim type', () => {
 
   it('upholds an update capability backed by PATCH', () => {
     const result = verifyFixture({
+      featureId: 'clients.edit',
       factualClaims: [
         factual({ type: 'capability', action: 'update', subjectRef: ID.edit, targets: [ID.patch] }),
       ],
@@ -63,6 +63,7 @@ describe('positive controls, one per claim type', () => {
 
   it('upholds a delete capability backed by DELETE', () => {
     const result = verifyFixture({
+      featureId: 'clients.delete',
       factualClaims: [
         factual({ type: 'capability', action: 'delete', subjectRef: ID.remove, targets: [ID.del] }),
       ],
@@ -81,6 +82,7 @@ describe('positive controls, one per claim type', () => {
     // against and the claim fails closed. An application with real, deterministic
     // search evidence can register a domain verifier; see registry.test.ts.
     const result = verifyFixture({
+      featureId: 'clients.search',
       factualClaims: [
         factual({
           type: 'capability',
@@ -100,6 +102,7 @@ describe('positive controls, one per claim type', () => {
     // Removing search must not weaken read claims: a route, component or GET
     // endpoint genuinely does prove something is viewable.
     const result = verifyFixture({
+      featureId: 'clients.search',
       factualClaims: [
         factual({
           type: 'capability',
@@ -114,12 +117,13 @@ describe('positive controls, one per claim type', () => {
 
   it('upholds a submit capability backed by a submits_to relationship', () => {
     const result = verifyFixture({
+      featureId: 'clients.form',
       factualClaims: [
         factual({
           type: 'capability',
           action: 'submit',
           subjectRef: ID.form,
-          targets: [ID.form, SUBMIT_EDGE],
+          targets: [ID.form, ID.handleCreate],
         }),
       ],
     });
@@ -128,6 +132,7 @@ describe('positive controls, one per claim type', () => {
 
   it('upholds a navigate capability backed by navigates_to', () => {
     const result = verifyFixture({
+      featureId: 'clients.list',
       factualClaims: [
         factual({
           type: 'capability',
@@ -142,6 +147,7 @@ describe('positive controls, one per claim type', () => {
 
   it('upholds a navigation claim naming a route the pack contains', () => {
     const result = verifyFixture({
+      featureId: 'clients.list',
       factualClaims: [
         factual({
           type: 'navigation',
@@ -211,6 +217,17 @@ describe('one test per rejection reason', () => {
     expectRefusal(result, 'UNKNOWN_SUBJECT');
   });
 
+  it('SUBJECT_OUT_OF_SCOPE — the subject is real, but it is the feature next door', () => {
+    // The delete button exists, sits on the same page and is deliberately in
+    // this feature's evidence, so the model can see what creating is not.
+    // Refusing it as unknown would tell a reader the button is not there; the
+    // truth is narrower and more useful — it is there, and it is not this.
+    const result = verifyFixture({
+      factualClaims: [factual({ subjectRef: ID.remove, action: 'create', targets: [ID.post] })],
+    });
+    expectRefusal(result, 'SUBJECT_OUT_OF_SCOPE');
+  });
+
   it('UNKNOWN_GRAPH_REFERENCE — a cited id does not exist', () => {
     const result = verifyFixture({
       factualClaims: [
@@ -242,6 +259,7 @@ describe('one test per rejection reason', () => {
 
   it('UNKNOWN_ROUTE — the claim names a route the evidence does not contain', () => {
     const result = verifyFixture({
+      featureId: 'clients.list',
       factualClaims: [
         factual({
           type: 'navigation',
@@ -269,13 +287,17 @@ describe('one test per rejection reason', () => {
 
   it('UNKNOWN_ENDPOINT — the rule needs an endpoint and none was cited', () => {
     const result = verifyFixture({
-      factualClaims: [factual({ action: 'create', targets: [ID.form, SUBMIT_EDGE] })],
+      featureId: 'clients.form',
+      factualClaims: [
+        factual({ subjectRef: ID.form, action: 'create', targets: [ID.form, ID.handleCreate] }),
+      ],
     });
     expectRefusal(result, 'UNKNOWN_ENDPOINT');
   });
 
   it('UNKNOWN_ENDPOINT — the only cited endpoint has a path the indexer could not resolve', () => {
     const result = verifyFixture({
+      featureId: 'clients.export',
       factualClaims: [
         factual({
           action: 'view',
@@ -289,15 +311,20 @@ describe('one test per rejection reason', () => {
 
   it('EVIDENCE_DOES_NOT_SUPPORT_CLAIM — a create claim citing a GET endpoint', () => {
     const result = verifyFixture({
-      factualClaims: [factual({ action: 'create', targets: [ID.get] })],
+      featureId: 'clients.search',
+      factualClaims: [
+        factual({ subjectRef: 'feature:clients.search', action: 'create', targets: [ID.get] }),
+      ],
     });
     expectRefusal(result, 'EVIDENCE_DOES_NOT_SUPPORT_CLAIM');
     expect(result.rejectedClaims[0]?.detail).toContain('GET');
   });
 
-  it('EVIDENCE_DOES_NOT_SUPPORT_CLAIM — a permission that gates something else entirely', () => {
+  it('TARGET_OUT_OF_SCOPE — a permission that gates something else entirely', () => {
     // `clients:export` is a real permission, in this very pack, required by a
-    // real element. It still says nothing about creating a client.
+    // real element. It belongs to the export button, and calling that weak
+    // evidence would send a reader hunting for better evidence for a claim
+    // whose evidence was never this feature's to cite.
     const result = verifyFixture({
       factualClaims: [
         factual({
@@ -308,7 +335,7 @@ describe('one test per rejection reason', () => {
         }),
       ],
     });
-    expectRefusal(result, 'EVIDENCE_DOES_NOT_SUPPORT_CLAIM');
+    expectRefusal(result, 'TARGET_OUT_OF_SCOPE');
   });
 
   it('UNSUPPORTED_CONSTRAINT — a constraint with no schema or gate behind it', () => {
@@ -370,7 +397,7 @@ describe('a stated value must be the value the cited facts prove', () => {
 
   it('refuses a permission claim naming a real permission its evidence does not reach', () => {
     // `clients:export` is real, is in this pack, and gates the export button.
-    // The claim cites the edge and node that prove `clients:create`. Without
+    // The claim cites the permission node that proves `clients:create`. Without
     // this check the page would print "It requires the clients:export
     // permission" two paragraphs below a table saying `clients:create`.
     const result = verifyFixture({
@@ -379,7 +406,7 @@ describe('a stated value must be the value the cited facts prove', () => {
           type: 'permission',
           permission: 'clients:export',
           text: 'It requires the clients:export permission.',
-          targets: [ID.createPermissionEdge, ID.permissionCreate],
+          targets: [ID.permissionCreate],
         }),
       ],
     });
@@ -392,6 +419,7 @@ describe('a stated value must be the value the cited facts prove', () => {
 
   it('POSITIVE CONTROL: a navigation claim naming the route its edge reaches', () => {
     const result = verifyFixture({
+      featureId: 'clients.list',
       factualClaims: [
         factual({
           type: 'navigation',
@@ -406,6 +434,7 @@ describe('a stated value must be the value the cited facts prove', () => {
 
   it('refuses a navigation claim naming a real route its evidence does not reach', () => {
     const result = verifyFixture({
+      featureId: 'clients.list',
       factualClaims: [
         factual({
           type: 'navigation',
@@ -458,12 +487,23 @@ describe('import, export and send fail closed', () => {
 
   it('distinguishes a deliberate gap in the matrix from an accidental one', () => {
     const deliberate = verifyFixture({
-      factualClaims: [factual({ action: 'export', targets: [ID.exportButton] })],
+      featureId: 'clients.export',
+      factualClaims: [
+        factual({ subjectRef: ID.exportButton, action: 'export', targets: [ID.exportButton] }),
+      ],
     });
     expect(onlyClaim(deliberate).rejection?.detail).toContain('deliberately');
 
     const accidental = verifyFixture({
-      factualClaims: [factual({ type: 'navigation', action: 'view', targets: [ID.routeDetail] })],
+      featureId: 'clients.list',
+      factualClaims: [
+        factual({
+          type: 'navigation',
+          action: 'view',
+          subjectRef: ID.list,
+          targets: [ID.routeDetail],
+        }),
+      ],
     });
     expect(onlyClaim(accidental).outcome).toBe('EXPLICITLY_UNSUPPORTED');
     expect(onlyClaim(accidental).rejection?.detail).not.toContain('deliberately');

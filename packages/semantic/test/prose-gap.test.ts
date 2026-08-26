@@ -80,7 +80,7 @@ describe('attack A — vocabulary collision: CSV, Upload and Clients are all pre
     type: 'capability',
     action: 'import',
     text: 'Clients can be imported from a CSV file.',
-    subjectRef: 'feature:clients.create',
+    subjectRef: 'feature:clients.upload',
     subjectLabel: 'the client CSV importer',
     targets: [CSV.upload],
   });
@@ -102,7 +102,7 @@ describe('attack A — vocabulary collision: CSV, Upload and Clients are all pre
     const claim = onlyClaim(
       verifyAgainst({
         graph: csvCollisionGraph(),
-        featureId: 'clients.create',
+        featureId: 'clients.upload',
         factualClaims: [importClaim],
       }),
     );
@@ -115,7 +115,7 @@ describe('attack A — vocabulary collision: CSV, Upload and Clients are all pre
   it('counts the refusal as unchecked rather than as disproved', () => {
     const result = verifyAgainst({
       graph: csvCollisionGraph(),
-      featureId: 'clients.create',
+      featureId: 'clients.upload',
       factualClaims: [importClaim],
     });
     expect(result.claimSummary.unsupportedActions).toEqual({ import: 1 });
@@ -128,7 +128,7 @@ describe('attack A — vocabulary collision: CSV, Upload and Clients are all pre
     const claim = onlyClaim(
       verifyAgainst({
         graph: csvCollisionGraph(),
-        featureId: 'clients.create',
+        featureId: 'clients.upload',
         factualClaims: [importClaim],
         registry,
       }),
@@ -146,7 +146,7 @@ describe('attack A — vocabulary collision: CSV, Upload and Clients are all pre
     const claim = onlyClaim(
       verifyAgainst({
         graph: csvCollisionGraph({ importEndpoint: true }),
-        featureId: 'clients.create',
+        featureId: 'clients.upload',
         factualClaims: [{ ...importClaim, targets: [CSV.upload, CSV.importEndpoint] }],
       }),
     );
@@ -159,7 +159,7 @@ describe('attack A — vocabulary collision: CSV, Upload and Clients are all pre
     registry.register(importVerifier);
     const result = verifyAgainst({
       graph: csvCollisionGraph({ importEndpoint: true }),
-      featureId: 'clients.create',
+      featureId: 'clients.upload',
       factualClaims: [{ ...importClaim, targets: [CSV.upload, CSV.importEndpoint] }],
       registry,
     });
@@ -316,7 +316,14 @@ describe('attack C — invented side effect: invoices here, email and Send over 
     );
   });
 
-  it('refuses "creating an invoice emails it" when it cites the other feature\'s Send button', () => {
+  it('refuses "creating an invoice emails it" even though it cites the other feature\'s Send button', () => {
+    // Reaching across to the notifications feature is the obvious way to try to
+    // buy a hearing for an assertion nothing can prove. It buys nothing:
+    // whether the matrix covers `send` is a fact about the matrix, settled
+    // before any citation is read, so this lands on the same refusal the next
+    // test gets for a claim that cites its own endpoint. A refusal that
+    // complained about the citation instead would invite someone to keep
+    // re-citing until it stopped complaining.
     const claim = onlyClaim(
       verifyAgainst({
         graph: invoiceGraph(),
@@ -333,8 +340,8 @@ describe('attack C — invented side effect: invoices here, email and Send over 
       }),
     );
     expect(claim.status).toBe('rejected');
-    expect(claim.outcome).toBe('REJECTED_INVALID');
-    expect(claim.rejection?.reason).toBe('NO_SUPPORTING_EVIDENCE');
+    expect(claim.outcome).toBe('EXPLICITLY_UNSUPPORTED');
+    expect(claim.rejection?.reason).toBe('UNSUPPORTED_CLAIM_RULE');
   });
 
   it("refuses it again when it cites only the invoice feature's own endpoint", () => {
@@ -447,14 +454,14 @@ describe('attack D — invented permission scope: admin:all exists, just not her
     );
     expect(claim.status).toBe('rejected');
     expect(claim.outcome).toBe('REJECTED_INVALID');
-    expect(claim.rejection?.reason).toBe('EVIDENCE_DOES_NOT_SUPPORT_CLAIM');
+    expect(claim.rejection?.reason).toBe('TARGET_OUT_OF_SCOPE');
   });
 
   it('refuses it even when the model cites the real requires_permission edge', () => {
     // The strongest form of the attack: every id is genuine and the edge really
     // does prove that `admin:all` is required. It starts at the settings
-    // button, so it proves nothing about creating a client — and direction is
-    // the whole check.
+    // button, so what it proves is the settings button's — and whose fact it
+    // is, not whether the fact is real, is the whole check.
     const claim = onlyClaim(
       verifyAgainst({
         graph: permissionScopeGraph(),
@@ -470,7 +477,7 @@ describe('attack D — invented permission scope: admin:all exists, just not her
         ],
       }),
     );
-    expect(claim.rejection?.reason).toBe('EVIDENCE_DOES_NOT_SUPPORT_CLAIM');
+    expect(claim.rejection?.reason).toBe('TARGET_OUT_OF_SCOPE');
     expect(claim.rejection?.detail).toContain('requires_permission');
   });
 

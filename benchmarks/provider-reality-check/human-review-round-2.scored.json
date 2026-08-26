@@ -1,0 +1,714 @@
+{
+  "package": "human-review-round-2",
+  "gateVersion": "v1",
+  "scoredBy": "OpenAI GPT-5.6 Sol \u2014 independent non-human reviewer",
+  "scoredAt": "2026-08-26T21:16:16.979818+00:00",
+  "instructions": [
+    "Judge the output as if you were an end user encountering this help inside an application.",
+    "Do not award points because the output is technically safe, evidence-backed, or generated through an impressive architecture.",
+    "The only question is whether the resulting help is correct and useful.",
+    "Score every item. Leave nothing null.",
+    "\"knownSupportedFacts\" lists what the application genuinely does, so you can judge correctness without reading source code. It is not part of the output being scored.",
+    "An item that is accurate but tells a user nothing is not a good item. Say so with a low score."
+  ],
+  "rubric": {
+    "usefulness": {
+      "0": "Useless. Accurate or not, this would not meaningfully help a user \u2014 repeats technical identifiers, says \"use clients.create\", or contains no understandable purpose or actionable guidance.",
+      "1": "Minimally useful. The user can roughly understand what the feature is, but guidance is incomplete, awkward, or too technical.",
+      "2": "Useful. A normal end user could understand the feature and get meaningful help. Accurate, understandable, sufficiently actionable.",
+      "3": "Excellent. Clear, concise, natural and genuinely helpful. Explains the purpose well and provides strong supported guidance without unnecessary technical language."
+    },
+    "dimensions": {
+      "scale": {
+        "0": "poor",
+        "1": "acceptable",
+        "2": "strong"
+      },
+      "correctness": "Does it say anything untrue of the application, judged against knownSupportedFacts?",
+      "clarity": "Would a non-technical user understand it on one read?",
+      "actionability": "Could a user act on it, or does it only describe?",
+      "naturalLanguage": "Does it read like a person wrote it for a user?"
+    },
+    "flags": [
+      "too_technical",
+      "too_vague",
+      "missing_capability",
+      "missing_workflow",
+      "incorrect_fact",
+      "irrelevant_information",
+      "repetitive",
+      "good_as_is"
+    ]
+  },
+  "itemCount": 21,
+  "items": [
+    {
+      "reviewId": "R01",
+      "featureId": "api.get.partial-clients",
+      "userContext": {
+        "screen": "Api",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Legacy client list endpoint",
+        "description": "Input is validated before it is accepted.",
+        "purpose": "Serves client data to older callers under the same read permission as the current client endpoints.",
+        "questions": [
+          "Why is my legacy client request denied?"
+        ],
+        "workflow": []
+      },
+      "knownSupportedFacts": [
+        "The application can send a GET request to ?/clients.",
+        "Using this requires the \"clients:read\" permission."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 1,
+      "actionability": 0,
+      "naturalLanguage": 2,
+      "flags": [
+        "too_vague",
+        "missing_workflow"
+      ],
+      "note": "The permission/endpoint context is useful, but the description is generic and there is no actionable guidance. Claims about legacy callers and validation are not established by the supplied facts."
+    },
+    {
+      "reviewId": "R02",
+      "featureId": "settings.save",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Save changes to settings",
+        "description": "You can submit the setting form from the Settings screen.",
+        "purpose": "Confirms edits made on the Settings page, such as organisation name and notification preference.",
+        "questions": [
+          "How do I save my settings changes?"
+        ],
+        "workflow": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Save changes\".",
+        "Submitting \"Save changes\" sends its form."
+      ],
+      "usefulness": 2,
+      "correctness": 1,
+      "clarity": 2,
+      "actionability": 1,
+      "naturalLanguage": 2,
+      "flags": [
+        "missing_workflow"
+      ],
+      "note": "The user can understand that settings are saved by submitting the form, but the specific organisation-name/notification examples are not established and there is no concrete save step."
+    },
+    {
+      "reviewId": "R03",
+      "featureId": "settings.form",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Settings form",
+        "description": "You can submit the setting form from the Settings screen.",
+        "purpose": "Lets an administrator update organisation settings from one form and save them.",
+        "questions": [
+          "How do I change my organisation name or turn notifications on or off?"
+        ],
+        "workflow": []
+      },
+      "knownSupportedFacts": [
+        "A form on this screen can be submitted."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 2,
+      "actionability": 1,
+      "naturalLanguage": 2,
+      "flags": [
+        "missing_workflow"
+      ],
+      "note": "Understandable but thin. It says the form can be submitted, while the administrator role and specific settings mentioned are not established by the supplied facts."
+    },
+    {
+      "reviewId": "R04",
+      "featureId": "clients.export",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Export CSV from clients list",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Lets you take the client list out of the app as a CSV file for use elsewhere.",
+        "questions": [],
+        "workflow": [
+          "On the Clients page, select Export CSV to export the client list."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Export CSV\"."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 1,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability"
+      ],
+      "note": "The step is actionable, but the output first says no capability is verified and then confidently describes an export capability. That is confusing for an end user, and only the control label is established."
+    },
+    {
+      "reviewId": "R05",
+      "featureId": "clients.create",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Add a new client",
+        "description": "You can create a new client and submit the client form.",
+        "purpose": null,
+        "questions": [
+          "How do I add a new client?",
+          "Why can't I see the New client button?"
+        ],
+        "workflow": [
+          "The client form asks for a name, billing email and plan, and offers Cancel or Create client.",
+          "The new client dialog holds the form used to enter the client's details.",
+          "Selecting \"New client\" opens the create client dialog."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a POST request to /api/clients.",
+        "The screen has a control labelled \"New client\".",
+        "The screen has a control labelled \"Cancel\".",
+        "The screen has a control labelled \"Create client\".",
+        "Using this requires the \"clients:create\" permission.",
+        "A form on this screen can be submitted."
+      ],
+      "usefulness": 2,
+      "correctness": 1,
+      "clarity": 2,
+      "actionability": 2,
+      "naturalLanguage": 2,
+      "flags": [],
+      "note": "Clearly useful overall, but the workflow is presented in reverse order and the specific form fields are not included in the supplied supported facts. Reorder to New client -> dialog -> fields -> Create client."
+    },
+    {
+      "reviewId": "R06",
+      "featureId": "settings.rotate-key",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Rotate API key",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Replaces the organisation's existing API key with a new one shown on the Settings page.",
+        "questions": [
+          "How do I get a new API key?"
+        ],
+        "workflow": [
+          "In the Settings danger zone, choose \"Rotate API key\" to replace the current API key."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Rotate API key\"."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 1,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability"
+      ],
+      "note": "The instruction is understandable, but the internal 'no capability verified' fallback conflicts with the confident explanation that the control replaces the key. Only the Rotate API key control itself is established."
+    },
+    {
+      "reviewId": "R07",
+      "featureId": "clients.table",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Client list table",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Displays clients in rows so you can scan the list and open one for details.",
+        "questions": [
+          "Why can't I see the client list?"
+        ],
+        "workflow": [
+          "The client list is shown as a table of client rows on the clients page."
+        ]
+      },
+      "knownSupportedFacts": [],
+      "usefulness": 1,
+      "correctness": 0,
+      "clarity": 1,
+      "actionability": 0,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability",
+        "too_vague"
+      ],
+      "note": "The output mostly describes what a client table would normally do, but no supported facts were established for this feature and the step is just a restatement rather than guidance."
+    },
+    {
+      "reviewId": "R08",
+      "featureId": "dashboard.new-client",
+      "userContext": {
+        "screen": "Dashboard",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "New client button on the dashboard",
+        "description": "Input is validated before it is accepted.",
+        "purpose": "Gives a shortcut from the dashboard for adding a client without first opening the clients list.",
+        "questions": [
+          "Why can't I see the New client button?"
+        ],
+        "workflow": [
+          "Starting from the dashboard, you begin adding a client by selecting \"New client\"."
+        ]
+      },
+      "knownSupportedFacts": [
+        "Using this requires the \"clients:create\" permission."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 2,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "irrelevant_information",
+        "missing_capability"
+      ],
+      "note": "The shortcut explanation and click guidance would help, but the only established fact is the clients:create permission. 'Input is validated before it is accepted' is irrelevant to the user's goal."
+    },
+    {
+      "reviewId": "R09",
+      "featureId": "clients.search",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Search clients",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Helps you find a specific client without scrolling the whole list.",
+        "questions": [
+          "How do I find a client by name?"
+        ],
+        "workflow": [
+          "Type into the search box on the Clients page to narrow the client list."
+        ]
+      },
+      "knownSupportedFacts": [],
+      "usefulness": 1,
+      "correctness": 0,
+      "clarity": 1,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability"
+      ],
+      "note": "The instruction would be useful if true, but no supported facts were established for this feature. The fallback also tells the user that the capability itself was not verified."
+    },
+    {
+      "reviewId": "R10",
+      "featureId": "invoices.list.clear",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Clear selection in invoice list",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Lets you step back from a highlighted invoice without picking another one.",
+        "questions": [
+          "How do I deselect the invoice I clicked on?"
+        ],
+        "workflow": [
+          "Choose \"Clear selection\" above the invoice list to drop the currently selected invoice."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Clear selection\"."
+      ],
+      "usefulness": 2,
+      "correctness": 1,
+      "clarity": 2,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability"
+      ],
+      "note": "The control label strongly supports the guidance and the step is immediately actionable. The internal verification fallback should not be exposed to the end user."
+    },
+    {
+      "reviewId": "R11",
+      "featureId": "settings.danger-zone",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Danger Zone (API Key Rotation)",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Groups risky, irreversible account actions apart from ordinary settings fields so they are harder to trigger by accident.",
+        "questions": [
+          "How do I rotate my API key?"
+        ],
+        "workflow": [
+          "The Settings page includes a separate danger zone section for high-risk actions such as rotating the API key."
+        ]
+      },
+      "knownSupportedFacts": [],
+      "usefulness": 1,
+      "correctness": 0,
+      "clarity": 1,
+      "actionability": 0,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability",
+        "too_vague"
+      ],
+      "note": "No supported facts were established. The text gives a plausible explanation of a danger zone but does not give the user a verified action or dependable product behaviour."
+    },
+    {
+      "reviewId": "R12",
+      "featureId": "invoices.list.open",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Open an invoice from the list",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Lets you pick an invoice from the list to view its details.",
+        "questions": [
+          "How do I open a specific invoice from the invoice list?"
+        ],
+        "workflow": [
+          "Select an invoice row in the list to open that invoice."
+        ]
+      },
+      "knownSupportedFacts": [],
+      "usefulness": 1,
+      "correctness": 0,
+      "clarity": 1,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability"
+      ],
+      "note": "The row-selection instruction is actionable, but no supported facts were established for this feature, so the claimed open-invoice behaviour is not grounded by the review evidence."
+    },
+    {
+      "reviewId": "R13",
+      "featureId": "client-detail.change-plan",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Upgrade a client's plan",
+        "description": "Input is validated before it is accepted.",
+        "purpose": "Lets an account manager move a client onto the enterprise plan without editing the record by hand.",
+        "questions": [
+          "How do I upgrade a client to the enterprise plan?",
+          "Why can't I see the Upgrade button on a client?"
+        ],
+        "workflow": [
+          "Select Upgrade on the client detail page to move the client onto the enterprise plan."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Upgrade\".",
+        "Using this requires the \"clients:update\" permission."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 2,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "irrelevant_information",
+        "missing_capability"
+      ],
+      "note": "The Upgrade control and update permission are established, but moving specifically to the enterprise plan is not. The validation sentence is generic and not useful to the user."
+    },
+    {
+      "reviewId": "R14",
+      "featureId": "clients.error",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Client list error message",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Tells you the client list failed to load rather than leaving the page blank.",
+        "questions": [
+          "Why is my client list not loading?"
+        ],
+        "workflow": []
+      },
+      "knownSupportedFacts": [],
+      "usefulness": 1,
+      "correctness": 0,
+      "clarity": 2,
+      "actionability": 0,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "too_vague",
+        "missing_capability"
+      ],
+      "note": "The purpose is understandable, but no supported facts were established and the output offers no action or diagnostic path beyond saying the list failed to load."
+    },
+    {
+      "reviewId": "R15",
+      "featureId": "invoices.create-form.submit",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Raise invoice",
+        "description": "You can create a new invoices create form and submit the invoices create form form from the Invoices screen.",
+        "purpose": "Lets a user record a new invoice for a client without leaving the Invoices page.",
+        "questions": [
+          "Why can't I see the invoice form?"
+        ],
+        "workflow": []
+      },
+      "knownSupportedFacts": [
+        "The application can send a POST request to /api/invoices.",
+        "The screen has a control labelled \"Raise invoice\".",
+        "Using this requires the \"invoices:create\" permission.",
+        "Submitting \"Raise invoice\" sends its form.",
+        "Doing this sends a POST request to /api/invoices."
+      ],
+      "usefulness": 1,
+      "correctness": 2,
+      "clarity": 0,
+      "actionability": 0,
+      "naturalLanguage": 0,
+      "flags": [
+        "too_technical",
+        "repetitive",
+        "missing_workflow"
+      ],
+      "note": "The underlying create/submit/API facts are strong, but the user-facing description is malformed ('create a new invoices create form... form form') and there are no actual steps. Correct but not yet usable copy."
+    },
+    {
+      "reviewId": "R16",
+      "featureId": "nav.clients",
+      "userContext": {
+        "screen": "Nav",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Clients Navigation Link",
+        "description": "You can open nav clients from the Clients screen.",
+        "purpose": "Gives quick access to the client list from anywhere in the app.",
+        "questions": [
+          "Where do I find my clients?"
+        ],
+        "workflow": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Clients\".",
+        "\"Clients\" takes the user to /clients.",
+        "There is a screen at /clients."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 1,
+      "actionability": 1,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_workflow"
+      ],
+      "note": "The destination is established, but 'open nav clients from the Clients screen' is awkward and the claim that it works from anywhere is not established by the supplied facts. A simple 'Choose Clients in the navigation' would be better."
+    },
+    {
+      "reviewId": "R17",
+      "featureId": "client-detail.rename",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Rename a client",
+        "description": "You can update a client detail rename.",
+        "purpose": "Lets an authorised user correct or update the name shown for a client.",
+        "questions": [
+          "How do I change a client's name?"
+        ],
+        "workflow": [
+          "Selecting Rename saves the new client name and reloads the client details."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a PUT request to /api/clients/:clientId.",
+        "The screen has a control labelled \"Rename\".",
+        "Using this requires the \"clients:update\" permission.",
+        "Doing this sends a PUT request to /api/clients/:clientId."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 1,
+      "actionability": 1,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "too_vague"
+      ],
+      "note": "The rename intent is understandable, but the description is machine-like, the step omits how the new name is entered, and 'reloads the client details' is not established by the supplied facts."
+    },
+    {
+      "reviewId": "R18",
+      "featureId": "client-detail.delete",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Delete a client",
+        "description": "Input is validated before it is accepted.",
+        "purpose": "Lets an authorised user remove a client record from the client's own detail page.",
+        "questions": [
+          "Why can't I see the Delete button on a client?"
+        ],
+        "workflow": [
+          "Select Delete on the client detail page to begin removing the client."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Delete\".",
+        "Using this requires the \"clients:delete\" permission."
+      ],
+      "usefulness": 1,
+      "correctness": 1,
+      "clarity": 2,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "irrelevant_information",
+        "missing_capability"
+      ],
+      "note": "The Delete control and permission are established and the step is useful, but the output cannot establish that deletion actually occurs. The generic validation sentence adds little."
+    },
+    {
+      "reviewId": "R19",
+      "featureId": "client-detail.audit",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Client audit trail",
+        "description": "You can view client detail audit.",
+        "purpose": "Lets someone check what has changed on a client account and when.",
+        "questions": [
+          "How do I see the history of changes for this client?"
+        ],
+        "workflow": [
+          "Select Audit trail on a client to load that client's recorded history."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a GET request to /api/clients/:clientId/audit.",
+        "The screen has a control labelled \"Audit trail\".",
+        "Using this requires the \"clients:read\" permission."
+      ],
+      "usefulness": 2,
+      "correctness": 2,
+      "clarity": 2,
+      "actionability": 2,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical"
+      ],
+      "note": "This is one of the stronger items: endpoint, control and permission support the explanation and the step is useful. The description 'view client detail audit' still reads like generated internal terminology."
+    },
+    {
+      "reviewId": "R20",
+      "featureId": "settings.new-key",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "New API key display",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Shows the newly generated API key so it can be copied after rotation.",
+        "questions": [
+          "Where do I find my new API key after rotating it?"
+        ],
+        "workflow": [
+          "The new API key appears on the Settings page in the danger zone after the key is rotated."
+        ]
+      },
+      "knownSupportedFacts": [],
+      "usefulness": 1,
+      "correctness": 0,
+      "clarity": 1,
+      "actionability": 1,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability"
+      ],
+      "note": "No supported facts were established for this display element. The purpose and step may be plausible, but the user-facing fallback openly says the capability was not verified."
+    },
+    {
+      "reviewId": "R21",
+      "featureId": "clients.table.forbidden",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Client list access notice",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "purpose": "Explains why the client table is empty by telling the user they lack access to the client list.",
+        "questions": [
+          "Why can't I see any clients on the Clients page?"
+        ],
+        "workflow": [
+          "If you lack access to the client list, the table area shows the message \"You do not have access to the client list.\""
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"You do not have access to the client list.\"."
+      ],
+      "usefulness": 2,
+      "correctness": 2,
+      "clarity": 2,
+      "actionability": 1,
+      "naturalLanguage": 1,
+      "flags": [
+        "too_technical",
+        "missing_capability"
+      ],
+      "note": "The exact access-denied message strongly supports the explanation, so this is useful diagnostic help. The internal verification fallback is still inappropriate user-facing copy."
+    }
+  ]
+}

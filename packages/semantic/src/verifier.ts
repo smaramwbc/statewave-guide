@@ -102,6 +102,9 @@ import type { EvidencePack } from './evidence-pack.js';
 import { checkRenderedPropositions } from './proposition.js';
 import type { ClaimVerifierRegistration, ClaimVerifierRegistry } from './registry.js';
 import { featureTitleFromId } from './render.js';
+import { computeFeatureScope } from './scope.js';
+import type { ClaimOpportunity } from './opportunities.js';
+import type { FeatureScope, ScopeClass } from './scope.js';
 import { REDACTION_PLACEHOLDER, redactSecrets } from './safety.js';
 import { BEHAVIOUR_SPINE, spineRank } from './spine.js';
 
@@ -167,6 +170,22 @@ export interface VerifyEnrichmentInput {
   provenance: ClaimProvenance;
   /** Application-supplied checks. Absent means the built-in matrix only. */
   registry?: ClaimVerifierRegistry;
+  /**
+   * What this feature may speak for.
+   *
+   * Optional only so existing callers keep compiling; when absent it is
+   * computed here from the pack. It is never *skipped* — a verifier with no
+   * scope is the Round 1 verifier, and Round 1 measured what that accepts.
+   */
+  scope?: FeatureScope;
+  /**
+   * The opportunities this feature was offered.
+   *
+   * Threaded through so `draftClaims` can take the subject, action and evidence
+   * from the offer rather than from the response — the model's answer supplies
+   * wording, and nothing it writes can change what is being claimed.
+   */
+  plan?: readonly ClaimOpportunity[];
 }
 
 /** Why a claim was refused, in the shape {@link ProductClaim.rejection} wants. */
@@ -176,7 +195,7 @@ interface Refusal {
 }
 
 /** How one factual assertion resolved. */
-interface FactualResolution {
+export interface FactualResolution {
   outcome: ClaimVerificationOutcome;
   /** Ids that justified acceptance. Empty on refusal. */
   evidenceIds: string[];
@@ -201,6 +220,12 @@ interface VerificationContext {
   /** Subjects already resolved in this pass. A feature's claims share subjects. */
   subjects: Map<string, ReadonlySet<string> | undefined>;
   registry: ClaimVerifierRegistry | undefined;
+  /**
+   * What this feature may speak for. Required, never optional — a verifier
+   * without a scope is the Round 1 verifier, and it accepted a sibling's
+   * capability as this feature's.
+   */
+  scope: FeatureScope;
 }
 
 // ---------------------------------------------------------------------------
@@ -590,7 +615,23 @@ function evaluateRule(
   subject: ReadonlySet<string>,
   context: VerificationContext,
 ): FactualResolution {
-  const targets = draft.targets;
+  // A dimension may only be satisfied by a fact the feature actually owns or
+  // reaches. The page a feature sits on is legitimate context and stays citable
+  // — but it proves nothing, and `workflow_step` constrains only `nodeKinds`,
+  // so without this narrowing any page in the pack satisfies it. Measured on
+  // the fixture, that accepted 203 of 203 cross-page citations, including
+  // `clients.create` describing the settings page.
+  const targets = draft.targets.filter((target) => context.scope.canWitness(target));
+  if (targets.length === 0) {
+    return {
+      outcome: 'REJECTED_INVALID',
+      evidenceIds: [],
+      refusal: {
+        reason: 'TARGET_OUT_OF_SCOPE',
+        detail: `Everything this claim cited is context around ${quote(context.candidate.id)} rather than part of it, so nothing it points at can prove the claim.`,
+      },
+    };
+  }
 
   const dimensions = [
     evaluateKinds(rule, draft.type, targets, context),
@@ -809,7 +850,26 @@ function checkUniversally(draft: ClaimDraft, context: VerificationContext): Refu
     };
   }
 
-  // 2. Subject scope. The identity is real; it still has to be *this* feature's.
+  // 2. Subject ownership. The identity is real, and facts it speaks for are in
+  //     this feature's evidence — but a pack is a *neighbourhood*, so both are
+  //     equally true of the feature next door. This is the check Round 1 did not
+  //     have: `settings.new-key` was given the settings form's submit capability
+  //     because `element:settings.form` sits in its pack and the form really
+  //     does submit. Every dimension of the rule was satisfied. The claim was
+  //     true. It was about something else.
+  //
+  //     Deliberately a *separate* reason from UNKNOWN_SUBJECT: the subject may
+  //     be entirely real and still be the wrong one, and a refusal that says
+  //     "no such thing" about something that exists teaches a reader nothing.
+  if (!isOwnSubject(subjectRef, context)) {
+    const where = context.scope.classify(subjectRef);
+    return {
+      reason: 'SUBJECT_OUT_OF_SCOPE',
+      detail: `${quote(subjectRef)} is real, but it is ${describeScope(where)} of ${quote(context.candidate.id)} — ${scopeAdvice(where)}`,
+    };
+  }
+
+  // 2b. Subject closure. The identity is real; it still has to be *this* feature's.
   //    Without this check a rule that names no `relationships` dimension —
   //    `capability/view` and `workflow_step` are the two — has nothing at all
   //    tying the assertion to the feature it is filed under, because those rules
@@ -850,6 +910,25 @@ function checkUniversally(draft: ClaimDraft, context: VerificationContext): Refu
     return { reason: 'NO_SUPPORTING_EVIDENCE', detail: 'The claim cited no graph facts at all.' };
   }
 
+  // 4b. Target ownership. Pack membership says a fact was *shown* to the model;
+  //     it does not say the fact is this feature's. The two are different, and
+  //     the gap between them is where a sibling's evidence lives.
+  //
+  //     Only OUTSIDE is refused here. Context the feature legitimately sits in —
+  //     its page, its route, the schema one of its steps validates with, the
+  //     endpoint behind which it is implemented — stays citable, because a
+  //     reader wants to be told where to go and a `constraint` claim has to name
+  //     its schema. What such a node may *not* do is prove the claim; that is
+  //     `canWitness`, enforced where the rule picks its witness.
+  for (const target of draft.targets) {
+    if (context.scope.classify(target) === 'OUTSIDE') {
+      return {
+        reason: 'TARGET_OUT_OF_SCOPE',
+        detail: `${quote(target)} is a real fact in this feature's evidence, but nothing connects it to ${quote(context.candidate.id)}. It belongs to another feature.`,
+      };
+    }
+  }
+
   // 5. Values written out in words, against the facts this claim cited. These
   //    belong with the ids rather than with the rule: a registered verifier gets
   //    to decide whether the evidence supports the assertion, never whether a
@@ -862,8 +941,81 @@ function checkUniversally(draft: ClaimDraft, context: VerificationContext): Refu
   );
 }
 
+/**
+ * True when `subjectRef` is something this candidate may speak as.
+ *
+ * Two shapes are legal. `feature:<id>` is the feature itself, and only *this*
+ * feature's id qualifies — `feature:invoices.create` filed under
+ * `clients.create` is precisely the misattribution being refused. Anything else
+ * is a graph node, which must be OWNED: reached by walking forward out of this
+ * feature's own roots. REACHABLE is not enough — a feature may *mention* the
+ * route it navigates to, but it may not make claims **as** that route.
+ */
+function isOwnSubject(subjectRef: string, context: VerificationContext): boolean {
+  if (subjectRef.startsWith(FEATURE_SUBJECT_PREFIX)) {
+    return subjectRef === `${FEATURE_SUBJECT_PREFIX}${context.candidate.id}`;
+  }
+  return context.scope.classify(subjectRef) === 'OWNED';
+}
+
+/** How a scope class reads to someone reading a refusal. */
+function describeScope(scope: ScopeClass): string {
+  switch (scope) {
+    case 'OWNED':
+      return 'part';
+    case 'REACHABLE':
+      return 'somewhere this feature reaches, not part';
+    case 'CONTEXTUAL':
+      return 'context around, not part';
+    case 'OUTSIDE':
+      return 'no part';
+  }
+}
+
+/** What a reader should do about it. */
+function scopeAdvice(scope: ScopeClass): string {
+  return scope === 'OUTSIDE'
+    ? 'it belongs to another feature, and a claim filed here would be read as being about this one.'
+    : 'this feature may cite it, but it may not speak as it.';
+}
+
 /** Resolves one factual assertion to exactly one outcome. */
 function verifyFactual(draft: ClaimDraft, context: VerificationContext): FactualResolution {
+  // Whether the matrix covers this pair is a property of the *matrix*, so it is
+  // settled before anything about this particular claim's evidence. Otherwise a
+  // scope refusal pre-empts it, and `export` stops being reported as an action
+  // nothing can prove — it starts being reported as a citation problem, which
+  // invites someone to "fix" it by citing something else.
+  //
+  // Only ever reached for a pair no application has registered a verifier for:
+  // a registered check still owns its pair, and still answers first.
+  const declaredAction = draft.assertion?.action;
+  if (
+    declaredAction !== undefined &&
+    UNSUPPORTED_CAPABILITY_ACTIONS.includes(declaredAction) &&
+    context.registry?.find(draft.type, declaredAction) === undefined &&
+    findBuiltInRule(draft.type, declaredAction) === undefined
+  ) {
+    return {
+      outcome: 'EXPLICITLY_UNSUPPORTED',
+      evidenceIds: [],
+      // Without this the four deliberately-unsupported actions resolve
+      // correctly per claim and are counted nowhere, so `unsupportedActions`
+      // and the run warning both go silent — which is precisely the
+      // conflation of "unverifiable" with "disproven" that keeping them
+      // separate exists to prevent.
+      unsupportedKey: declaredAction,
+      refusal: {
+        reason: 'UNSUPPORTED_CLAIM_RULE',
+        // Word for word what the matrix-lookup branch below says. The
+        // distinction it draws — not checked, rather than disproven — is the
+        // whole point of keeping this outcome separate, and two paths to the
+        // same conclusion must not describe it two ways.
+        detail: `No verification rule exists for ${declaredAction}. The claim was not checked, and an unchecked claim is not evidence that the application cannot do this. The matrix omits ${declaredAction} deliberately: no generic graph fact proves it, so an application that can prove it must register a verifier.`,
+      },
+    };
+  }
+
   const universal = checkUniversally(draft, context);
   if (universal !== undefined) {
     return { outcome: 'REJECTED_INVALID', evidenceIds: [], refusal: universal };
@@ -992,8 +1144,21 @@ function sortedCounts(counts: ReadonlyMap<string, number>): Record<string, numbe
  * tried to say that we would not let it is the single most useful signal this
  * pipeline produces.
  */
-export function verifyEnrichment(input: VerifyEnrichmentInput): SemanticVerificationResult {
-  const { candidate, pack, graph, enrichment, attribution, provenance } = input;
+/**
+ * Builds the shared per-feature verification state.
+ *
+ * Extracted so the opportunity planner can probe assertions through the *same*
+ * verifier the pipeline uses, rather than re-implementing the matrix. Two rule
+ * systems that must agree eventually disagree; there is one here, read in both
+ * directions — enumerated from, and checked against.
+ *
+ * The context is built once and reused across probes because
+ * {@link VerificationContext.subjects} is the memo that keeps a pass linear.
+ * Rebuilding it per probe turns the planner into thousands of subject-closure
+ * walks.
+ */
+function buildContext(input: VerifyEnrichmentInput): VerificationContext {
+  const { candidate, pack, graph } = input;
 
   const outgoing = new Map<string, Relationship[]>();
   for (const relationship of pack.relationships) {
@@ -1013,7 +1178,43 @@ export function verifyEnrichment(input: VerifyEnrichmentInput): SemanticVerifica
     outgoing,
     subjects: new Map<string, ReadonlySet<string> | undefined>(),
     registry: input.registry,
+    // Computed over the pack, not the whole graph. The two must agree: a scope
+    // drawn from the graph would classify nodes OWNED that the pack never
+    // contained, and the subject gate would pass for a node whose closure is
+    // empty — which is the hole step 2 exists to close, re-opened from the
+    // other side. Measured on the fixture, that flipped 90 subject/feature
+    // pairs from refused to accepted.
+    scope:
+      input.scope ??
+      computeFeatureScope({
+        featureId: input.candidate.id,
+        roots: input.candidate.rootNodes,
+        nodes: input.pack.nodes,
+        relationships: input.pack.relationships,
+      }),
   };
+
+  return context;
+}
+
+/**
+ * Asks the verifier whether one assertion would hold, without recording it.
+ *
+ * The planner's only route to the matrix. It answers the question the planner
+ * needs — "is this claim provable from evidence this feature owns?" — using the
+ * exact code path that will judge the model's answer later, so an opportunity
+ * the planner offers cannot be one the verifier refuses.
+ */
+export function createAssertionProbe(
+  input: VerifyEnrichmentInput,
+): (draft: ClaimDraft) => FactualResolution {
+  const context = buildContext(input);
+  return (draft) => verifyFactual(draft, context);
+}
+
+export function verifyEnrichment(input: VerifyEnrichmentInput): SemanticVerificationResult {
+  const { candidate, pack, enrichment, attribution, provenance } = input;
+  const context = buildContext(input);
 
   const claims: ProductClaim[] = [];
   const rejectedClaims: RejectedClaim[] = [];
@@ -1027,7 +1228,7 @@ export function verifyEnrichment(input: VerifyEnrichmentInput): SemanticVerifica
   let languageClaims = 0;
   let semanticallyGrounded = 0;
 
-  for (const draft of draftClaims(candidate.id, enrichment)) {
+  for (const draft of draftClaims(candidate.id, enrichment, input.plan ?? [])) {
     if (draft.assertion !== undefined) {
       factualClaims += 1;
       const resolution = verifyFactual(draft, context);

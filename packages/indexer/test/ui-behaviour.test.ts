@@ -1224,3 +1224,102 @@ describe('validation schemas', () => {
     expect(edgesOfType(graph, 'validates_with')).toEqual([]);
   });
 });
+
+// ---------------------------------------------------------------------------
+// N. A submit control and the form it submits
+//
+// Paired like every rule above: the control inside the form gets the edge, the
+// control that only *names* a form does not, and neither does a sibling that
+// merely sits nearby. The last case is the one that matters — it is the shape
+// that let `settings.new-key` borrow the settings form's submit capability.
+// ---------------------------------------------------------------------------
+
+describe('a submit control and the form it submits', () => {
+  it('gives a type="submit" control inside a form the form\'s submits_to edge', async () => {
+    const graph = await indexProject({
+      ...BASE,
+      'src/Page.tsx': lines(
+        'export function Page() {',
+        '  const save = async () => {};',
+        '  return (',
+        '    <form data-guide="settings.form" onSubmit={save}>',
+        '      <button data-guide="settings.save" type="submit">Save</button>',
+        '    </form>',
+        '  );',
+        '}',
+      ),
+    });
+    expect(targets(graph, 'submits_to', 'element:settings.save')).toEqual([
+      'function:src/Page.tsx#save',
+    ]);
+    // Derived from the form's edge, so it may never claim to be better evidence.
+    const derived = edge(
+      graph,
+      'element:settings.save',
+      'submits_to',
+      'function:src/Page.tsx#save',
+    );
+    expect(derived?.confidence).toBe(CONFIDENCE.STATIC_INFERENCE);
+    expect(derived?.evidence[0]?.rule).toBe('submit-control-in-form');
+  });
+
+  it('refuses a control that names a form it is not inside', async () => {
+    // `form="settings-form"` is a real HTML association, but proving which form
+    // means resolving an `id` this source never declares.
+    const graph = await indexProject({
+      ...BASE,
+      'src/Page.tsx': lines(
+        'export function Page() {',
+        '  const save = async () => {};',
+        '  return (',
+        '    <div>',
+        '      <form data-guide="settings.form" onSubmit={save} />',
+        '      <button data-guide="settings.detached" type="submit" form="settings-form">Save</button>',
+        '    </div>',
+        '  );',
+        '}',
+      ),
+    });
+    expect(targets(graph, 'submits_to', 'element:settings.detached')).toEqual([]);
+  });
+
+  it('gives a passive sibling of the form nothing at all', async () => {
+    // The regression. `settings.new-key` displays a value next to a form; it
+    // submits nothing, and no edge may suggest otherwise.
+    const graph = await indexProject({
+      ...BASE,
+      'src/Page.tsx': lines(
+        'export function Page() {',
+        '  const save = async () => {};',
+        '  return (',
+        '    <section>',
+        '      <form data-guide="settings.form" onSubmit={save} />',
+        '      <code data-guide="settings.new-key">abc</code>',
+        '    </section>',
+        '  );',
+        '}',
+      ),
+    });
+    expect(targets(graph, 'submits_to', 'element:settings.new-key')).toEqual([]);
+    expect(graph.relationships.filter((r) => r.source === 'element:settings.new-key')).toHaveLength(
+      0,
+    );
+  });
+
+  it('does not treat a dynamic type as a submit control', async () => {
+    const graph = await indexProject({
+      ...BASE,
+      'src/Page.tsx': lines(
+        'export function Page({ kind }: { kind: "submit" | "button" }) {',
+        '  const save = async () => {};',
+        '  return (',
+        '    <form data-guide="settings.form" onSubmit={save}>',
+        '      <button data-guide="settings.maybe" type={kind}>Save</button>',
+        '    </form>',
+        '  );',
+        '}',
+      ),
+    });
+    expect(targets(graph, 'submits_to', 'element:settings.maybe')).toEqual([]);
+  });
+});

@@ -125,7 +125,12 @@ function chainGraph(depth: number): ReturnType<typeof makeGraph> {
 }
 
 describe('bounding', () => {
-  it('stops the walk at the requested depth', () => {
+  it('keeps a whole ownership chain, however deep, past the contextual depth', () => {
+    // `depth` bounds the *contextual* walk. It does not bound the behaviour
+    // path, because a path that proves a capability is not context a pack may
+    // trim: measured on the real fixture, `clients.create` reaches its endpoint
+    // in six hops, and a depth of four silently removed the ability to prove
+    // the flagship feature does anything at all.
     const graph = chainGraph(6);
 
     const shallow = buildEvidencePack(graph, candidate(elementId('clients.create')), { depth: 2 });
@@ -134,8 +139,24 @@ describe('bounding', () => {
       elementId('clients.create'),
       functionId(PAGE, 'hop0'),
       functionId(PAGE, 'hop1'),
+      functionId(PAGE, 'hop2'),
+      functionId(PAGE, 'hop3'),
+      functionId(PAGE, 'hop4'),
+      functionId(PAGE, 'hop5'),
     ]);
-    expect(shallow.truncated).toBe(true);
+  });
+
+  it('still bounds the pack by size, which is what keeps a prompt finite', () => {
+    // The limit that does the real work. Ownership seeding respects it, and
+    // stops at a whole node rather than leaving half a path behind.
+    const graph = chainGraph(6);
+
+    const small = buildEvidencePack(graph, candidate(elementId('clients.create')), {
+      maxNodes: 3,
+    });
+
+    expect(small.nodes.length).toBeLessThanOrEqual(3);
+    expect(small.truncated).toBe(true);
   });
 
   it('does not report truncation when nothing was cut', () => {

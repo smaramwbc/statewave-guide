@@ -37,11 +37,21 @@ import type { ProvenanceReference } from '@statewavedev/guide-shared';
 import type { FeatureCandidate } from './candidates.js';
 import { compareOptionalNumbers, compareOptionalStrings, compareStrings } from './compare.js';
 import { isSensitivePath, redactSecrets } from './safety.js';
+import { computeFeatureScope } from './scope.js';
 import { spineRank } from './spine.js';
 
 /** Caps on one neighbourhood. */
 export interface EvidencePackLimits {
-  /** Hops from the roots. Default 4. */
+  /**
+   * Hops from the roots, for the *contextual* walk. Default 4.
+   *
+   * The ownership closure is seeded before this walk runs and is not bounded by
+   * it. A behaviour path that proves a capability is not context a pack may
+   * trim — measured, `clients.create` reaches its endpoint in six hops, so a
+   * depth of four silently removed the ability to prove the fixture's flagship
+   * feature does anything. Size is still bounded, by `maxNodes` and
+   * `maxRelationships`, which the seeding respects.
+   */
   depth?: number;
   /** Nodes in the pack, roots included. Default 40. */
   maxNodes?: number;
@@ -356,6 +366,65 @@ export function buildEvidencePack(
       break;
     }
     selectedNodes.set(rootId, node);
+  }
+
+  // --- Seed with what the feature owns, before anything else competes for the
+  // budget.
+  //
+  // The walk below is *undirected*: it reaches a sibling through the shared
+  // container as readily as it reaches the endpoint through the handler. On the
+  // real fixture that filled `clients.create`'s pack with thirteen sibling
+  // elements while omitting every `submits_to` and `calls_api` edge on its own
+  // behaviour path — so the endpoint node was present, the chain that reaches
+  // it was not, and no `capability/create` could be proved for the fixture's
+  // flagship feature.
+  //
+  // Ownership is directed, so seeding from it guarantees the path a claim needs
+  // is in the pack. Context still gets the remaining budget, because a model
+  // that cannot see what a feature is *not* has no way to decline.
+  const ownership = computeFeatureScope({
+    featureId: candidate.id,
+    roots: candidate.rootNodes,
+    nodes: [...visibleNodes.values()],
+    relationships: visibleRelationships,
+  });
+  const edgeByStep = new Map<string, Relationship>();
+  for (const relationship of visibleRelationships) {
+    const key = `${relationship.source}|${relationship.type}|${relationship.target}`;
+    if (!edgeByStep.has(key)) edgeByStep.set(key, relationship);
+  }
+  const ownedFirst = ownership
+    .entries()
+    .filter((entry) => entry.scope === 'OWNED')
+    .sort((a, b) => a.path.length - b.path.length || compareStrings(a.nodeId, b.nodeId));
+  for (const entry of ownedFirst) {
+    const chain = entry.path
+      .map((step) => edgeByStep.get(`${step.source}|${step.relationship}|${step.target}`))
+      .filter((relationship): relationship is Relationship => relationship !== undefined);
+    const missingNodes = new Set<string>();
+    for (const relationship of chain) {
+      for (const id of [relationship.source, relationship.target]) {
+        if (!selectedNodes.has(id)) missingNodes.add(id);
+      }
+    }
+    const missingEdges = chain.filter(
+      (relationship) => !selectedRelationships.has(relationship.id),
+    );
+    // All or nothing per node: half a path proves nothing, and spending the
+    // budget on half of it starves the next one for no gain.
+    if (
+      selectedNodes.size + missingNodes.size > maxNodes ||
+      selectedRelationships.size + missingEdges.length > maxRelationships
+    ) {
+      truncated = true;
+      continue;
+    }
+    for (const relationship of missingEdges)
+      selectedRelationships.set(relationship.id, relationship);
+    for (const id of missingNodes) {
+      const node = visibleNodes.get(id);
+      if (node !== undefined) selectedNodes.set(id, node);
+    }
   }
 
   // --- Breadth-first, one hop at a time, spine edges first within each hop.

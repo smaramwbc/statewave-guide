@@ -76,8 +76,22 @@ export const MALFORMED_RESPONSE = '{"title":12345,"description":null,"id":"renam
 interface ParsedNode {
   id: string;
   kind: string;
+  /** What this fact is to the feature: `belongs`, `reaches`, `context`, `other`. */
+  scope?: string;
   name?: string;
   facts: Record<string, string>;
+}
+
+/**
+ * True for a fact this feature may speak for.
+ *
+ * `belongs` always. `reaches` only for a route, which is a destination a
+ * feature legitimately names without owning what is on it.
+ */
+function belongsToFeature(node: ParsedNode): boolean {
+  if (node.scope === undefined) return true;
+  if (node.scope === 'belongs') return true;
+  return node.scope === 'reaches' && node.kind === 'route';
 }
 
 /** One relationship, as the mock reads it back out of the data block. */
@@ -164,6 +178,7 @@ function parseEvidence(evidence: string): ParsedEvidence {
     nodes.push({
       id: entry.id,
       kind: entry.kind,
+      ...(typeof entry.scope === 'string' ? { scope: entry.scope } : {}),
       ...(typeof entry.name === 'string' ? { name: entry.name } : {}),
       facts: asFacts(entry.facts),
     });
@@ -322,6 +337,13 @@ function defaultFeatureResponse(parsed: ParsedEvidence): unknown {
     if (!chain.has(relationship.source)) continue;
     const target = byId.get(relationship.target);
     if (target === undefined) continue;
+    // Same reason as the step loop below: an edge is the feature's to cite only
+    // when both ends are. A navigation link reaches the destination page, so
+    // without this it would claim the destination's permission requirement as
+    // its own.
+    const source = byId.get(relationship.source);
+    if (source !== undefined && !belongsToFeature(source)) continue;
+    if (!belongsToFeature(target)) continue;
 
     if (relationship.type === 'calls_api' && target.kind === 'api') {
       const path = target.facts.path ?? '';
@@ -372,6 +394,18 @@ function defaultFeatureResponse(parsed: ParsedEvidence): unknown {
   for (const node of parsed.nodes) {
     if (!chain.has(node.id)) continue;
     if (node.kind !== 'element' && node.kind !== 'route') continue;
+    // The chain alone is not enough. A navigation link's chain runs through
+    // the route it points at and into the destination page's controls, so a
+    // "go to Clients" feature would list every button on the clients page as
+    // one of its own steps. The scope label says which facts are the feature's
+    // to speak for; a model that ignores it gets TARGET_OUT_OF_SCOPE, and a
+    // stand-in for a well-behaved model should not need to be told twice.
+    //
+    // A route it merely *reaches* is the exception, and the reason `reaches`
+    // exists as a class of its own: "then you land on the client's page" is a
+    // step, where "then you press the button on that page" is someone else's
+    // feature.
+    if (!belongsToFeature(node)) continue;
     steps.push({
       type: 'workflow_step',
       text: clamp(`Use ${node.name ?? node.id}.`, 200),

@@ -112,6 +112,10 @@ export function workflow(overrides: Partial<ProductWorkflow> = {}): ProductWorkf
     id: 'clients.create#workflow',
     featureId: 'clients.create',
     title: 'How to create a client',
+    // A numbered workflow has to say where its order came from. The default is
+    // `unknown`, and a page that numbers unordered steps is asserting a
+    // sequence nobody proved.
+    orderBasis: 'ownership-path',
     steps: [
       {
         index: 1,

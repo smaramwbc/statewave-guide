@@ -460,6 +460,12 @@ export function extractHandlers(
     });
   };
 
+  // Forms whose `onSubmit` resolved, keyed by the opening tag's start. Filled
+  // during the pass below and drained afterwards, because a submit control is
+  // usually written before the reader reaches the form's closing tag and a
+  // single forward pass would have to guess.
+  const resolvedForms = new Map<number, { targetId: string; at: Node }>();
+
   for (const tag of getJsxTagNodes(sourceFile)) {
     const elementId = options.elementIdsByTagStart.get(tag.getStart());
     const componentId = findComponentOwner(tag, options.owners);
@@ -500,6 +506,7 @@ export function extractHandlers(
               ]),
             );
           }
+          resolvedForms.set(tag.getStart(), { targetId: outcome.targetId, at: outcome.at });
         }
       }
     }
@@ -531,5 +538,67 @@ export function extractHandlers(
     }
   }
 
+  // Second pass: the controls that submit those forms.
+  //
+  // Only lexical nesting counts. A control carrying `form="some-id"` from
+  // outside the form is submitting *something*, but proving which form means
+  // resolving an `id` attribute that may not exist — the fixture's own footer
+  // button names `settings-form`, and no element declares that id. An edge we
+  // cannot prove is exactly what this indexer refuses to draw.
+  if (resolvedForms.size > 0) {
+    for (const tag of getJsxTagNodes(sourceFile)) {
+      const elementId = options.elementIdsByTagStart.get(tag.getStart());
+      if (elementId === undefined) continue;
+      if (!isSubmitControl(tag)) continue;
+
+      const form = enclosingResolvedForm(tag, resolvedForms);
+      if (form === undefined) continue;
+      if (elementId === form.targetId) continue;
+
+      const symbol = symbolOfNodeId(
+        findComponentOwner(tag, options.owners) ?? findOwnerId(tag, options.owners),
+      );
+      relationships.push(
+        createRelationship(
+          'submits_to',
+          elementId,
+          form.targetId,
+          // An inference by definition, and the floor of the scale — so it can
+          // never claim to be better evidence than the form's own edge it is
+          // derived from, whatever that edge scored.
+          CONFIDENCE.STATIC_INFERENCE,
+          [inferenceEvidence(tag, options.relativePath, 'submit-control-in-form', symbol)],
+        ),
+      );
+    }
+  }
+
   return { relationships, diagnostics };
+}
+
+/** True for a tag declaring `type="submit"` as a plain string attribute. */
+function isSubmitControl(tag: JsxTagNode): boolean {
+  const attribute = getJsxAttribute(tag, 'type');
+  if (attribute === undefined) return false;
+  const initializer = attribute.getInitializer();
+  if (initializer === undefined) return false;
+  // Only a literal counts. `type={kind}` may be "submit" at runtime and the
+  // graph would have no way to say so.
+  if (Node.isStringLiteral(initializer)) return initializer.getLiteralValue() === 'submit';
+  return false;
+}
+
+/**
+ * The nearest enclosing `<form>` whose submit handler resolved, if any.
+ *
+ * Nearest rather than outermost: nested forms are invalid HTML, but a component
+ * rendered inside two of them should still answer for the one it sits in.
+ */
+function enclosingResolvedForm<T>(tag: JsxTagNode, forms: ReadonlyMap<number, T>): T | undefined {
+  for (const ancestor of tag.getAncestors()) {
+    if (!Node.isJsxElement(ancestor)) continue;
+    const found = forms.get(ancestor.getOpeningElement().getStart());
+    if (found !== undefined) return found;
+  }
+  return undefined;
 }

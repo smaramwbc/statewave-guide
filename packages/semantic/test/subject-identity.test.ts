@@ -42,42 +42,52 @@ describe('references the pipeline proposed', () => {
     // be stored as a verified fact about `clients.create` and the renderer would
     // take its noun from `invoices`.
     const result = claimAbout('feature:invoices.create');
-    expect(reasonOf(result)).toBe('NO_SUPPORTING_EVIDENCE');
+    expect(reasonOf(result)).toBe('SUBJECT_OUT_OF_SCOPE');
     expect(reasonOf(result)).not.toBe('UNKNOWN_SUBJECT');
-    expect(onlyClaim(result).rejection?.detail).toContain('real identity');
+    expect(onlyClaim(result).rejection?.detail).toContain('is real, but');
   });
 
   it('resolves a canonical graph node id inside the pack', () => {
-    expect(reasonOf(claimAbout(ID.form))).toBeUndefined();
+    expect(reasonOf(claimAbout(ID.handleCreate))).toBeUndefined();
   });
 
   it('refuses a canonical graph node id from outside the pack', () => {
     // A real node in a different neighbourhood is a real subject — of a claim
     // about that neighbourhood. It is not the subject of a claim filed here.
-    expect(reasonOf(claimAbout(ID.invoiceCreate))).toBe('NO_SUPPORTING_EVIDENCE');
+    expect(reasonOf(claimAbout(ID.invoiceCreate))).toBe('SUBJECT_OUT_OF_SCOPE');
   });
 
   it('will not let a foreign subject put a foreign noun in the description', () => {
     // The end-to-end shape of the same attack: `capability/view` also names no
     // relationship dimension, and its subject is what `render.ts` turns into the
-    // sentence's noun.
+    // sentence's noun. The cited endpoint is one this feature owns, so the
+    // subject is the only thing wrong with the claim and the only thing that can
+    // account for the refusal.
     const result = verifyFixture({
       factualClaims: [
         factual({
           action: 'view',
           subjectRef: 'feature:invoices.create',
           text: 'Every invoice raised against a client is listed on this screen.',
-          targets: [ID.get],
+          targets: [ID.post],
         }),
       ],
     });
     expect(onlyClaim(result).status).toBe('rejected');
-    expect(reasonOf(result)).toBe('NO_SUPPORTING_EVIDENCE');
+    expect(reasonOf(result)).toBe('SUBJECT_OUT_OF_SCOPE');
   });
 
-  it('resolves a route and a permission node as subjects', () => {
-    expect(reasonOf(claimAbout(ID.routeList))).toBeUndefined();
+  it('resolves an endpoint and a permission node as subjects', () => {
+    expect(reasonOf(claimAbout(ID.post))).toBeUndefined();
     expect(reasonOf(claimAbout(ID.permissionCreate))).toBeUndefined();
+  });
+
+  it('refuses the route the feature is merely reached through', () => {
+    // `/clients` is where this feature lives, not something it is: every button
+    // on the page would speak as the page's route, and a claim about one of them
+    // would read as a claim about all of them. Context stays citable; it just
+    // cannot be spoken as.
+    expect(reasonOf(claimAbout(ID.routeList))).toBe('SUBJECT_OUT_OF_SCOPE');
   });
 });
 
@@ -155,12 +165,16 @@ describe('the subject decides what relationship evidence counts', () => {
     expect(onlyClaim(result).status).toBe('structurally_verified');
   });
 
-  it('refuses the same claim when the subject is a feature the edge never touches', () => {
+  it('refuses the same claim when the subject is a node the edge never touches', () => {
+    // The handler is this feature's own, so scope has nothing to object to. The
+    // permission is required by the button that invokes it, and by nothing
+    // further down the chain, which leaves the missing edge as the only thing
+    // the refusal can be about.
     const result = verifyFixture({
       factualClaims: [
         factual({
           type: 'permission',
-          subjectRef: ID.search,
+          subjectRef: ID.handleCreate,
           permission: 'clients:create',
           targets: [ID.permissionCreate],
         }),
@@ -171,8 +185,8 @@ describe('the subject decides what relationship evidence counts', () => {
   });
 
   it('refuses a permission claim whose subject is another feature entirely', () => {
-    // The reference resolves — it is a known candidate — and it speaks for
-    // nothing in this pack, so it is refused before a rule is ever consulted.
+    // The reference resolves — it is a known candidate — and it names the
+    // feature next door, so it is refused before a rule is ever consulted.
     // Rules that name a `relationships` dimension would have refused it a step
     // later anyway; rules that do not would not have refused it at all.
     const result = verifyFixture({
@@ -185,7 +199,7 @@ describe('the subject decides what relationship evidence counts', () => {
         }),
       ],
     });
-    expect(reasonOf(result)).toBe('NO_SUPPORTING_EVIDENCE');
+    expect(reasonOf(result)).toBe('SUBJECT_OUT_OF_SCOPE');
   });
 
   it('follows the behaviour chain, so a handler two hops out is still the subject', () => {

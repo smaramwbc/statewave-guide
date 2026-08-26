@@ -39,6 +39,7 @@ import type {
 } from '@statewavedev/guide-shared';
 import { isFactualClaimType, toCapabilityAction } from '@statewavedev/guide-shared';
 import { compareStrings } from './compare.js';
+import type { ClaimOpportunity } from './opportunities.js';
 import { redactSecrets } from './safety.js';
 
 /**
@@ -116,7 +117,21 @@ export function acceptedStatusFor(type: ProductClaimType): ProductClaimStatus {
  * untouched — they are looked up in the graph verbatim, and a redaction there
  * would turn a real permission into an unverifiable one.
  */
-export function draftClaims(featureId: string, enrichment: FeatureEnrichment): ClaimDraft[] {
+export function draftClaims(
+  featureId: string,
+  enrichment: FeatureEnrichment,
+  /**
+   * The opportunities this feature was offered, when it was offered any.
+   *
+   * Everything a model may not decide is read from here rather than from its
+   * response: subject identity, capability action, and the graph facts that
+   * prove the claim. The response supplies wording. A decision naming an
+   * opportunity that was never offered becomes a draft with no assertion, so it
+   * is refused and recorded rather than silently dropped — a model inventing an
+   * opportunity id is exactly as interesting as one inventing a route.
+   */
+  plan: readonly ClaimOpportunity[] = [],
+): ClaimDraft[] {
   const ordinals = new Map<ProductClaimType, number>();
   const nextOrdinal = (type: ProductClaimType): number => {
     const ordinal = (ordinals.get(type) ?? 0) + 1;
@@ -147,6 +162,50 @@ export function draftClaims(featureId: string, enrichment: FeatureEnrichment): C
       text: redactSecrets(claim.text),
       assertion,
       targets: [...claim.targets],
+      ordinal,
+    });
+  }
+
+  const offered = new Map(plan.map((opportunity) => [opportunity.id, opportunity]));
+  for (const decision of enrichment.decisions ?? []) {
+    if (decision.decision !== 'accept') continue;
+    // The refinement on the schema guarantees this, but a stored model written
+    // by an older pipeline has not been through it.
+    if (decision.text === undefined) continue;
+    const text = decision.text;
+    const opportunity = offered.get(decision.opportunityId);
+    if (opportunity === undefined) {
+      // Recorded, not dropped. The list of things a model tried to say that we
+      // would not let it is the most useful signal this pipeline produces, and
+      // an invented opportunity id belongs in it.
+      const ordinal = nextOrdinal('capability');
+      drafts.push({
+        id: `${featureId}#unknown-opportunity:${ordinal}`,
+        featureId,
+        type: 'capability',
+        text: redactSecrets(text),
+        targets: [],
+        ordinal,
+      });
+      continue;
+    }
+    const ordinal = nextOrdinal(opportunity.type);
+    drafts.push({
+      id: `${featureId}#${opportunity.type}:${ordinal}`,
+      featureId,
+      type: opportunity.type,
+      text: redactSecrets(text),
+      assertion: {
+        subjectRef: opportunity.subjectRef,
+        ...(decision.subjectLabel === undefined
+          ? {}
+          : { subjectLabel: redactSecrets(decision.subjectLabel) }),
+        ...(opportunity.action === undefined ? {} : { action: opportunity.action }),
+        ...(opportunity.route === undefined ? {} : { route: opportunity.route }),
+        ...(opportunity.permission === undefined ? {} : { permission: opportunity.permission }),
+        targets: [...opportunity.targets],
+      },
+      targets: [...opportunity.targets],
       ordinal,
     });
   }

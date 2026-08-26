@@ -80,6 +80,7 @@ export { BEHAVIOUR_SPINE, spineRank } from './spine.js';
 export {
   SEMANTIC_SYSTEM_INSTRUCTION,
   FEATURE_ENRICHMENT_INSTRUCTION,
+  OPPORTUNITY_INSTRUCTION,
   WORKFLOW_ENRICHMENT_INSTRUCTION,
   FEATURE_ENRICHMENT_TASK,
   WORKFLOW_ENRICHMENT_TASK,
@@ -240,3 +241,31 @@ export { DEFAULT_PROVIDERS, resolveProvider, resolveProviders } from './provider
 export type { ProviderConfig, ProviderKind, ResolvedProvider } from './providers/registry.js';
 export { toJsonSchema } from './providers/json-schema.js';
 export { extractJsonObject } from './providers/shared.js';
+
+// --- Feature scope and claim opportunities ---------------------------------
+// The Round 2 layer: which graph facts belong to a feature, and which factual
+// claims that feature could truthfully make. Both are deterministic and both
+// are computed before a model is asked anything.
+export { computeFeatureScope, describeOwnershipPath } from './scope.js';
+export type {
+  FeatureScope,
+  FeatureScopeInput,
+  ScopeClass,
+  ScopeBasis,
+  ScopeEntry,
+  OwnershipStep,
+} from './scope.js';
+export { planClaimOpportunities, OPPORTUNITY_LIMITS } from './opportunities.js';
+export type {
+  ClaimOpportunity,
+  ClaimDecision,
+  DeclinedOpportunity,
+  OpportunityPlanInput,
+} from './opportunities.js';
+export { createClaimOpportunityRegistry } from './opportunity-registry.js';
+export type {
+  ClaimOpportunityProvider,
+  ClaimOpportunityRegistry,
+  ClaimOpportunityContext,
+  ClaimOpportunityDraft,
+} from './opportunity-registry.js';

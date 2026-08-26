@@ -1,0 +1,85 @@
+{
+  "round": "round-2",
+  "provider": "anthropic-opus-5",
+  "model": "claude-opus-5",
+  "settings": "model=claude-opus-5 effort=low temperature=unsupported-by-api",
+  "dataset": "v1",
+  "gold": "v1",
+  "prompt": "v2",
+  "scopeAlgorithm": "forward-spine-1",
+  "opportunityPlanner": "matrix-probe-1",
+  "runs": 3,
+  "runAt": "2026-08-26T20:35:32.124Z",
+  "stability": 0.8589892873777364,
+  "metrics": {
+    "features": 63,
+    "factualProposed": 120,
+    "factualVerified": 114,
+    "factualRejected": 6,
+    "languageProposed": 196,
+    "languageGrounded": 183,
+    "languageRejected": 13,
+    "forbiddenCapabilitiesProposed": 0,
+    "unsupportedActionsProposed": 0,
+    "unknownSubjectsProposed": 0,
+    "unknownReferencesProposed": 0,
+    "invalidPermissionsProposed": 0,
+    "invalidRoutesProposed": 0,
+    "evidenceDoesNotSupport": 19,
+    "unsupportedClaimRule": 0,
+    "requiredConceptsExpected": 63,
+    "requiredConceptsRecovered": 50,
+    "requiredEvidenceExpected": 84,
+    "requiredEvidenceRecovered": 72,
+    "requiredWorkflowExpected": 39,
+    "requiredWorkflowRecovered": 27,
+    "capabilitiesOutsideAllowed": 0,
+    "opportunitiesOffered": 165,
+    "opportunitiesAccepted": 120,
+    "opportunitiesDeclined": 45,
+    "subjectOutOfScope": 0,
+    "targetOutOfScope": 0,
+    "capabilitiesOutsideAllowedDetail": [],
+    "rejectionSamples": {
+      "EVIDENCE_DOES_NOT_SUPPORT_CLAIM": [
+        {
+          "featureId": "clients.create",
+          "type": "purpose",
+          "detail": "The wording asserts \"email\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on."
+        },
+        {
+          "featureId": "clients.error",
+          "type": "synonym",
+          "detail": "The wording asserts \"notify\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on."
+        },
+        {
+          "featureId": "clients.error",
+          "type": "workflow_step",
+          "detail": "The wording asserts \"notify\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on."
+        }
+      ]
+    },
+    "forbiddenClaimsInProse": 0,
+    "restraintCases": 30,
+    "restraintHeld": 30,
+    "featuresWithoutCapability": 45,
+    "featuresOnlyWorkflowSteps": 27,
+    "featuresRepeatingIdentifiers": 0,
+    "calls": 63,
+    "schemaFailures": 0,
+    "providerErrors": 0,
+    "rateLimited": 0,
+    "timeouts": 0,
+    "inputTokens": 1378887,
+    "outputTokens": 36185,
+    "reportedTokens": true,
+    "latencies": [
+      176536,
+      182607,
+      176631
+    ],
+    "rejectionsByReason": {
+      "EVIDENCE_DOES_NOT_SUPPORT_CLAIM": 19
+    }
+  }
+}

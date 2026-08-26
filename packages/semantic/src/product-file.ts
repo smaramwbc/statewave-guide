@@ -176,6 +176,7 @@ function normaliseWorkflow(workflow: ProductWorkflow): ProductWorkflow {
     id: workflow.id,
     featureId: workflow.featureId,
     title: workflow.title,
+    orderBasis: workflow.orderBasis,
     steps: [...workflow.steps].sort((a, b) => a.index - b.index).map(normaliseStep),
     evidence: normaliseEvidence(workflow.evidence),
     ...(workflow.generatedBy === undefined

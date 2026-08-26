@@ -264,3 +264,58 @@ export function reportError(io: CliIo, message: string): void {
 export function reportWarning(io: CliIo, message: string): void {
   io.err(`${pc.yellow('!')} ${message}`);
 }
+
+/**
+ * What the planner offered a feature, and what the model did with it.
+ *
+ * Development-only, and shaped for the question a developer actually asks when
+ * a feature comes out thin: *was there nothing to say, or did the model decline
+ * to say it?* Those look identical in the output and have opposite fixes — the
+ * first is a gap in the graph, the second is a judgement call the model made.
+ *
+ * A feature with no opportunities is printed as restraint rather than failure.
+ * `settings.new-key` displays a rotated API key and can be proved to do nothing
+ * at all; a pipeline that reported that as a shortfall would be inviting
+ * someone to fix it by loosening a rule.
+ */
+export function formatOpportunityReport(run: EnrichmentRun): string[] {
+  const tallies = run.opportunities ?? [];
+  if (tallies.length === 0) return [];
+
+  const lines: string[] = ['', 'Claim opportunities', ''];
+  const offered = tallies.reduce((total, entry) => total + entry.offered, 0);
+  const accepted = tallies.reduce((total, entry) => total + entry.accepted, 0);
+  const declined = tallies.reduce((total, entry) => total + entry.declined, 0);
+
+  lines.push(`  offered   ${offered}`);
+  lines.push(`  accepted  ${accepted}`);
+  lines.push(`  declined  ${declined}`);
+  lines.push('');
+
+  const silent = tallies.filter((entry) => entry.offered === 0);
+  if (silent.length > 0) {
+    lines.push(
+      `  ${pluralise(silent.length, 'feature')} had nothing provable to say. That is restraint,`,
+      '  not a shortfall: the graph does not show these features doing anything.',
+      '',
+    );
+    for (const entry of silent.slice(0, 10)) lines.push(`    ○ ${entry.featureId}`);
+    if (silent.length > 10) lines.push(`    … and ${silent.length - 10} more`);
+    lines.push('');
+  }
+
+  const refused = tallies.filter((entry) => entry.offered > 0 && entry.accepted === 0);
+  if (refused.length > 0) {
+    lines.push(
+      `  ${pluralise(refused.length, 'feature')} were offered a provable claim and took none.`,
+      '  Worth reading: the model judged every one of them not worth saying.',
+      '',
+    );
+    for (const entry of refused.slice(0, 10)) {
+      lines.push(`    ✗ ${entry.featureId} — ${entry.offered} offered, all declined`);
+    }
+    lines.push('');
+  }
+
+  return lines;
+}

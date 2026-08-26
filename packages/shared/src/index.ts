@@ -32,6 +32,7 @@ export type {
   ProductClaim,
   ProductWorkflowStep,
   ProductWorkflow,
+  WorkflowOrderBasis,
   ProductFeatureIdOrigin,
   ProductPermission,
   ProductFeature,
@@ -67,6 +68,7 @@ export {
   workflowEnrichmentSchema,
   workflowStepEnrichmentSchema,
   toCapabilityAction,
+  claimDecisionSchema,
 } from './semantic-schemas.js';
 
 export type {

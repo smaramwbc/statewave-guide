@@ -296,6 +296,37 @@ next consumer parses prose to recover facts the model already holds structurally
 which is how a documentation system becomes a second source of truth to maintain.
 See [ADR 0008](adr/0008-documentation-is-output-not-source-of-truth.md).
 
+### The semantic pipeline
+
+Between the graph and the Product Model there are more stages than "ask a model",
+and all but one of them are deterministic:
+
+```
+ApplicationGraph          authoritative facts, no model involved
+      ↓
+FeatureCandidate          one guide element and the code reachable from it
+      ↓
+FeatureScope              deterministic ownership — what this feature may speak about
+      ↓
+EvidencePack              seeded from the ownership closure, then widened for context
+      ↓
+ClaimOpportunities        claims the graph already supports, each proved through
+                          the verifier before it is offered
+      ↓
+model selects or declines the only step a model performs
+      ↓
+Verifier                  the selected claim re-checked against the graph
+      ↓
+ProductModel              accepted and rejected claims, both persisted
+      ↓
+Renderer                  deterministic projection — Markdown, and whatever comes after it
+```
+
+The model's position in that list is the design. It is handed a bounded set of
+things it is already known to be allowed to say, it chooses among them and writes
+the sentence, and what it chose is checked again on the way out. Everything before
+and after it is reproducible without a network call.
+
 ### Claims, not documents
 
 `ProductClaim` is the unit. Factual claims (`capability`, `navigation`,
@@ -317,6 +348,145 @@ checked and it is false_, and reported separately so an unverifiable claim never
 reads as disproven. Reasoning in
 [ADR 0007](adr/0007-ai-enriches-but-does-not-define-product-truth.md) and
 [ADR 0009](adr/0009-semantic-knowledge-is-claim-based.md).
+
+### Feature Scope
+
+_"True somewhere in the graph" is not the same as "true for this feature."_
+
+The failure that forced this stage is worth stating exactly, because nothing about
+it resembles a hallucination.
+
+`settings.new-key` is a `<code>` element that displays a freshly rotated API key.
+Asked to describe it, a real model (`claude-opus-5`) produced, and the verifier
+accepted:
+
+> Settings changes are saved by submitting the settings form.
+
+typed as a `capability` with action `submit`, subject `element:settings.form`,
+targeting that element and `SettingsPage.tsx#saveSettings`. Nothing in the sentence
+is false. The settings form really does submit, the relationships are real and
+carry evidence, and every dimension of the capability/submit rule was satisfied.
+The verifier checked that the subject was a known identity and that the evidence
+was in the feature's pack, and both were true — because an evidence pack is a
+neighbourhood, and the sibling was sitting in it. It happened in two runs out of
+three.
+
+The structural cause is small and entirely mechanical. `element:settings.new-key`
+has zero outgoing relationships. `element:settings.form` has `submits_to`. Both are
+contained by `component:…#SettingsPage`. The only route from the feature to the
+form goes **up** a `contains` edge into the shared page and back **down** into a
+sibling.
+
+**A feature owns what it reaches by walking forward out of its own roots along
+behaviour edges. It never owns what it reaches by walking an edge backwards and
+descending somewhere else.** Ownership is a path, never a distance.
+
+The rejected alternative was "a node within depth _N_ is owned". It is the same
+mistake in a different unit: the borrowed form is two hops from the feature, and so
+are a great many nodes that genuinely belong to it. No hop count separates them,
+because the thing that separates them is direction.
+
+Every node the graph can see is placed in one of four classes:
+
+| Class        | Reached how                                                           | A claim may                              |
+| ------------ | --------------------------------------------------------------------- | ---------------------------------------- |
+| `OWNED`      | forward from the feature's own roots, along behaviour edges           | name it as subject or as target          |
+| `REACHABLE`  | forward, but past an ownership boundary — the code behind an endpoint | name it as a target, never as subject    |
+| `CONTEXTUAL` | ancestry of the roots — the page the feature sits on                  | be positioned by it, not assert about it |
+| `OUTSIDE`    | anywhere else, siblings included                                      | not name it at all                       |
+
+Two boundaries end the forward walk. Neither is a hop count; both are semantic.
+
+**The API endpoint is the frontier.** A feature owns the endpoint _identity_ it
+calls. The controller, the service, the repository and the `db.query` behind that
+endpoint are reachable and may be cited, but they are not the feature. This is the
+line between what the product does and how it is built, and it falls on the same
+node [ADR 0006](adr/0006-api-endpoint-identity.md) makes the join key, for the same
+reason: the endpoint is the one thing both tiers name independently.
+
+**Shared infrastructure is nobody's feature.** Measured fan-in on the realistic-app
+fixture: `lib/http.ts#unwrap` has 13 callers, `db.ts#query` 11, `hasPermission` 5,
+and `primitives/Button` has 8 incoming `renders`. A feature-specific function has
+exactly one. A node that everything reaches describes the codebase rather than any
+product capability, and letting one into a feature's scope drags the rest of the
+application in behind it.
+
+Two rejection reasons enforce this: `SUBJECT_OUT_OF_SCOPE` and
+`TARGET_OUT_OF_SCOPE`. Deliberately _not_ `UNKNOWN_SUBJECT` — the subject is real,
+and telling a reader "no such thing" about something that exists sends them looking
+for a typo that is not there.
+
+A citation gate alone is not sufficient, because not every claim type names its
+evidence precisely. `workflow_step` names only `nodeKinds`, so before a witness
+gate was added — requiring the claim's named participants to be in scope, not
+merely its evidence to be in the pack — 203 of 203 cross-page citations were
+accepted, including `clients.create` describing the settings page.
+
+What the change measures out to, on the same fixture:
+
+- `settings.new-key`: owned set is `{itself}`, `element:settings.form` is
+  `OUTSIDE`, and the claim is refused with `SUBJECT_OUT_OF_SCOPE`.
+- `settings.form`: the identical claim still verifies. The positive control holds,
+  which is what distinguishes a scope rule from a mute button.
+- `clients.create`: owns `api:POST:/api/clients` along
+  `invokes → opens → renders → submits_to → calls → calls_api`. Its owned node count
+  fell from 28 to 20 once backend internals became `REACHABLE`.
+- Contextual nodes fell from 14 to 3 once ancestry was seeded from the roots only.
+  Before that, `primitives/Button` and its 8 incoming `renders` made SettingsPage,
+  InvoicesPage, DashboardPage and ClientDetailPage all "context" for
+  `clients.create`.
+
+Two other things had to change to make the rule survivable.
+
+**The indexer now emits `submits_to` from a `type="submit"` control to its enclosing
+form's resolved handler**, as a named inference rule (`submit-control-in-form`,
+static inference, confidence 0.9). The reason is that `contains` is flat: of 62
+`contains` edges in the fixture, none is element→element and every source is a
+component. A submit _button_ therefore had no outgoing behaviour of its own and
+could only support a submit claim by citing the _form's_ edge — structurally the
+same borrowing as the bug. Three features were affected: `settings.save`,
+`invoices.create-form.submit` and `clients.create-dialog.submit`. A control that
+carries `form="some-id"` from outside the form gets no edge; the fixture's own
+footer button names `settings-form` and no element declares that id, so the link is
+unprovable and is left unmade.
+
+**The evidence pack is now seeded from the ownership closure before its undirected
+breadth-first search.** The search reaches siblings as readily as the behaviour
+path, and unseeded it did: `clients.create`'s pack held 13 sibling elements while
+omitting every `submits_to` and `calls_api` edge on its own path, so no
+capability/create claim could be proved for the flagship feature at all.
+
+### Claim Opportunities
+
+Three participants, and the division of labour between them is the whole idea.
+
+**The graph proposes factual possibilities.** Before a model is asked anything, the
+pipeline enumerates the claims this feature's scope can already support — this
+element, this action, this endpoint, this permission — and runs each candidate
+through the verifier. An opportunity is not a hint or a suggestion. It is a claim
+already known to pass. What the model is handed is therefore a menu of true things,
+derived deterministically, reproducible without a model.
+
+**The model adds semantic usefulness.** Truth is not the scarce resource here; the
+graph has more of it than anyone wants to read. The scarce resource is knowing
+which facts a person would care about and how to say them in that person's words.
+So the model selects among the opportunities and writes the language, and it may
+also decline every one of them. Declining is an ordinary outcome, not a failure: a
+feature about which nothing useful can be said should produce nothing, rather than
+a sentence written to fill the slot.
+
+**The verifier decides what survives.** A selected claim is checked again on the way
+out, against the graph and against the feature's scope, and a rejection is
+persisted with its reason. The re-check is not redundant. The opportunity was
+proved as offered; what comes back is a claim the model has written, and the text,
+the subject and the targets can all differ from what was proposed.
+
+The alternative — let the model write claims freely and lean on the verifier to
+catch the bad ones — is what produced the `settings.new-key` sentence. A verifier
+can only refuse a claim on a rule it holds. Enumerating the possibilities first
+means the model's freedom is spent on wording rather than on choosing what the
+feature is about, and choosing what the feature is about is the decision that went
+wrong.
 
 ---
 
