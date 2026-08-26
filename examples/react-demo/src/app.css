@@ -250,6 +250,50 @@ code {
   overflow-wrap: anywhere;
 }
 
+/* The structured error code is the point of the failure buttons, so it gets
+   its own line above the raw JSON rather than being buried inside it. */
+
+.guide-panel__outcome {
+  display: grid;
+  gap: 6px;
+}
+
+.guide-panel__code {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.guide-panel__code code {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.guide-panel__code.ok code {
+  color: var(--ok);
+}
+
+.guide-panel__code.err code {
+  color: var(--err);
+}
+
+.guide-panel__code-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.guide-panel__message {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
 .guide-panel__result {
   margin: 0;
   padding: 8px;
@@ -270,4 +314,161 @@ code {
 .guide-panel__result.err {
   border-color: #5b2b2b;
   color: var(--err);
+}
+
+/* Inspector — an engineering tool, not product UI. */
+
+.inspector {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: 420px;
+  max-height: 76vh;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
+  z-index: 2147483000;
+  font-size: 12px;
+}
+
+.inspector h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.inspector h5 {
+  margin: 0 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.inspector__select {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.inspector__section {
+  margin-bottom: 12px;
+}
+
+.inspector__muted {
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.inspector__gap {
+  color: #d29922;
+}
+
+.inspector__highlight {
+  margin-left: 8px;
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.inspector__chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.inspector__start {
+  font-weight: 600;
+  padding: 2px 0;
+}
+
+.inspector__hop-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.inspector__hop-line:hover {
+  background: #1f242c;
+}
+
+.inspector__arrow {
+  color: var(--muted);
+}
+
+.inspector__rel {
+  color: var(--accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
+
+.inspector__target {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.inspector__confidence {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.inspector__evidence {
+  list-style: none;
+  margin: 2px 0 6px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--border);
+  background: #0d1117;
+  border-radius: 0 4px 4px 0;
+}
+
+.inspector__evidence li {
+  margin-bottom: 6px;
+}
+
+.inspector__evidence code {
+  display: block;
+  margin-top: 3px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.inspector__where {
+  color: var(--muted);
+  display: block;
+}
+
+.inspector__rule {
+  display: inline-block;
+  margin-top: 2px;
+  color: #a371f7;
+  font-size: 11px;
+}
+
+.inspector__stop {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  color: var(--muted);
+}
+
+.inspector__diagnostics {
+  margin: 6px 0 0;
+  padding-left: 16px;
+}
+
+.inspector__code {
+  color: #d29922;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }

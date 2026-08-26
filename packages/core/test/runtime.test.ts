@@ -70,7 +70,7 @@ describe('action delegation', () => {
 
     const result = await guide.executeAction({ action: 'navigate', input: { route: '/clients' } });
 
-    expect(result.ok).toBe(true);
+    expect(result.success).toBe(true);
     expect(execute).toHaveBeenCalledOnce();
   });
 
@@ -87,7 +87,7 @@ describe('action delegation', () => {
 
     expect(guide.actions).toBe(actions);
     await expect(guide.executeAction({ action: 'ping', input: {} })).resolves.toMatchObject({
-      ok: true,
+      success: true,
       data: 'pong',
     });
   });
@@ -112,7 +112,7 @@ describe('action delegation', () => {
   it('returns failures as data rather than throwing', async () => {
     const guide = createGuideRuntime();
     const result = await guide.executeAction({ action: 'nope' });
-    expect(result.ok === false && result.error.code).toBe('unknown_action');
+    expect(result.success === false && result.error.code).toBe('action_not_found');
   });
 
   it('lists available actions and hides restricted ones from an agent', () => {

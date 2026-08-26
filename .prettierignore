@@ -11,3 +11,6 @@ packages/indexer/test/fixtures
 # Auto-managed by Statewave — reformatting here is overwritten on the next sync.
 CLAUDE.md
 .github/copilot-instructions.md
+
+# Generated benchmark snapshots — written by scripts/indexer-quality.mjs
+docs/benchmarks

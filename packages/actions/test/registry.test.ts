@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import type { GuideActionDefinition } from '@statewavedev/guide-shared';
-import { ActionRegistrationError, createActionRegistry } from '../src/index.js';
+import { ActionFailure, ActionRegistrationError, createActionRegistry } from '../src/index.js';
 
 const navigate = (spy = vi.fn()) =>
   ({
@@ -91,8 +91,8 @@ describe('execution', () => {
 
     const result = await actions.execute({ action: 'navigate', input: { route: '/clients' } });
 
-    expect(result.ok).toBe(true);
-    expect(result.ok && result.data).toEqual({ navigatedTo: '/clients' });
+    expect(result.success).toBe(true);
+    expect(result.success && result.data).toEqual({ navigatedTo: '/clients' });
     expect(spy).toHaveBeenCalledWith(
       { route: '/clients' },
       expect.objectContaining({ source: 'user', requestId: expect.any(String) }),
@@ -119,9 +119,9 @@ describe('execution', () => {
 
     const result = await actions.execute({ action: 'teleport' });
 
-    expect(result.ok).toBe(false);
-    expect(result.ok === false && result.error.code).toBe('unknown_action');
-    expect(result.ok === false && result.error.message).toContain('navigate');
+    expect(result.success).toBe(false);
+    expect(result.success === false && result.error.code).toBe('action_not_found');
+    expect(result.success === false && result.error.message).toContain('navigate');
   });
 
   it('rejects invalid parameters with a per-field issue list', async () => {
@@ -129,8 +129,8 @@ describe('execution', () => {
 
     const result = await actions.execute({ action: 'navigate', input: { route: 42 } });
 
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
+    expect(result.success).toBe(false);
+    if (result.success) return;
     expect(result.error.code).toBe('invalid_input');
     expect(result.error.issues).toEqual([{ path: ['route'], message: expect.any(String) }]);
   });
@@ -138,7 +138,7 @@ describe('execution', () => {
   it('rejects missing input entirely', async () => {
     const actions = createActionRegistry({ actions: [navigate()] });
     const result = await actions.execute({ action: 'navigate' });
-    expect(result.ok === false && result.error.code).toBe('invalid_input');
+    expect(result.success === false && result.error.code).toBe('invalid_input');
   });
 
   it('does not call the handler when validation fails', async () => {
@@ -188,8 +188,8 @@ describe('execution', () => {
     await actions.execute({ action: 'nope' });
 
     expect(onExecuted).toHaveBeenCalledTimes(2);
-    expect(onExecuted.mock.calls[0]?.[0].ok).toBe(true);
-    expect(onExecuted.mock.calls[1]?.[0].ok).toBe(false);
+    expect(onExecuted.mock.calls[0]?.[0].success).toBe(true);
+    expect(onExecuted.mock.calls[1]?.[0].success).toBe(false);
   });
 });
 
@@ -207,8 +207,8 @@ describe('failures never escape', () => {
 
     const result = await actions.execute({ action: 'save', input: {} });
 
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
+    expect(result.success).toBe(false);
+    if (result.success) return;
     expect(result.error.code).toBe('execution_failed');
     expect(result.error.message).toBe('backend exploded');
     expect(result.error.cause).toBeInstanceOf(Error);
@@ -226,7 +226,7 @@ describe('failures never escape', () => {
     });
 
     await expect(actions.execute({ action: 'boom', input: {} })).resolves.toMatchObject({
-      ok: false,
+      success: false,
       error: { code: 'execution_failed', message: 'sync boom' },
     });
   });
@@ -243,7 +243,7 @@ describe('failures never escape', () => {
     });
 
     const result = await actions.execute({ action: 'weird', input: {} });
-    expect(result.ok === false && result.error.message).toBe('a string');
+    expect(result.success === false && result.error.message).toBe('a string');
   });
 
   it('reports cancellation when the signal is already aborted', async () => {
@@ -256,7 +256,7 @@ describe('failures never escape', () => {
       signal: AbortSignal.abort(),
     });
 
-    expect(result.ok === false && result.error.code).toBe('cancelled');
+    expect(result.success === false && result.error.code).toBe('cancelled');
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -281,7 +281,7 @@ describe('failures never escape', () => {
       signal: controller.signal,
     });
 
-    expect(result.ok === false && result.error.code).toBe('cancelled');
+    expect(result.success === false && result.error.code).toBe('cancelled');
   });
 
   it('survives a policy that throws', async () => {
@@ -293,6 +293,101 @@ describe('failures never escape', () => {
     });
 
     const result = await actions.execute({ action: 'navigate', input: { route: '/x' } });
-    expect(result.ok === false && result.error.code).toBe('execution_failed');
+    expect(result.success === false && result.error.code).toBe('execution_failed');
+  });
+});
+
+describe('classified handler failures', () => {
+  it('passes an ActionFailure code straight through instead of flattening it', async () => {
+    // The whole point of ActionFailure: without it, "the element is not on
+    // screen" and "the handler crashed" would be indistinguishable to a caller.
+    const actions = createActionRegistry();
+    actions.register({
+      name: 'highlight',
+      description: 'Highlight an element',
+      schema: z.object({ elementId: z.string() }),
+      execute: ({ elementId }) => {
+        throw new ActionFailure('target_not_mounted', `"${elementId}" is not on screen.`, {
+          details: { elementId },
+        });
+      },
+    });
+
+    const result = await actions.execute({
+      action: 'highlight',
+      input: { elementId: 'clients.create' },
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error.code).toBe('target_not_mounted');
+    expect(result.error.details).toEqual({ elementId: 'clients.create' });
+  });
+
+  it('round-trips a GuideError through ActionFailure.from', async () => {
+    const actions = createActionRegistry();
+    actions.register({
+      name: 'scroll',
+      description: 'Scroll to an element',
+      schema: z.object({}),
+      execute: () => {
+        throw ActionFailure.from({
+          code: 'target_not_found',
+          message: 'nothing registered under that id',
+          details: { elementId: 'ghost' },
+        });
+      },
+    });
+
+    const result = await actions.execute({ action: 'scroll', input: {} });
+
+    expect(result.success === false && result.error).toMatchObject({
+      code: 'target_not_found',
+      message: 'nothing registered under that id',
+      details: { elementId: 'ghost' },
+    });
+  });
+
+  it('still reports an unclassified throw as execution_failed', async () => {
+    const actions = createActionRegistry();
+    actions.register({
+      name: 'boom',
+      description: 'Boom',
+      schema: z.object({}),
+      execute: () => {
+        throw new Error('kaboom');
+      },
+    });
+
+    const result = await actions.execute({ action: 'boom', input: {} });
+    expect(result.success === false && result.error.code).toBe('execution_failed');
+  });
+
+  it('reports a TimeoutError as timeout, not execution_failed', async () => {
+    const actions = createActionRegistry();
+    actions.register({
+      name: 'slow',
+      description: 'Slow',
+      schema: z.object({}),
+      execute: () => {
+        const error = new Error('took too long');
+        error.name = 'TimeoutError';
+        throw error;
+      },
+    });
+
+    const result = await actions.execute({ action: 'slow', input: {} });
+    expect(result.success === false && result.error.code).toBe('timeout');
+  });
+
+  it('names the known actions in the details of an action_not_found failure', async () => {
+    const actions = createActionRegistry({ actions: [navigate()] });
+    const result = await actions.execute({ action: 'teleport' });
+
+    expect(result.success === false && result.error.code).toBe('action_not_found');
+    expect(result.success === false && result.error.details).toEqual({
+      action: 'teleport',
+      knownActions: ['navigate'],
+    });
   });
 });

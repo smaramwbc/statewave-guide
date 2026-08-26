@@ -7,9 +7,20 @@
  * because everything downstream trusts that a graph element is addressable at
  * runtime.
  *
+ * A repeated id is where that trust runs out. One semantic id is one node, and
+ * two tags carrying it are two different controls: the node keeps the first
+ * sighting's provenance, and *behaviour* is read from that sighting only. Both
+ * tags still count as contained by the components that render them — that much
+ * is true of each independently — but a handler on the second one is not read.
+ * Reading it would put two `invokes` edges on one element, each at full
+ * confidence, naming two different functions, and a consumer asking what the
+ * element does would get both answers with no way to choose. The duplicate is
+ * reported so the ambiguity is visible rather than silently resolved.
+ *
  * @packageDocumentation
  */
 
+import { Node } from 'ts-morph';
 import type { SourceFile } from 'ts-morph';
 import {
   GUIDE_ATTRIBUTES,
@@ -23,8 +34,17 @@ import type {
   ProvenanceReference,
 } from '@statewavedev/guide-shared';
 import type { IndexerDiagnostic, UIElementNode } from '../graph.js';
+import { elementId as toElementId } from '../node-id.js';
+import { bindingNames } from '../resolve/symbols.js';
 import { nodeProvenance } from '../provenance.js';
-import { getJsxTagNodes, getSingleTextChild, getStringAttributeValue, getTagName } from './jsx.js';
+import {
+  getJsxAttribute,
+  getJsxTagNodes,
+  getSingleTextChild,
+  getStringAttributeValue,
+  getTagName,
+  readStringLiteral,
+} from './jsx.js';
 import type { JsxTagNode } from './jsx.js';
 
 /** Attribute carrying an explicit element type override. */
@@ -78,15 +98,78 @@ export interface ElementIdRegistry {
   firstSeen: Map<string, ProvenanceReference>;
 }
 
+/**
+ * One sighting of a guide element.
+ *
+ * The node and the component that renders it are kept apart because the v2
+ * graph expresses containment as a `contains` relationship rather than as a
+ * field: the same semantic id may legitimately be rendered by two components,
+ * and a single `componentId` field could only ever record one of them.
+ */
+export interface ExtractedElement {
+  node: UIElementNode;
+  /** Canonical id of the component that renders it, when there is one. */
+  componentId?: string;
+  /**
+   * True when this tag repeats an id already seen, so it is not the sighting
+   * the node was built from.
+   */
+  duplicate?: true;
+  /** The JSX tag, for evidence on the `contains` edge. */
+  tag: JsxTagNode;
+}
+
 /** Result of scanning one file. */
 export interface ExtractedElements {
-  elements: UIElementNode[];
+  elements: ExtractedElement[];
   diagnostics: IndexerDiagnostic[];
 }
 
 /** Creates the cross-file registry {@link extractElements} needs. */
 export function createElementIdRegistry(): ElementIdRegistry {
   return { firstSeen: new Map() };
+}
+
+/**
+ * True when `expression` names props this component's own caller supplied.
+ *
+ * `({ label, ...rest }: Props) => <Button {...rest} />` forwards everything the
+ * caller passed and did not name — a bag whose contents are decided at every
+ * call site, and which may perfectly well contain a guide attribute. A spread of
+ * anything else (`{...register('name')}`, `{...{ 'data-guide': 'x' }}`) is a
+ * value produced here, whose shape belongs to this file.
+ *
+ * A local binding that shadows a parameter of the same name is read as the
+ * parameter, which costs an element rather than inventing one.
+ */
+function namesCallerSuppliedProps(expression: Node): boolean {
+  if (!Node.isIdentifier(expression)) return false;
+  const name = expression.getText();
+  for (const ancestor of expression.getAncestors()) {
+    if (Node.isSourceFile(ancestor)) return false;
+    if (!Node.isFunctionLikeDeclaration(ancestor)) continue;
+    for (const parameter of ancestor.getParameters()) {
+      if (bindingNames(parameter.getNameNode()).includes(name)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Start offset of the first spread of caller-supplied props on a tag.
+ *
+ * JSX props are applied left to right, so a literal written before such a spread
+ * is only a default: `<Button data-guide="toolbar.action" {...rest}>` renders
+ * with whatever `data-guide` the caller passed. An id a caller can overwrite
+ * names no element at runtime — which is where the graph has to be right — so it
+ * is not recorded, rather than recorded as an id that may never reach the DOM.
+ */
+function firstSpreadStart(node: JsxTagNode): number | undefined {
+  for (const attribute of node.getAttributes()) {
+    if (!Node.isJsxSpreadAttribute(attribute)) continue;
+    if (namesCallerSuppliedProps(attribute.getExpression())) return attribute.getStart();
+  }
+  return undefined;
 }
 
 /**
@@ -100,9 +183,13 @@ export function createElementIdRegistry(): ElementIdRegistry {
 function findGuideAttribute(
   node: JsxTagNode,
 ): { attribute: GuideAttribute; id: string } | undefined {
-  for (const attribute of GUIDE_ATTRIBUTES) {
-    const id = getStringAttributeValue(node, attribute);
-    if (id !== undefined) return { attribute, id };
+  const spread = firstSpreadStart(node);
+  for (const found of GUIDE_ATTRIBUTES) {
+    const attribute = getJsxAttribute(node, found);
+    if (attribute === undefined) continue;
+    if (spread !== undefined && attribute.getStart() < spread) continue;
+    const id = readStringLiteral(attribute.getInitializer());
+    if (id !== undefined) return { attribute: found, id };
   }
   return undefined;
 }
@@ -130,10 +217,10 @@ function resolveLabel(node: JsxTagNode): string | undefined {
 }
 
 /**
- * The component's name from its `${file}#${name}` id.
+ * The component's name from its `component:${file}#${name}` id.
  *
  * Read from the last `#` rather than the first: `#` is a legal character in a
- * file name, so `src/we#ird.tsx#Widget` has to resolve to `Widget`.
+ * file name, so `component:src/we#ird.tsx#Widget` has to resolve to `Widget`.
  */
 function componentSymbol(componentId: string | undefined): string | undefined {
   if (componentId === undefined) return undefined;
@@ -161,7 +248,7 @@ export function extractElements(
   lookup: ComponentLookup,
   registry: ElementIdRegistry,
 ): ExtractedElements {
-  const elements: UIElementNode[] = [];
+  const elements: ExtractedElement[] = [];
   const diagnostics: IndexerDiagnostic[] = [];
 
   for (const node of getJsxTagNodes(sourceFile)) {
@@ -174,7 +261,8 @@ export function extractElements(
 
     if (!isValidGuideElementId(found.id)) {
       diagnostics.push({
-        code: 'invalid-element-id',
+        code: 'INVALID_ELEMENT_ID',
+        severity: 'warning',
         message:
           `"${found.id}" is not a valid guide element id. ` +
           `Use dot-separated lowercase segments, e.g. "clients.create".`,
@@ -185,31 +273,37 @@ export function extractElements(
     }
 
     const first = registry.firstSeen.get(found.id);
-    if (first === undefined) {
-      registry.firstSeen.set(found.id, provenance);
-    } else {
+    if (first !== undefined) {
       diagnostics.push({
-        code: 'duplicate-element-id',
+        code: 'DUPLICATE_ELEMENT_ID',
+        severity: 'warning',
         message: `"${found.id}" is declared more than once; first seen at ${formatLocation(first)}.`,
         file: relativePath,
         line: provenance.line ?? 1,
       });
     }
+    const duplicate = first !== undefined;
+    if (!duplicate) registry.firstSeen.set(found.id, provenance);
 
     // Key order is fixed by this literal, and optional keys are spread in
     // conditionally so an absent value is an absent key rather than
     // `"label": undefined` — same meaning, different bytes.
     const label = resolveLabel(node);
     elements.push({
-      kind: 'ui-element',
-      id: found.id,
-      type: resolveType(node, tagName),
-      ...(label !== undefined ? { label } : {}),
-      attribute: found.attribute,
-      tagName,
+      node: {
+        kind: 'element',
+        id: toElementId(found.id),
+        elementId: found.id,
+        type: resolveType(node, tagName),
+        ...(label !== undefined ? { label } : {}),
+        attribute: found.attribute,
+        tagName,
+        featureId: guideElementNamespace(found.id),
+        provenance,
+      },
       ...(componentId !== undefined ? { componentId } : {}),
-      featureId: guideElementNamespace(found.id),
-      provenance,
+      ...(duplicate ? { duplicate: true } : {}),
+      tag: node,
     });
   }
 

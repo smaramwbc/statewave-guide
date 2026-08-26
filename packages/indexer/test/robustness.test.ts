@@ -2,8 +2,8 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createProjectIndexer } from '../src/indexer.js';
-import { escapeGlobLiteral, globPrefix, joinGlob } from '../src/paths.js';
-import { createTempProject, removeTempProject } from './helpers.js';
+import { createPatternSet, discoverSourceFiles, expandBraces } from '../src/discover.js';
+import { createTempProject, nodesOfKind, removeTempProject } from './helpers.js';
 
 /** A one-element application, used wherever only the file set is interesting. */
 const WIDGET: Record<string, string> = {
@@ -20,18 +20,135 @@ function nested(directory: string): Record<string, string> {
   );
 }
 
-describe('glob construction', () => {
-  it('quotes the metacharacters in a project path and leaves the pattern alone', () => {
-    const prefix = globPrefix(path.join('/work', 'my (app)'), '/work');
-    expect(joinGlob(prefix, 'src/**/*.{ts,tsx}')).toBe('my [(]app[)]/src/**/*.{ts,tsx}');
+describe('pattern matching', () => {
+  it('expands braces, nesting included', () => {
+    expect(expandBraces('src/**/*.{ts,tsx}')).toEqual(['src/**/*.ts', 'src/**/*.tsx']);
+    expect(expandBraces('a/{b,{c,d}}/e')).toEqual(['a/b/e', 'a/c/e', 'a/d/e']);
+    // An unbalanced brace is far likelier to be a directory name than a pattern.
+    expect(expandBraces('a/{b/c')).toEqual(['a/{b/c']);
   });
 
-  it('quotes nothing when the project is the directory the command was run from', () => {
-    expect(globPrefix('/work/app', '/work/app')).toBe('');
+  it('matches `**` across any number of segments and `*` within one', () => {
+    const set = createPatternSet(['src/**/*.{ts,tsx}']);
+    expect(set.matches('src/a.ts')).toBe(true);
+    expect(set.matches('src/deep/deeper/b.tsx')).toBe(true);
+    expect(set.matches('src/a.js')).toBe(false);
+    expect(set.matches('other/a.ts')).toBe(false);
   });
 
-  it('leaves `!` alone, because `[!]` would be a negated bracket expression', () => {
-    expect(escapeGlobLiteral('wow!/a+b/at@x')).toBe('wow!/a+b/at@x');
+  it('refuses to let a wildcard match a leading dot', () => {
+    const set = createPatternSet(['src/**/*.ts']);
+    expect(set.matches('src/.hidden/a.ts')).toBe(false);
+    expect(set.matches('src/.a.ts')).toBe(false);
+    expect(createPatternSet(['src/.hidden/*.ts']).matches('src/.hidden/a.ts')).toBe(true);
+  });
+
+  it('knows which directories a pattern could still reach', () => {
+    const set = createPatternSet(['src/**/*.ts']);
+    expect(set.reaches('src')).toBe(true);
+    expect(set.reaches('src/deep')).toBe(true);
+    expect(set.reaches('node_modules')).toBe(false);
+  });
+
+  it('knows which directories an exclude covers entirely', () => {
+    const set = createPatternSet(['**/node_modules/**', '**/*.test.*']);
+    expect(set.covers('node_modules')).toBe(true);
+    expect(set.covers('packages/app/node_modules')).toBe(true);
+    expect(set.covers('src')).toBe(false);
+    expect(set.matches('src/a.test.ts')).toBe(true);
+  });
+
+  it('treats a path that is only a glob metacharacter as a literal name', () => {
+    const set = createPatternSet(['src/**/*.ts']);
+    expect(set.matches('src/a(1).ts')).toBe(true);
+    expect(set.matches('src/wow!/a.ts')).toBe(true);
+  });
+});
+
+describe('file discovery', () => {
+  it('is a property of the project, not of the working directory', async () => {
+    const root = await createTempProject({
+      ...WIDGET,
+      'src/deep/Nested.tsx': 'export const nested = 1;\n',
+      'src/Widget.test.tsx': 'export const spec = 1;\n',
+    });
+
+    try {
+      const from = (cwd: string): string[] => {
+        const previous = process.cwd();
+        process.chdir(cwd);
+        try {
+          return discoverSourceFiles({
+            root,
+            include: ['src/**/*.{ts,tsx}'],
+            exclude: ['**/*.test.*'],
+          }).files.map((file) => file.relativePath);
+        } finally {
+          process.chdir(previous);
+        }
+      };
+
+      const expected = ['src/Widget.tsx', 'src/deep/Nested.tsx'];
+      expect(from(root)).toEqual(expected);
+      expect(from(path.join(root, 'src'))).toEqual(expected);
+      expect(from(path.join(root, 'src', 'deep'))).toEqual(expected);
+      expect(from(path.parse(root).root)).toEqual(expected);
+    } finally {
+      await removeTempProject(root);
+    }
+  });
+
+  it('indexes a project whose path begins with `!`', async () => {
+    const temporary = await createTempProject(nested('!apps'));
+
+    try {
+      const root = path.join(temporary, '!apps');
+      const previous = process.cwd();
+      process.chdir(temporary);
+      try {
+        const { graph } = await createProjectIndexer({ root }).index();
+        expect(nodesOfKind(graph, 'file').map((file) => file.path)).toEqual(['src/Widget.tsx']);
+        expect(graph.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
+          'NO_SOURCE_FILES',
+        );
+      } finally {
+        process.chdir(previous);
+      }
+    } finally {
+      await removeTempProject(temporary);
+    }
+  });
+
+  it('says so rather than leaking a machine path when a pattern points outside', async () => {
+    const root = await createTempProject(WIDGET);
+
+    try {
+      const { graph } = await createProjectIndexer({
+        root,
+        config: { include: [path.join(path.parse(root).root, 'elsewhere', 'src', '**', '*.ts')] },
+      }).index();
+
+      const messages = graph.diagnostics.map((diagnostic) => diagnostic.message).join('\n');
+      expect(messages).toContain('outside the project');
+      expect(messages).not.toContain(root);
+    } finally {
+      await removeTempProject(root);
+    }
+  });
+
+  it('reads an absolute include that points inside the project', async () => {
+    const root = await createTempProject(WIDGET);
+
+    try {
+      const { graph } = await createProjectIndexer({
+        root,
+        config: { include: [path.join(root, 'src', '**', '*.tsx')] },
+      }).index();
+
+      expect(nodesOfKind(graph, 'file').map((file) => file.path)).toEqual(['src/Widget.tsx']);
+    } finally {
+      await removeTempProject(root);
+    }
   });
 });
 
@@ -50,10 +167,12 @@ describe('projects in awkward directories', () => {
           root: path.join(temporary, directory),
         }).index();
 
-        expect(graph.files.map((file) => file.path)).toEqual(['src/Widget.tsx']);
-        expect(graph.elements.map((element) => element.id)).toEqual(['widget.go']);
+        expect(nodesOfKind(graph, 'file').map((file) => file.path)).toEqual(['src/Widget.tsx']);
+        expect(nodesOfKind(graph, 'element').map((element) => element.id)).toEqual([
+          'element:widget.go',
+        ]);
         expect(graph.diagnostics.map((diagnostic) => diagnostic.code)).not.toContain(
-          'no-source-files',
+          'NO_SOURCE_FILES',
         );
       } finally {
         await removeTempProject(temporary);
@@ -71,8 +190,10 @@ describe('projects in awkward directories', () => {
       if (!existsSync(misspelt)) return;
 
       const { graph } = await createProjectIndexer({ root: misspelt }).index();
-      expect(graph.files.map((file) => file.path)).toEqual(['src/Widget.tsx']);
-      expect(graph.elements.map((element) => element.id)).toEqual(['widget.go']);
+      expect(nodesOfKind(graph, 'file').map((file) => file.path)).toEqual(['src/Widget.tsx']);
+      expect(nodesOfKind(graph, 'element').map((element) => element.id)).toEqual([
+        'element:widget.go',
+      ]);
     } finally {
       await removeTempProject(temporary);
     }
@@ -114,7 +235,7 @@ describe('element extraction edge cases', () => {
     try {
       const { graph } = await createProjectIndexer({ root }).index();
 
-      for (const element of graph.elements) {
+      for (const element of nodesOfKind(graph, 'element')) {
         expect(element.type).toBe('other');
         // A function survives `toEqual` but disappears from the JSON, taking a
         // required field of the contract with it.
@@ -148,7 +269,9 @@ describe('element extraction edge cases', () => {
 
     try {
       const { graph } = await createProjectIndexer({ root }).index();
-      const labels = new Map(graph.elements.map((element) => [element.id, element.label]));
+      const labels = new Map(
+        nodesOfKind(graph, 'element').map((element) => [element.elementId, element.label]),
+      );
 
       expect(labels.get('entity.text')).toBe('Save & close');
       // A no-break space is whitespace, so it collapses like any other.
@@ -175,10 +298,19 @@ describe('element extraction edge cases', () => {
 
     try {
       const { graph } = await createProjectIndexer({ root }).index();
-      const element = graph.elements.find((candidate) => candidate.id === 'hash.file');
+      const element = nodesOfKind(graph, 'element').find(
+        (candidate) => candidate.elementId === 'hash.file',
+      );
 
-      expect(element?.componentId).toBe('src/we#ird.tsx#Widget');
       expect(element?.provenance.symbol).toBe('Widget');
+      expect(
+        graph.relationships.some(
+          (relationship) =>
+            relationship.type === 'contains' &&
+            relationship.source === 'component:src/we#ird.tsx#Widget' &&
+            relationship.target === 'element:hash.file',
+        ),
+      ).toBe(true);
     } finally {
       await removeTempProject(root);
     }

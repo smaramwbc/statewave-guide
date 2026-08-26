@@ -27,7 +27,10 @@
     "format:check": "prettier --check .",
     "dev:example": "pnpm --filter @statewavedev/guide-react-demo dev",
     "index:example": "pnpm --filter @statewavedev/guide-react-demo guide:index",
-    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm format:check"
+    "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm format:check",
+    "test:indexer-quality": "node scripts/indexer-quality.mjs",
+    "test:indexer-perf": "node scripts/indexer-perf.mjs",
+    "test:indexer-quality:diff": "node scripts/benchmark-diff.mjs docs/benchmarks/pre-fix.json docs/benchmarks/post-fix.json"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

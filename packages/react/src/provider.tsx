@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState, type ReactElement, type ReactNode
 import { createGuideRuntime, type GuideRuntime } from '@statewavedev/guide-core';
 import type { NavigateInput, OpenInput, StartGuideInput } from '@statewavedev/guide-shared';
 import { createElementRegistry } from './element-registry.js';
+import { internalsOf } from './registry-internals.js';
 import { createHighlightController, type HighlightOptions } from './highlight/controller.js';
 import { createGuidanceActions, type GuidanceActionHandlers } from './guidance-actions.js';
 import { GuideReactContext, type GuideContextValue } from './internal-context.js';
@@ -176,7 +177,15 @@ export function StatewaveGuideProvider(props: StatewaveGuideProviderProps): Reac
       // Both are re-usable after being destroyed, so a StrictMode remount — or
       // a host that moves the provider — recovers rather than breaking.
       engine.highlight.destroy();
-      engine.registry.destroy();
+      // Looked up here rather than parked in the `engine` object above, and the
+      // rule is not stylistic. React keeps every hook's state on the fiber, and
+      // links that fiber from the DOM node it rendered — so anything held in
+      // `useState`/`useMemo`/`useRef` is reachable from the page through
+      // `node.__reactFiber$…`. The friend table is not: a WeakMap lookup made
+      // inside a closure leaves nothing behind for a walk of the fiber tree to
+      // find, which is what keeps `resolveNode` unreachable from a host in fact
+      // and not only in the types.
+      internalsOf(engine.registry).destroy();
     };
   }, [engine]);
 

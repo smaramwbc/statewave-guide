@@ -142,7 +142,7 @@ describe('<StatewaveGuideProvider>', () => {
     await waitFor(() => {
       expect(result).not.toBeNull();
     });
-    expect((result as GuideActionResult | null)?.ok).toBe(true);
+    expect((result as GuideActionResult | null)?.success).toBe(true);
     expect(document.querySelectorAll('.sw-guide-dim')).toHaveLength(4);
     expect(document.querySelector('.sw-guide-popover')?.textContent).toContain('Here');
   });
@@ -175,8 +175,8 @@ describe('<StatewaveGuideProvider>', () => {
     });
 
     const failure = result as GuideActionResult | null;
-    expect(failure?.ok).toBe(false);
-    if (failure && !failure.ok) {
+    expect(failure?.success).toBe(false);
+    if (failure && !failure.success) {
       expect(failure.error.code).toBe('invalid_input');
       expect(failure.error.issues?.[0]?.path).toEqual(['elementId']);
     }
@@ -185,7 +185,7 @@ describe('<StatewaveGuideProvider>', () => {
     expect(document.querySelector('[data-statewave-guide-overlay]')).toBeNull();
   });
 
-  it('reports a missing element as a failed action rather than an exception', async () => {
+  it('reports a missing element as target_not_found rather than an exception', async () => {
     let result: GuideActionResult | null = null;
 
     render(
@@ -206,8 +206,12 @@ describe('<StatewaveGuideProvider>', () => {
     });
 
     const failure = result as GuideActionResult | null;
-    expect(failure?.ok).toBe(false);
-    if (failure && !failure.ok) {
+    expect(failure?.success).toBe(false);
+    if (failure && !failure.success) {
+      // End to end, through the provider, the runtime and the registry: the
+      // engine's code reaches the caller intact.
+      expect(failure.error.code).toBe('target_not_found');
+      expect(failure.error.details).toEqual({ elementId: 'clients.nowhere' });
       expect(failure.error.message).toContain('clients.nowhere');
     }
   });

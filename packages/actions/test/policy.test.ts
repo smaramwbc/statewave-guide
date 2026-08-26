@@ -28,7 +28,7 @@ describe('default risk policy', () => {
     const execute = vi.fn();
     const result = await registryWith(risk, execute).execute({ action: 'act', input: {}, source });
 
-    expect(result.ok).toBe(true);
+    expect(result.success).toBe(true);
     expect(execute).toHaveBeenCalledOnce();
   });
 
@@ -40,8 +40,8 @@ describe('default risk policy', () => {
       source: 'agent',
     });
 
-    expect(result.ok).toBe(false);
-    expect(result.ok === false && result.error.code).toBe('confirmation_required');
+    expect(result.success).toBe(false);
+    expect(result.success === false && result.error.code).toBe('confirmation_required');
     expect(execute).not.toHaveBeenCalled();
   });
 
@@ -53,7 +53,7 @@ describe('default risk policy', () => {
       source: 'agent',
     });
 
-    expect(result.ok === false && result.error.code).toBe('not_permitted');
+    expect(result.success === false && result.error.code).toBe('permission_denied');
     expect(execute).not.toHaveBeenCalled();
   });
 
@@ -65,7 +65,7 @@ describe('default risk policy', () => {
       source: 'agent',
     });
 
-    expect(result.ok === false && result.error.code).toBe('not_permitted');
+    expect(result.success === false && result.error.code).toBe('permission_denied');
   });
 
   it('can be called directly', () => {
@@ -80,7 +80,7 @@ describe('default risk policy', () => {
 
     expect(defaultActionPolicy({ action, source: 'user', requestId: 'r1' })).toBeUndefined();
     expect(defaultActionPolicy({ action, source: 'agent', requestId: 'r1' })).toMatchObject({
-      code: 'not_permitted',
+      code: 'permission_denied',
     });
   });
 });
@@ -130,13 +130,13 @@ describe('custom policy', () => {
 
     const result = await actions.execute({ action: 'send', input: {}, source: 'agent' });
 
-    expect(result.ok).toBe(true);
+    expect(result.success).toBe(true);
     expect(execute).toHaveBeenCalledOnce();
   });
 
   it('may be asynchronous', async () => {
     const actions = createActionRegistry({
-      policy: async () => ({ code: 'not_permitted' as const, message: 'nope' }),
+      policy: async () => ({ code: 'permission_denied' as const, message: 'nope' }),
     });
     actions.register({
       name: 'x',
@@ -146,7 +146,7 @@ describe('custom policy', () => {
     });
 
     const result = await actions.execute({ action: 'x', input: {} });
-    expect(result.ok === false && result.error.message).toBe('nope');
+    expect(result.success === false && result.error.message).toBe('nope');
   });
 });
 

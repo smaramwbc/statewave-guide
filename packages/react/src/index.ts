@@ -67,21 +67,24 @@ export { useGuideElement } from './use-guide-element.js';
 /**
  * Creates a live element registry.
  *
- * Note what is *not* exported alongside it: `InternalElementRegistry`, the
- * interface that adds `resolveNode(id): HTMLElement | null`. Raw DOM access
- * deliberately stops at this boundary.
+ * What comes back is read-only state: `has`, `get`, `list`, `visibleIds`,
+ * `subscribe`, `getSnapshot`. There is no way to reach a DOM node through it,
+ * and no mutator either — not merely absent from this module's types, absent
+ * from the object. Registration, node attachment and DOM resolution live in a
+ * module-private `WeakMap` keyed by the registry, in a file this package does
+ * not export, so the capability cannot be reached by a host, by a hook, or by
+ * an agent — only by code inside `@statewavedev/guide-react`, and only from
+ * inside a closure: nothing in this package memoises the lookup into React
+ * state, because a fiber is reachable from the DOM node it rendered.
  *
- * Concretely: the React context stores the registry as {@link GuideElementRegistry},
- * so no hook and no component can reach a node; every action takes a semantic
- * id validated by `guideElementIdSchema`, so no selector can reach a query; and
+ * That is what makes the rest of the design hold: every action takes a semantic
+ * id validated by `guideElementIdSchema`, so no selector reaches a query; and
  * the highlight engine is the only code in the package that ever holds an
- * `HTMLElement`. The engine needs a registry that can resolve one, which is why
- * this factory still returns one — but that capability is reachable only by
- * host code that already has `document`, never by an agent.
+ * `HTMLElement`.
  */
 export { createElementRegistry } from './element-registry.js';
 export type {
-  RegisteredElement,
+  GuideElementState,
   RegisterElementInput,
   GuideElementRegistry,
   ElementRegistryOptions,
@@ -93,9 +96,9 @@ export type {
   HighlightController,
   HighlightControllerOptions,
   HighlightOptions,
-  HighlightFailureReason,
   HighlightResult,
   ScrollResult,
+  TargetResult,
   ScrollToOptions,
 } from './highlight/controller.js';
 

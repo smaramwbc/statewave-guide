@@ -34,11 +34,11 @@ export type {
   RegisteredGuideAction,
   GuideActionDescriptor,
   GuideActionRequest,
-  GuideActionErrorCode,
-  GuideActionIssue,
-  GuideActionError,
   GuideActionResult,
 } from './guide-action.js';
+
+export type { GuideErrorCode, GuideErrorIssue, GuideError, GuideResult } from './guide-error.js';
+export { guideError, isSuccess } from './guide-error.js';
 
 export {
   GUIDE_ATTRIBUTE,
@@ -63,6 +63,8 @@ export {
   productModelSchema,
   appContextEntitySchema,
   appContextSchema,
+  guideErrorCodeSchema,
+  guideErrorSchema,
   guideActionRiskSchema,
   guideActionSourceSchema,
   guideActionRequestSchema,

@@ -12,18 +12,35 @@
  * @packageDocumentation
  */
 
-import { readFileSync, statSync } from 'node:fs';
+import { readFileSync, realpathSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { loadConfig } from './config.js';
 import type { StatewaveGuideConfig } from './config.js';
 import { createProjectIndexer } from './indexer.js';
-import { printError, printJson, printLines, printReport, printWritten } from './reporter.js';
+import {
+  formatHealthReport,
+  printError,
+  printHealth,
+  printJson,
+  printLines,
+  printReport,
+  printWritten,
+} from './reporter.js';
 import { serializeApplicationGraph } from './serialize.js';
 import { writeApplicationGraph } from './write.js';
 
 /** A fully parsed command line. */
-type ParsedArgs =
-  | { kind: 'run'; directory: string; outDir?: string; json: boolean; silent: boolean }
+export type ParsedArgs =
+  | {
+      kind: 'run';
+      directory: string;
+      outDir?: string;
+      json: boolean;
+      silent: boolean;
+      /** Print only the graph health section. */
+      health: boolean;
+    }
   | { kind: 'help' }
   | { kind: 'version' }
   | { kind: 'error'; message: string };
@@ -37,6 +54,7 @@ const HELP = [
   'Options',
   '  --out <dir>   Directory the graph is written to (default: .statewave-guide)',
   '  --json        Print the graph to stdout instead of writing a file',
+  '  --health      Print only the ApplicationGraph health section',
   '  --silent      Suppress all output',
   '  --version     Print the indexer version',
   '  --help        Show this message',
@@ -60,6 +78,7 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
   let outDir: string | undefined;
   let json = false;
   let silent = false;
+  let health = false;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -69,6 +88,10 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
     if (arg === '--version' || arg === '-v') return { kind: 'version' };
     if (arg === '--json') {
       json = true;
+      continue;
+    }
+    if (arg === '--health') {
+      health = true;
       continue;
     }
     if (arg === '--silent') {
@@ -119,6 +142,7 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
     ...(outDir !== undefined ? { outDir } : {}),
     json,
     silent,
+    health,
   };
 }
 
@@ -199,15 +223,22 @@ async function main(argv: readonly string[]): Promise<number> {
     });
 
     if (!parsed.silent) {
-      printReport({
-        tsconfigDetected: tsconfigPath !== undefined,
-        files: graph.stats.files,
-        components: graph.stats.components,
-        elements: graph.stats.elements,
-        routes: graph.stats.routes,
-        diagnostics: graph.diagnostics,
-      });
-      printWritten(written.relativePath);
+      // `--health` is a narrower question than the default report, so it
+      // replaces it rather than adding to it.
+      if (parsed.health) {
+        printLines(formatHealthReport(graph));
+      } else {
+        printReport({
+          tsconfigDetected: tsconfigPath !== undefined,
+          files: graph.stats.byKind.file,
+          components: graph.stats.byKind.component,
+          elements: graph.stats.byKind.element,
+          routes: graph.stats.byKind.route,
+          diagnostics: graph.diagnostics,
+        });
+        printHealth(graph);
+        printWritten(written.relativePath);
+      }
     }
 
     return 0;
@@ -217,11 +248,31 @@ async function main(argv: readonly string[]): Promise<number> {
   }
 }
 
-main(process.argv.slice(2))
-  .then((code) => {
-    process.exitCode = code;
-  })
-  .catch((error: unknown) => {
-    printError(toMessage(error));
-    process.exitCode = 1;
-  });
+/**
+ * True when this module *is* the program, rather than something a test or a
+ * host imported.
+ *
+ * `realpathSync` matters: a `node_modules/.bin` shim is a symlink, so comparing
+ * the raw `argv[1]` against `import.meta.url` would say "imported" for the most
+ * common way of all to invoke the binary.
+ */
+function isProgramEntry(): boolean {
+  const entry = process.argv[1];
+  if (entry === undefined) return false;
+  try {
+    return pathToFileURL(realpathSync(entry)).href === import.meta.url;
+  } catch {
+    return false;
+  }
+}
+
+if (isProgramEntry()) {
+  main(process.argv.slice(2))
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch((error: unknown) => {
+      printError(toMessage(error));
+      process.exitCode = 1;
+    });
+}

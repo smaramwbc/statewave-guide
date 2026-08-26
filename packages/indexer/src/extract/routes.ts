@@ -17,6 +17,7 @@ import type {
   SourceFile,
 } from 'ts-morph';
 import type { RouteNode } from '../graph.js';
+import { routeId } from '../node-id.js';
 import { nodeProvenance } from '../provenance.js';
 import { getJsxTagNodes, getStringAttributeValue, getTagName } from './jsx.js';
 import type { JsxTagNode } from './jsx.js';
@@ -27,30 +28,52 @@ const ROUTER_FACTORIES = new Set(['createBrowserRouter', 'createHashRouter', 'cr
 /** Object properties that name the component rendered at a route. */
 const COMPONENT_PROPERTIES = ['element', 'Component', 'component'] as const;
 
+/**
+ * A route plus the expression naming what it renders.
+ *
+ * The expression is kept so the pipeline can resolve `<Clients />` to a
+ * component node and record a `renders` edge; the name alone would leave the
+ * route unable to point at anything.
+ */
+export interface ExtractedRoute {
+  node: RouteNode;
+  /** The identifier or JSX tag naming the rendered component, when there is one. */
+  componentNode?: Node;
+}
+
 function makeRoute(
   routePath: string,
-  componentName: string | undefined,
+  component: { name: string; node: Node } | undefined,
   detectedFrom: RouteNode['detectedFrom'],
   node: Node,
   relativePath: string,
-): RouteNode {
+): ExtractedRoute {
   return {
-    kind: 'route',
-    id: routePath,
-    path: routePath,
-    ...(componentName !== undefined ? { componentName } : {}),
-    detectedFrom,
-    provenance: nodeProvenance(node, relativePath),
+    node: {
+      kind: 'route',
+      id: routeId(routePath),
+      path: routePath,
+      ...(component !== undefined ? { componentName: component.name } : {}),
+      detectedFrom,
+      provenance: nodeProvenance(node, relativePath),
+    },
+    ...(component !== undefined ? { componentNode: component.node } : {}),
   };
 }
 
-/** Reads `<Foo />` or `Foo` down to the identifier `Foo`. */
-function readComponentName(node: Node | undefined): string | undefined {
+/** Reads `<Foo />` or `Foo` down to the identifier `Foo` and its node. */
+function readComponent(node: Node | undefined): { name: string; node: Node } | undefined {
   if (!node) return undefined;
-  if (Node.isJsxExpression(node)) return readComponentName(node.getExpression());
-  if (Node.isJsxSelfClosingElement(node)) return node.getTagNameNode().getText();
-  if (Node.isJsxElement(node)) return node.getOpeningElement().getTagNameNode().getText();
-  if (Node.isIdentifier(node)) return node.getText();
+  if (Node.isJsxExpression(node)) return readComponent(node.getExpression());
+  if (Node.isJsxSelfClosingElement(node)) {
+    const nameNode = node.getTagNameNode();
+    return { name: nameNode.getText(), node: nameNode };
+  }
+  if (Node.isJsxElement(node)) {
+    const nameNode = node.getOpeningElement().getTagNameNode();
+    return { name: nameNode.getText(), node: nameNode };
+  }
+  if (Node.isIdentifier(node)) return { name: node.getText(), node };
   return undefined;
 }
 
@@ -58,24 +81,24 @@ function readComponentName(node: Node | undefined): string | undefined {
 // `<Route path="/clients" element={<Clients />} />`
 // ---------------------------------------------------------------------------
 
-function extractJsxRoutes(sourceFile: SourceFile, relativePath: string): RouteNode[] {
-  const routes: RouteNode[] = [];
+function extractJsxRoutes(sourceFile: SourceFile, relativePath: string): ExtractedRoute[] {
+  const routes: ExtractedRoute[] = [];
   for (const node of getJsxTagNodes(sourceFile)) {
     if (getTagName(node) !== 'Route') continue;
     const routePath = getStringAttributeValue(node, 'path');
     if (routePath === undefined) continue;
-    routes.push(makeRoute(routePath, readJsxComponentName(node), 'jsx-route', node, relativePath));
+    routes.push(makeRoute(routePath, readJsxComponent(node), 'jsx-route', node, relativePath));
   }
   return routes;
 }
 
-function readJsxComponentName(node: JsxTagNode): string | undefined {
+function readJsxComponent(node: JsxTagNode): { name: string; node: Node } | undefined {
   for (const attributeName of COMPONENT_PROPERTIES) {
     for (const attribute of node.getAttributes()) {
       if (!Node.isJsxAttribute(attribute)) continue;
       if (attribute.getNameNode().getText() !== attributeName) continue;
-      const name = readComponentName(attribute.getInitializer());
-      if (name !== undefined) return name;
+      const component = readComponent(attribute.getInitializer());
+      if (component !== undefined) return component;
     }
   }
   return undefined;
@@ -117,7 +140,7 @@ function collectRouteObjects(
   array: ArrayLiteralExpression,
   parentPath: string | undefined,
   relativePath: string,
-  routes: RouteNode[],
+  routes: ExtractedRoute[],
 ): void {
   for (const entry of array.getElements()) {
     if (!Node.isObjectLiteralExpression(entry)) continue;
@@ -128,11 +151,11 @@ function collectRouteObjects(
     const resolved = rawPath === undefined ? parentPath : joinRoutePath(parentPath, rawPath);
 
     if (rawPath !== undefined && resolved !== undefined) {
-      let componentName: string | undefined;
+      let component: { name: string; node: Node } | undefined;
       for (const property of COMPONENT_PROPERTIES) {
-        componentName ??= readComponentName(getProperty(entry, property));
+        component ??= readComponent(getProperty(entry, property));
       }
-      routes.push(makeRoute(resolved, componentName, 'router-object', entry, relativePath));
+      routes.push(makeRoute(resolved, component, 'router-object', entry, relativePath));
     }
 
     const children = getProperty(entry, 'children');
@@ -142,8 +165,8 @@ function collectRouteObjects(
   }
 }
 
-function extractRouterObjectRoutes(sourceFile: SourceFile, relativePath: string): RouteNode[] {
-  const routes: RouteNode[] = [];
+function extractRouterObjectRoutes(sourceFile: SourceFile, relativePath: string): ExtractedRoute[] {
+  const routes: ExtractedRoute[] = [];
   for (const call of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
     const callee = call.getExpression();
     const name = Node.isPropertyAccessExpression(callee)
@@ -161,7 +184,7 @@ function extractRouterObjectRoutes(sourceFile: SourceFile, relativePath: string)
 }
 
 /** Every statically detectable route in `sourceFile`, in document order. */
-export function extractRoutes(sourceFile: SourceFile, relativePath: string): RouteNode[] {
+export function extractRoutes(sourceFile: SourceFile, relativePath: string): ExtractedRoute[] {
   return [
     ...extractJsxRoutes(sourceFile, relativePath),
     ...extractRouterObjectRoutes(sourceFile, relativePath),

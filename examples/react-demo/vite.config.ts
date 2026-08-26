@@ -22,6 +22,13 @@ export default defineConfig({
       '@statewavedev/guide-react': fileURLToPath(
         new URL('../../packages/react/src/index.ts', import.meta.url),
       ),
+      // The graph model and its traversal are pure and dependency-free, so the
+      // Inspector can use them in the browser. Aliasing the module directly is
+      // what keeps ts-morph — which the rest of the indexer needs — out of the
+      // bundle entirely.
+      '@statewavedev/guide-graph': fileURLToPath(
+        new URL('../../packages/indexer/src/traversal.ts', import.meta.url),
+      ),
     },
   },
   server: { port: 5173 },

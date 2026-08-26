@@ -1,6 +1,23 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createElementRegistry } from '../src/element-registry.js';
+import {
+  createElementRegistry,
+  type ElementRegistryOptions,
+  type GuideElementRegistry,
+} from '../src/element-registry.js';
+import { internalsOf, type ElementRegistryInternals } from '../src/registry-internals.js';
 import { intersectionObservers } from './setup.js';
+
+/**
+ * The registry plus its friend-access half, which is exactly what the package
+ * itself holds. This file is about registry *behaviour*; that the public object
+ * carries none of the second half is proved in `dom-boundary.test.ts`.
+ */
+function testRegistry(
+  options?: ElementRegistryOptions,
+): GuideElementRegistry & ElementRegistryInternals {
+  const registry = createElementRegistry(options);
+  return { ...registry, ...internalsOf(registry) };
+}
 
 function connectedNode(id?: string): HTMLButtonElement {
   const node = document.createElement('button');
@@ -11,7 +28,7 @@ function connectedNode(id?: string): HTMLButtonElement {
 
 describe('createElementRegistry', () => {
   it('yields a DOM-free view of a registration', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     registry.register({ id: 'clients.create', type: 'button', label: 'New Client' });
 
     expect(registry.get('clients.create')).toEqual({
@@ -29,7 +46,7 @@ describe('createElementRegistry', () => {
     const element = registry.get('clients.create');
     expect(element?.mounted).toBe(true);
     // The point of the public interface: there is no route from a
-    // RegisteredElement back to the page.
+    // GuideElementState back to the page.
     for (const value of Object.values(element ?? {})) {
       expect(value).not.toBeInstanceOf(HTMLElement);
     }
@@ -37,14 +54,14 @@ describe('createElementRegistry', () => {
   });
 
   it('throws on an id that is really a selector', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     expect(() => registry.register({ id: '#app > div' })).toThrow(/not a valid/i);
     expect(() => registry.register({ id: 'Clients.Create' })).toThrow(/not a valid/i);
     expect(registry.list()).toEqual([]);
   });
 
   it('defaults featureId to the id namespace', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     registry.register({ id: 'clients.create.submit-button' });
     registry.register({ id: 'dashboard' });
     registry.register({ id: 'clients.export', featureId: 'reporting' });
@@ -56,7 +73,7 @@ describe('createElementRegistry', () => {
 
   it('does not let a stale disposer remove a re-registration', () => {
     const onWarning = vi.fn();
-    const registry = createElementRegistry({ onWarning });
+    const registry = testRegistry({ onWarning });
 
     const disposeFirst = registry.register({ id: 'clients.create', label: 'first' });
     registry.register({ id: 'clients.create', label: 'second' });
@@ -69,7 +86,7 @@ describe('createElementRegistry', () => {
   });
 
   it('keeps a stable snapshot identity until something actually changes', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     registry.register({ id: 'clients.create', label: 'New Client' });
 
     const first = registry.getSnapshot();
@@ -94,7 +111,7 @@ describe('createElementRegistry', () => {
   });
 
   it('notifies subscribers and stops when unsubscribed', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     const listener = vi.fn();
     const unsubscribe = registry.subscribe(listener);
 
@@ -107,7 +124,7 @@ describe('createElementRegistry', () => {
   });
 
   it('reports visibility from the IntersectionObserver', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     registry.register({ id: 'clients.create' });
     registry.setNode('clients.create', connectedNode());
 
@@ -123,7 +140,7 @@ describe('createElementRegistry', () => {
   });
 
   it('drops the node — and the visibility — when it detaches', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     registry.register({ id: 'clients.create' });
     const node = connectedNode();
     registry.setNode('clients.create', node);
@@ -136,7 +153,7 @@ describe('createElementRegistry', () => {
 
   describe('resolveNode', () => {
     it('prefers the attached node', () => {
-      const registry = createElementRegistry();
+      const registry = testRegistry();
       const node = connectedNode();
       registry.register({ id: 'clients.create' });
       registry.setNode('clients.create', node);
@@ -144,37 +161,37 @@ describe('createElementRegistry', () => {
     });
 
     it('falls back to an element declared only by a data-guide attribute', () => {
-      const registry = createElementRegistry();
+      const registry = testRegistry();
       const node = connectedNode('clients.export');
       expect(registry.has('clients.export')).toBe(false);
       expect(registry.resolveNode('clients.export')).toBe(node);
     });
 
     it('recognises the legacy data-ai-id attribute', () => {
-      const registry = createElementRegistry();
+      const registry = testRegistry();
       const node = document.createElement('div');
       node.setAttribute('data-ai-id', 'clients.legacy');
       document.body.appendChild(node);
       expect(registry.resolveNode('clients.legacy')).toBe(node);
     });
 
-    it('returns null for an unknown id, and when DOM fallback is off', () => {
-      const registry = createElementRegistry();
-      expect(registry.resolveNode('nothing.here')).toBeNull();
+    it('returns undefined for an unknown id, and when DOM fallback is off', () => {
+      const registry = testRegistry();
+      expect(registry.resolveNode('nothing.here')).toBeUndefined();
 
-      const strict = createElementRegistry({ resolveFromDom: false });
+      const strict = testRegistry({ resolveFromDom: false });
       connectedNode('clients.create');
-      expect(strict.resolveNode('clients.create')).toBeNull();
+      expect(strict.resolveNode('clients.create')).toBeUndefined();
     });
 
     it('refuses a selector-shaped id, with or without CSS.escape', () => {
-      const registry = createElementRegistry();
+      const registry = testRegistry();
       const secret = document.createElement('input');
       secret.type = 'password';
       document.body.appendChild(secret);
 
       const injected = 'x"], input[type="password';
-      expect(registry.resolveNode(injected)).toBeNull();
+      expect(registry.resolveNode(injected)).toBeUndefined();
 
       // `CSS.escape` is the belt; `isValidGuideElementId` is the braces. A
       // jsdom, happy-dom or prerender document often has no CSS global at all,
@@ -183,25 +200,25 @@ describe('createElementRegistry', () => {
       try {
         // @ts-expect-error deliberately removing the optional global
         delete globalThis.CSS;
-        expect(registry.resolveNode(injected)).toBeNull();
-        expect(registry.resolveNode('#app > div:nth-child(4)')).toBeNull();
+        expect(registry.resolveNode(injected)).toBeUndefined();
+        expect(registry.resolveNode('#app > div:nth-child(4)')).toBeUndefined();
       } finally {
         globalThis.CSS = original;
       }
     });
 
     it('ignores a registered node that has left the document', () => {
-      const registry = createElementRegistry();
+      const registry = testRegistry();
       const node = connectedNode();
       registry.register({ id: 'clients.create' });
       registry.setNode('clients.create', node);
       node.remove();
-      expect(registry.resolveNode('clients.create')).toBeNull();
+      expect(registry.resolveNode('clients.create')).toBeUndefined();
     });
   });
 
   it('destroy drops every registration and stays usable', () => {
-    const registry = createElementRegistry();
+    const registry = testRegistry();
     registry.register({ id: 'clients.create' });
     registry.setNode('clients.create', connectedNode());
 

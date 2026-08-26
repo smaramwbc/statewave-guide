@@ -1,18 +1,33 @@
 /**
  * Path helpers that keep the graph machine-independent.
  *
- * Every path that reaches the graph goes through here first. Absolute paths and
- * Windows separators are the two easiest ways to break byte-for-byte
- * reproducibility, so neither is allowed past this module.
+ * Every path that reaches the graph goes through here first. Three things break
+ * byte-for-byte reproducibility and none of them is allowed past this module:
+ * absolute paths, Windows separators, and — less obviously — the Unicode
+ * normalisation the filesystem chose. macOS hands back `café` decomposed while
+ * git stores it composed, so the same checkout on two machines would otherwise
+ * produce different `file:` ids, different `component:` ids and a different sort
+ * order. Composing here makes the id a property of the name rather than of the
+ * filesystem that spelled it.
  *
  * @packageDocumentation
  */
 
 import path from 'node:path';
 
-/** Converts any platform's separators to POSIX `/`. */
+/**
+ * Converts this platform's separators to POSIX `/` and composes the name.
+ *
+ * Only `path.sep` is rewritten. A backslash is a separator on Windows — where
+ * it is `path.sep`, so the split already covers it — and an ordinary, legal
+ * character in a POSIX file name, where rewriting it would turn one file into a
+ * path that names a directory nobody has.
+ *
+ * NFC is chosen because it is what git stores and what every other tool in the
+ * chain will already be holding.
+ */
 export function toPosixPath(value: string): string {
-  return value.split(path.sep).join('/').split('\\').join('/');
+  return value.split(path.sep).join('/').normalize('NFC');
 }
 
 /**
@@ -27,55 +42,33 @@ export function toRelativePosix(root: string, absolute: string): string {
 }
 
 /**
- * Characters that a glob matcher reads as syntax rather than as a file name.
+ * Renders a configured path for a diagnostic without leaking the machine.
  *
- * `!`, `+` and `@` are absent on purpose: they only mean anything immediately
- * before a `(`, and quoting the `(` already defuses them. Quoting a lone `!`
- * would turn it into the negated bracket expression `[!]`, which matches
- * nothing at all.
+ * A config may name a tsconfig or a glob by absolute path. Echoing it back
+ * would put `/Users/someone/…` in `application.json`, which is exactly the kind
+ * of value that makes one machine's graph differ from another's. Inside the
+ * project it becomes a project-relative path; outside it, only the last segment
+ * survives, which is enough to recognise what was meant and carries nothing
+ * about where the command ran.
  */
-const GLOB_METACHARACTERS = /[()[\]{}*?|]/g;
-
-/**
- * Quotes every glob metacharacter in a literal path so that it matches itself.
- *
- * One-character bracket expressions are used rather than backslashes because
- * ts-morph rewrites every backslash in a pattern to a forward slash before
- * matching, on the assumption that a backslash is a Windows separator — so a
- * backslash-escaped pattern would reach the matcher as a corrupted path. `[(]`
- * survives that rewrite and means exactly "a literal `(`".
- */
-export function escapeGlobLiteral(value: string): string {
-  return value.replace(GLOB_METACHARACTERS, (character) => `[${character}]`);
+export function describeConfiguredPath(root: string, configured: string): string {
+  if (!path.isAbsolute(configured)) return toPosixPath(configured);
+  const relative = toRelativePosix(root, configured);
+  return relative === '' || relative.startsWith('..')
+    ? toPosixPath(path.basename(configured))
+    : relative;
 }
 
 /**
- * The prefix that anchors the config's patterns to the project being analysed.
+ * Renders a configured glob for a diagnostic without leaking the machine.
  *
- * ts-morph resolves globs against `process.cwd()` and offers no way to say
- * otherwise, so the pattern itself has to carry the journey from there to the
- * project. Two things make that journey easy to get wrong, and both of them
- * silently produce an empty graph rather than an error:
- *
- * 1. A directory is a path, not a pattern. `~/Dropbox (Work)/app` is an
- *    ordinary directory name, but spliced in raw its `(Work)` becomes a match
- *    group, and the pattern then describes a directory nobody has. So the
- *    prefix is quoted, while the pattern the user wrote is left alone.
- * 2. The prefix is expressed relative to the current directory rather than as
- *    an absolute path, because the matcher underneath rewrites an absolute
- *    pattern against a differently-escaped copy of `process.cwd()` — a rewrite
- *    that loses every file whenever the directory the command was run from
- *    contains a glob character of its own.
- *
- * The result still denotes exactly `root`, so which directory the command was
- * run from changes the pattern but never the file set.
+ * A pattern is not a path, so the basename of one is usually just `*.ts` — no
+ * help to anybody. A pattern that points outside the project is therefore named
+ * by its position in the config rather than by its text, which says everything
+ * the reader needs in order to find it and nothing about this machine.
  */
-export function globPrefix(root: string, fromDirectory: string): string {
-  const relative = toPosixPath(path.relative(fromDirectory, root));
-  return relative === '' ? '' : `${escapeGlobLiteral(relative)}/`;
-}
-
-/** Joins a config pattern onto a prefix from {@link globPrefix}. */
-export function joinGlob(prefix: string, pattern: string): string {
-  return `${prefix}${pattern.replace(/^\.\//, '')}`;
+export function describeConfiguredPattern(root: string, pattern: string): string {
+  if (!path.isAbsolute(pattern)) return toPosixPath(pattern);
+  const relative = toRelativePosix(root, pattern);
+  return relative === '' || relative.startsWith('..') ? '<outside the project>' : relative;
 }

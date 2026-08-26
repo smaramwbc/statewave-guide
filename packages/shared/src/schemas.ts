@@ -123,6 +123,30 @@ export const appContextSchema = z.object({
 // Actions
 // ---------------------------------------------------------------------------
 
+/** Validates {@link GuideErrorCode}. */
+export const guideErrorCodeSchema = z.enum([
+  'target_not_found',
+  'target_not_mounted',
+  'target_not_visible',
+  'timeout',
+  'cancelled',
+  'invalid_input',
+  'action_not_found',
+  'permission_denied',
+  'confirmation_required',
+  'execution_failed',
+]);
+
+/** Validates {@link GuideError}. */
+export const guideErrorSchema = z.object({
+  code: guideErrorCodeSchema,
+  message: z.string(),
+  issues: z
+    .array(z.object({ path: z.array(z.union([z.string(), z.number()])), message: z.string() }))
+    .optional(),
+  details: metadataSchema.optional(),
+});
+
 /** Validates {@link GuideActionRisk}. */
 export const guideActionRiskSchema = z.enum(['safe', 'confirm', 'restricted']);
 

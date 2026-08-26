@@ -9,7 +9,7 @@ import {
 } from '../src/config.js';
 import type { StatewaveGuideConfig } from '../src/config.js';
 import { createProjectIndexer } from '../src/indexer.js';
-import { createTempProject, removeTempProject } from './helpers.js';
+import { createTempProject, nodesOfKind, removeTempProject } from './helpers.js';
 
 /** A two-page project, so `include`/`exclude` have something to choose between. */
 const PROJECT_FILES: Record<string, string> = {
@@ -22,6 +22,54 @@ const PROJECT_FILES: Record<string, string> = {
   'app/Extra.tsx':
     'export function Extra() {\n  return <button data-guide="extra.go">Go</button>;\n}\n',
 };
+
+describe('closed loop 2 config', () => {
+  it('defaults the new recognisers rather than leaving them undefined', async () => {
+    const root = await createTempProject({ 'package.json': '{ "name": "bare" }\n' });
+
+    try {
+      const loaded = await loadConfig(root);
+      expect(loaded.config.backend).toEqual(['backend/**', 'server/**', 'api/**']);
+      expect(loaded.config.httpClients).toContain('api');
+      expect(loaded.config.permissions?.functions).toContain('requirePermission');
+      expect(loaded.config.permissions?.components).toContain('Can');
+    } finally {
+      await removeTempProject(root);
+    }
+  });
+
+  it('reads backend, httpClients and permissions from a JSON config', async () => {
+    const root = await createTempProject({
+      ...PROJECT_FILES,
+      'statewave-guide.config.json': JSON.stringify({
+        backend: ['services/**'],
+        httpClients: ['client'],
+        permissions: { functions: ['gate'], components: ['Gate'] },
+      }),
+    });
+
+    try {
+      const loaded = await loadConfig(root);
+      expect(loaded.config.backend).toEqual(['services/**']);
+      expect(loaded.config.httpClients).toEqual(['client']);
+      expect(loaded.config.permissions).toEqual({ functions: ['gate'], components: ['Gate'] });
+    } finally {
+      await removeTempProject(root);
+    }
+  });
+
+  it('rejects a permissions block that is not an object', async () => {
+    const root = await createTempProject({
+      'statewave-guide.config.json': JSON.stringify({ permissions: ['requirePermission'] }),
+    });
+
+    try {
+      await expect(loadConfig(root)).rejects.toThrow(/"permissions" must be an object/);
+    } finally {
+      await removeTempProject(root);
+    }
+  });
+});
 
 describe('defineConfig', () => {
   it('round-trips its input unchanged', () => {
@@ -116,11 +164,14 @@ describe('loadConfig', () => {
       const result = await createProjectIndexer({ root }).index();
 
       expect(result.configPath).toBe('statewave-guide.config.ts');
-      expect(result.graph.files.map((file) => file.path)).toEqual([
+      expect(nodesOfKind(result.graph, 'file').map((file) => file.path)).toEqual([
         'app/Extra.tsx',
         'src/Kept.tsx',
       ]);
-      expect(result.graph.elements.map((element) => element.id)).toEqual(['extra.go', 'kept.go']);
+      expect(nodesOfKind(result.graph, 'element').map((element) => element.elementId)).toEqual([
+        'extra.go',
+        'kept.go',
+      ]);
     } finally {
       await removeTempProject(root);
     }
@@ -211,7 +262,7 @@ describe('loadConfig', () => {
         config: { include: ['app/**/*.tsx'] },
       }).index();
 
-      expect(result.graph.files.map((file) => file.path)).toEqual(['app/Extra.tsx']);
+      expect(nodesOfKind(result.graph, 'file').map((file) => file.path)).toEqual(['app/Extra.tsx']);
       // The config file is still reported, so the override is auditable.
       expect(result.configPath).toBe('statewave-guide.config.json');
     } finally {
