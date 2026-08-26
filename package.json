@@ -30,7 +30,9 @@
     "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm lint && pnpm format:check",
     "test:indexer-quality": "node scripts/indexer-quality.mjs",
     "test:indexer-perf": "node scripts/indexer-perf.mjs",
-    "test:indexer-quality:diff": "node scripts/benchmark-diff.mjs docs/benchmarks/pre-fix.json docs/benchmarks/post-fix.json"
+    "test:indexer-quality:diff": "node scripts/benchmark-diff.mjs docs/benchmarks/pre-fix.json docs/benchmarks/post-fix.json",
+    "test:semantic-quality": "node scripts/semantic-quality.mjs",
+    "benchmark:providers": "node scripts/benchmark-providers.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

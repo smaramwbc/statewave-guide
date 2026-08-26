@@ -441,6 +441,23 @@ everything below them is **not yet implemented**.
 | **Day 6** | Conversational runtime                | A `ModelProvider` returns _action requests_; the registry still validates them |
 | **Day 7** | Dynamic multi-step guidance           | Sequences composed at request time rather than authored in advance             |
 
+### Provider Reality Check — the next evaluation, not yet run
+
+Closed Loop #3 measured the **verifier**, not a model. No provider credentials were
+configured, so every semantic number in this repository comes from a deterministic
+stand-in returning scripted responses.
+
+That answers "does the verifier fail closed?" — it does not answer "how often does
+a real model try to fabricate?". The evaluation that would:
+
+Run the same evidence packs and the same gold set across several providers and
+measure, per provider: unsupported factual claims proposed · claims rejected, by
+reason · accepted factual correctness against the gold set · language quality ·
+input and output tokens · latency · cost.
+
+Until that runs, treat "276 hostile assertions blocked" as a statement about the
+verifier and nothing else.
+
 ### Later
 
 - GitHub connector

@@ -14,10 +14,68 @@ export type {
   ProvenanceReference,
   ProductElement,
   ProductElementType,
-  ProductFeature,
-  ProductModel,
   ProductKnowledgeResult,
 } from './product-model.js';
+
+// --- The semantic Product Model -------------------------------------------
+export type {
+  SemanticEvidence,
+  GeneratorAttribution,
+  ProductClaimType,
+  ProductClaimStatus,
+  CapabilityAction,
+  ClaimAssertion,
+  ClaimProvenance,
+  ClaimVerificationOutcome,
+  FeatureClaimSummary,
+  SemanticRejectionReason,
+  ProductClaim,
+  ProductWorkflowStep,
+  ProductWorkflow,
+  ProductFeatureIdOrigin,
+  ProductPermission,
+  ProductFeature,
+  ProductModelSource,
+  SemanticVerificationSummary,
+  ProductModel,
+} from './semantic.js';
+
+export { FACTUAL_CLAIM_TYPES, LANGUAGE_CLAIM_TYPES, isFactualClaimType } from './semantic.js';
+
+export {
+  SEMANTIC_LIMITS,
+  semanticEvidenceSchema,
+  generatorAttributionSchema,
+  productClaimTypeSchema,
+  productClaimStatusSchema,
+  capabilityActionSchema,
+  claimAssertionSchema,
+  claimProvenanceSchema,
+  claimVerificationOutcomeSchema,
+  semanticRejectionReasonSchema,
+  productClaimSchema,
+  productWorkflowStepSchema,
+  productWorkflowSchema,
+  productPermissionSchema,
+  productFeatureSchema,
+  productModelSourceSchema,
+  semanticVerificationSummarySchema,
+  productModelSchema,
+  featureEnrichmentSchema,
+  factualClaimEnrichmentSchema,
+  languageClaimEnrichmentSchema,
+  workflowEnrichmentSchema,
+  workflowStepEnrichmentSchema,
+  toCapabilityAction,
+} from './semantic-schemas.js';
+
+export type {
+  FeatureEnrichment,
+  FactualClaimEnrichment,
+  LanguageClaimEnrichment,
+  WorkflowEnrichment,
+  WorkflowStepEnrichment,
+} from './semantic-schemas.js';
 
 export type { AppContext, AppContextEntity, AppContextPatch } from './app-context.js';
 
@@ -59,8 +117,6 @@ export {
   provenanceReferenceSchema,
   productElementTypeSchema,
   productElementSchema,
-  productFeatureSchema,
-  productModelSchema,
   appContextEntitySchema,
   appContextSchema,
   guideErrorCodeSchema,
@@ -86,3 +142,11 @@ export type {
   StartGuideInput,
   HighlightPlacement,
 } from './schemas.js';
+
+// --- The claim verification matrix ----------------------------------------
+export type { ClaimVerificationRule } from './verification-matrix.js';
+export {
+  BUILT_IN_VERIFICATION_RULES,
+  UNSUPPORTED_CAPABILITY_ACTIONS,
+  findBuiltInRule,
+} from './verification-matrix.js';

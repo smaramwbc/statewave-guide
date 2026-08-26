@@ -1,0 +1,213 @@
+{
+  "provider": "anthropic-opus-5",
+  "model": "claude-opus-5",
+  "settings": "model=claude-opus-5 effort=low temperature=unsupported-by-api",
+  "runs": 3,
+  "runAt": "2026-08-26T18:25:40.792Z",
+  "stability": 0.6806550469258763,
+  "metrics": {
+    "features": 63,
+    "factualProposed": 382,
+    "factualVerified": 77,
+    "factualRejected": 305,
+    "languageProposed": 197,
+    "languageGrounded": 185,
+    "languageRejected": 12,
+    "forbiddenCapabilitiesProposed": 27,
+    "unsupportedActionsProposed": 23,
+    "unknownSubjectsProposed": 0,
+    "unknownReferencesProposed": 1,
+    "invalidPermissionsProposed": 0,
+    "invalidRoutesProposed": 0,
+    "evidenceDoesNotSupport": 94,
+    "unsupportedClaimRule": 83,
+    "requiredConceptsExpected": 63,
+    "requiredConceptsRecovered": 44,
+    "requiredEvidenceExpected": 84,
+    "requiredEvidenceRecovered": 75,
+    "requiredWorkflowExpected": 39,
+    "requiredWorkflowRecovered": 7,
+    "capabilitiesOutsideAllowed": 2,
+    "capabilitiesOutsideAllowedDetail": [
+      {
+        "claimId": "settings.new-key#capability:2",
+        "featureId": "settings.new-key",
+        "action": "submit",
+        "allowed": [
+          "view"
+        ],
+        "subjectRef": "element:settings.form",
+        "targets": [
+          "element:settings.form",
+          "function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+          "element:settings.save"
+        ],
+        "text": "Settings changes are saved by submitting the settings form."
+      },
+      {
+        "claimId": "settings.new-key#capability:2",
+        "featureId": "settings.new-key",
+        "action": "submit",
+        "allowed": [
+          "view"
+        ],
+        "subjectRef": "element:settings.form",
+        "targets": [
+          "element:settings.form",
+          "function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+          "element:settings.save"
+        ],
+        "text": "Settings changes are saved by submitting the settings form."
+      }
+    ],
+    "rejectionSamples": {
+      "UNSUPPORTED_CLAIM_RULE": [
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "capability",
+          "action": "search",
+          "detail": "No verification rule exists for search. The claim was not checked, and an unchecked claim is not evidence that the application cannot do this. The matrix omits search deliberately: no generic graph fact proves it, so an application that can prove it must register a verifier."
+        },
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "capability",
+          "action": "export",
+          "detail": "No verification rule exists for export. The claim was not checked, and an unchecked claim is not evidence that the application cannot do this. The matrix omits export deliberately: no generic graph fact proves it, so an application that can prove it must register a verifier."
+        },
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "navigation",
+          "action": "navigate",
+          "detail": "No verification rule exists for navigate. The claim was not checked, and an unchecked claim is not evidence that the application cannot do this."
+        }
+      ],
+      "UNKNOWN_ENDPOINT": [
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "capability",
+          "action": "delete",
+          "detail": "The rule requires DELETE; the claim cited no endpoint the graph contains."
+        },
+        {
+          "featureId": "client-detail.audit",
+          "type": "capability",
+          "action": "view",
+          "detail": "The rule requires GET; the claim cited no endpoint the graph contains."
+        },
+        {
+          "featureId": "client-detail.audit",
+          "type": "capability",
+          "action": "view",
+          "detail": "The rule requires GET; the claim cited no endpoint the graph contains."
+        }
+      ],
+      "UNSUPPORTED_CONSTRAINT": [
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "constraint",
+          "detail": "No validates_with, requires_permission relationship runs from the subject to any cited fact."
+        },
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "constraint",
+          "detail": "The rule requires a schema or permission target, reached by a validates_with or requires_permission relationship from the subject; none of the cited facts is a schema, permission node."
+        },
+        {
+          "featureId": "clients.error",
+          "type": "constraint",
+          "detail": "The rule requires a schema or permission target, reached by a validates_with or requires_permission relationship from the subject; none of the cited facts is a schema, permission node."
+        }
+      ],
+      "EVIDENCE_DOES_NOT_SUPPORT_CLAIM": [
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "permission",
+          "detail": "No requires_permission relationship runs from the subject to any cited fact."
+        },
+        {
+          "featureId": "api.get.partial-clients",
+          "type": "user_question",
+          "detail": "The wording asserts \"excel\", which no accepted claim and no cited fact supports. The assertion may well hold; the sentence beside it says more than the assertion does, and the sentence is what a reader acts on."
+        },
+        {
+          "featureId": "client-detail.delete",
+          "type": "capability",
+          "action": "delete",
+          "detail": "No calls_api relationship runs from the subject to any cited fact."
+        }
+      ],
+      "UNSUPPORTED_WORKFLOW_STEP": [
+        {
+          "featureId": "client-detail.audit",
+          "type": "workflow_step",
+          "detail": "The rule requires at least one addressable target: an element, component, route or api node; none of the cited facts is a element, component, route, api node."
+        },
+        {
+          "featureId": "client-detail.change-plan",
+          "type": "workflow_step",
+          "detail": "The rule requires at least one addressable target: an element, component, route or api node; none of the cited facts is a element, component, route, api node."
+        },
+        {
+          "featureId": "client-detail.delete",
+          "type": "workflow_step",
+          "detail": "The rule requires at least one addressable target: an element, component, route or api node; none of the cited facts is a element, component, route, api node."
+        }
+      ],
+      "UNSUPPORTED_CAPABILITY": [
+        {
+          "featureId": "invoices.list.open",
+          "type": "capability",
+          "action": "view",
+          "detail": "The rule requires a route, element, component or GET endpoint among the cited facts; none of the cited facts is a route, element, component, api node."
+        },
+        {
+          "featureId": "settings.form",
+          "type": "capability",
+          "action": "view",
+          "detail": "The rule requires a route, element, component or GET endpoint among the cited facts; none of the cited facts is a route, element, component, api node."
+        },
+        {
+          "featureId": "nav.clients",
+          "type": "capability",
+          "action": "navigate",
+          "detail": "The rule requires a route or element target, reached by a navigates_to relationship from the subject; none of the cited facts is a route, element node."
+        }
+      ],
+      "UNKNOWN_GRAPH_REFERENCE": [
+        {
+          "featureId": "invoices.list.open",
+          "type": "workflow_step",
+          "detail": "\"component:frontend/src/pages/InvoicesPage.tsx#InvoiceList\" does not exist in the graph."
+        }
+      ]
+    },
+    "forbiddenClaimsInProse": 0,
+    "restraintCases": 30,
+    "restraintHeld": 0,
+    "featuresWithoutCapability": 45,
+    "featuresOnlyWorkflowSteps": 13,
+    "featuresRepeatingIdentifiers": 0,
+    "calls": 63,
+    "schemaFailures": 0,
+    "providerErrors": 0,
+    "rateLimited": 0,
+    "timeouts": 0,
+    "inputTokens": 1321833,
+    "outputTokens": 72932,
+    "reportedTokens": true,
+    "latencies": [
+      279801,
+      271208,
+      278224
+    ],
+    "rejectionsByReason": {
+      "UNSUPPORTED_CLAIM_RULE": 83,
+      "UNKNOWN_ENDPOINT": 75,
+      "UNSUPPORTED_CONSTRAINT": 29,
+      "EVIDENCE_DOES_NOT_SUPPORT_CLAIM": 94,
+      "UNSUPPORTED_WORKFLOW_STEP": 31,
+      "UNSUPPORTED_CAPABILITY": 4,
+      "UNKNOWN_GRAPH_REFERENCE": 1
+    }
+  }
+}

@@ -11,7 +11,6 @@
 
 import type {
   AppContext,
-  ProductElement,
   ProductFeature,
   ProductKnowledgeResult,
   ProductModel,
@@ -30,29 +29,30 @@ export interface StaticKnowledgeProviderOptions {
   routeBoost?: number;
 }
 
-/** Weights chosen so an element label or a title beats a passing mention. */
+/**
+ * Weights chosen so a title or a phrasing a user would actually type beats a
+ * passing mention.
+ *
+ * `questions` carries the most weight after the title. They are generated
+ * language variants — "How do I add a customer?" — which is precisely what a
+ * user's query looks like, and matching them is what a lexical scorer is good
+ * for.
+ */
 function featureFields(feature: ProductFeature): ScoredField[] {
   const fields: ScoredField[] = [
     { text: feature.title, weight: 3 },
     { text: feature.id, weight: 2 },
   ];
   if (feature.description) fields.push({ text: feature.description, weight: 2 });
+  if (feature.purpose) fields.push({ text: feature.purpose, weight: 2 });
+  for (const question of feature.questions ?? []) fields.push({ text: question, weight: 3 });
   for (const route of feature.routes ?? []) fields.push({ text: route, weight: 1 });
-  for (const element of feature.elements ?? []) {
-    fields.push({ text: element.id, weight: 2 });
-    if (element.label) fields.push({ text: element.label, weight: 2 });
-    if (element.description) fields.push({ text: element.description, weight: 1 });
-  }
+  for (const elementId of feature.elements ?? []) fields.push({ text: elementId, weight: 2 });
   return fields;
 }
 
-function elementMatches(element: ProductElement, queryTokens: readonly string[]): boolean {
-  const fields: ScoredField[] = [
-    { text: element.id, weight: 1 },
-    { text: element.label ?? '', weight: 1 },
-    { text: element.description ?? '', weight: 1 },
-  ];
-  return scoreFields(queryTokens, fields) > 0;
+function elementMatches(elementId: string, queryTokens: readonly string[]): boolean {
+  return scoreFields(queryTokens, [{ text: elementId, weight: 1 }]) > 0;
 }
 
 /**
@@ -83,10 +83,11 @@ export function createStaticKnowledgeProvider(
   const routeBoost = options.routeBoost ?? 0.15;
 
   const features = new Map(model.features.map((feature) => [feature.id, feature]));
-  const elements = new Map<string, ProductElement>();
+  /** Which feature owns each semantic element id. */
+  const elementOwners = new Map<string, string>();
   for (const feature of model.features) {
-    for (const element of feature.elements ?? []) {
-      if (!elements.has(element.id)) elements.set(element.id, element);
+    for (const elementId of feature.elements ?? []) {
+      if (!elementOwners.has(elementId)) elementOwners.set(elementId, feature.id);
     }
   }
 
@@ -108,8 +109,8 @@ export function createStaticKnowledgeProvider(
           score = Math.min(1, score + routeBoost);
         }
 
-        const matchedElements = (feature.elements ?? []).filter((element) =>
-          elementMatches(element, queryTokens),
+        const matchedElements = (feature.elements ?? []).filter((elementId) =>
+          elementMatches(elementId, queryTokens),
         );
 
         const result: ProductKnowledgeResult = { id: feature.id, feature, score };
@@ -126,7 +127,11 @@ export function createStaticKnowledgeProvider(
     },
 
     async getElement(id) {
-      return elements.get(id);
+      const owner = elementOwners.get(id);
+      if (owner === undefined) return undefined;
+      // The semantic model records element membership by id; the element's own
+      // type and label are technical facts and live in the ApplicationGraph.
+      return { id, type: 'other', featureId: owner };
     },
   };
 }
