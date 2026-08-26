@@ -1,13 +1,19 @@
 /**
- * The Product Model: what the application *is*, expressed as data.
+ * Shared data contracts for describing an application's parts.
  *
- * Everything here is a plain data contract with no runtime behaviour. The
- * indexer produces it from source code, a {@link ProductFeature} describes one
- * user-facing capability, and the guide runtime consumes it to answer questions
- * and to decide what it is allowed to point at.
+ * Plain data, no runtime behaviour. {@link ProvenanceReference} is the backbone:
+ * every fact the indexer emits carries one, which is what keeps the whole model
+ * auditable.
+ *
+ * The *semantic* Product Model — features, workflows, claims — lives in
+ * `./semantic.ts`. It supersedes the sketch that used to live here: there is one
+ * Product Model, and it is the one the enrichment pipeline produces and the
+ * runtime consumes.
  *
  * @packageDocumentation
  */
+
+import type { ProductFeature } from './semantic.js';
 
 /**
  * Where a piece of extracted knowledge came from.
@@ -67,54 +73,6 @@ export interface ProductElement {
 }
 
 /**
- * One user-facing capability of the application.
- *
- * A feature is the unit the guide reasons about: "creating a client" rather
- * than "the `ClientForm` component". Features are what an end user asks
- * questions about, so they own the routes, elements and actions involved.
- */
-export interface ProductFeature {
-  /** Stable identifier, e.g. `clients`. */
-  id: string;
-  /** Discriminator, so features can share a collection with future node kinds. */
-  kind: 'feature';
-  /** Short human-readable title. */
-  title: string;
-  /** What the feature does, in the user's language. */
-  description?: string;
-  /** Route patterns where the feature lives, e.g. `/clients/:id`. */
-  routes?: string[];
-  /** Permissions a user needs before the feature is usable. */
-  permissions?: string[];
-  /** Addressable UI elements belonging to the feature. */
-  elements?: ProductElement[];
-  /** Names of registered guide actions relevant to the feature. */
-  actions?: string[];
-  /** Identifiers of related features. */
-  relationships?: string[];
-  /** Where this feature was derived from. */
-  provenance?: ProvenanceReference[];
-  /** Adapter-specific extras. Never interpreted by the runtime. */
-  metadata?: Record<string, unknown>;
-}
-
-/**
- * A complete Product Model: the knowledge the guide has about an application.
- *
- * Intentionally free of timestamps. Two runs of the indexer over unchanged
- * source must produce byte-identical output so the model is reviewable in a
- * diff, so anything non-deterministic belongs outside this structure.
- */
-export interface ProductModel {
-  /** Schema version of this document. */
-  version: 1;
-  /** Human-readable name of the indexed application, when known. */
-  application?: string;
-  /** Features, sorted by `id`. */
-  features: ProductFeature[];
-}
-
-/**
  * A single hit from a {@link ProductFeature} search.
  *
  * Providers rank results themselves; the runtime does not re-sort them.
@@ -126,8 +84,14 @@ export interface ProductKnowledgeResult {
   feature: ProductFeature;
   /** Provider-defined relevance in `[0, 1]`, higher is better. */
   score: number;
-  /** Elements within the feature that matched the query, when applicable. */
-  matchedElements?: ProductElement[];
+  /**
+   * Semantic element ids within the feature that matched the query.
+   *
+   * Ids rather than element objects: an element's type and label are technical
+   * facts owned by the ApplicationGraph, and duplicating them into the semantic
+   * layer would create two places for them to disagree.
+   */
+  matchedElements?: string[];
   /** Short text supporting the match, for display or model grounding. */
   excerpt?: string;
 }

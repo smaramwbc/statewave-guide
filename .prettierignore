@@ -14,3 +14,8 @@ CLAUDE.md
 
 # Generated benchmark snapshots — written by scripts/indexer-quality.mjs
 docs/benchmarks
+
+# Benchmark result artefacts are written by the runner, not by hand. Formatting
+# them is meaningless — the next run rewrites the file — and a failing style
+# check on a machine-written output would block `verify` for no reason.
+benchmarks/*/results/

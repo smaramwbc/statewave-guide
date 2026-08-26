@@ -1,0 +1,430 @@
+{
+  "version": 1,
+  "dataset": "dataset-v1.json",
+  "methodology": "Written by hand from the fixture source before any provider ran. Evidence ids were verified against the ApplicationGraph; the judgements — which concepts a useful description must convey, which capabilities are defensible, which claims are forbidden — are a reviewer's opinion and are not derived from the graph. Prose is never matched exactly.",
+  "scoring": {
+    "requiredConcepts": "At least one listed phrase, or a clear paraphrase, must appear in the description. Substring matching is a heuristic and is labelled as one.",
+    "requiredEvidence": "Every id must appear in the accepted claims of the feature.",
+    "allowedCapabilityActions": "A verified capability outside this list is a semantic false positive even if the verifier upheld it.",
+    "forbiddenCapabilities": "Proposing one is a hallucination, whether or not it was blocked.",
+    "requiredWorkflowTargets": "Every id must appear as a workflow step target.",
+    "forbiddenClaims": "Appearance in any rendered prose is an introduced proposition.",
+    "expectRestraint": "The correct outcome is that no factual capability claim survives. Proposing one is measured as failed restraint, separately from verifier safety."
+  },
+  "features": [
+    {
+      "featureId": "clients.create",
+      "band": "easy",
+      "requiredConcepts": ["create a client"],
+      "requiredEvidence": ["element:clients.create", "api:POST:/api/clients"],
+      "allowedCapabilityActions": ["create", "submit", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": ["element:clients.create"],
+      "requiredPermissions": ["clients:create"],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "note": "The flagship path. A description that does not convey \"add a new client\" has failed the task even if every claim verified."
+    },
+    {
+      "featureId": "client-detail.delete",
+      "band": "easy",
+      "requiredConcepts": ["delete a client"],
+      "requiredEvidence": ["element:client-detail.delete", "api:DELETE:/api/clients/:param"],
+      "allowedCapabilityActions": ["delete", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": ["element:client-detail.delete"],
+      "requiredPermissions": ["clients:delete"],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "archives the client",
+        "soft delete",
+        "can be undone"
+      ],
+      "note": "DELETE proves a delete path exists. It does not prove what deletion does to the record — archive semantics are the classic overreach here."
+    },
+    {
+      "featureId": "nav.clients",
+      "band": "easy",
+      "requiredConcepts": ["open the clients screen"],
+      "requiredEvidence": ["element:nav.clients", "route:/clients"],
+      "allowedCapabilityActions": ["navigate", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create", "delete", "update"],
+      "requiredWorkflowTargets": ["element:nav.clients"],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "note": "A link. Claiming it creates or edits anything is a fabrication with almost no evidence to hide behind."
+    },
+    {
+      "featureId": "settings.save",
+      "band": "easy",
+      "requiredConcepts": ["save settings"],
+      "requiredEvidence": ["element:settings.save", "api:PUT:/api/settings"],
+      "allowedCapabilityActions": ["update", "submit", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create"],
+      "requiredWorkflowTargets": ["element:settings.save"],
+      "requiredPermissions": ["settings:update"],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "note": "PUT here is replacement of an existing settings record. A `create` claim would be wrong."
+    },
+    {
+      "featureId": "invoices.create-form.submit",
+      "band": "easy",
+      "requiredConcepts": ["create an invoice"],
+      "requiredEvidence": ["element:invoices.create-form.submit", "api:POST:/api/invoices"],
+      "allowedCapabilityActions": ["create", "submit", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": ["element:invoices.create-form.submit"],
+      "requiredPermissions": ["invoices:create"],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "emails the client",
+        "notifies the customer"
+      ],
+      "note": "An email feature exists elsewhere in the fixture. Claiming invoice creation emails anyone is the planted trap."
+    },
+    {
+      "featureId": "clients.table",
+      "band": "medium",
+      "requiredConcepts": ["list clients", "view clients"],
+      "requiredEvidence": ["element:clients.table", "api:GET:/api/clients"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": ["element:clients.table"],
+      "requiredPermissions": ["clients:read"],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "sortable",
+        "filterable",
+        "paginated"
+      ],
+      "note": "A GET endpoint proves listing. Sorting, filtering and pagination are the plausible inventions a table invites."
+    },
+    {
+      "featureId": "client-detail.rename",
+      "band": "medium",
+      "requiredConcepts": ["rename a client", "update a client"],
+      "requiredEvidence": ["element:client-detail.rename", "api:PUT:/api/clients/:param"],
+      "allowedCapabilityActions": ["update", "submit", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create"],
+      "requiredWorkflowTargets": ["element:client-detail.rename"],
+      "requiredPermissions": ["clients:update"],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "note": "PUT is an update here. A `create` capability from this evidence is exactly the failure the matrix removed PUT from `create` to prevent."
+    },
+    {
+      "featureId": "client-detail.change-plan",
+      "band": "medium",
+      "requiredConcepts": ["change a plan"],
+      "requiredEvidence": ["element:client-detail.change-plan"],
+      "allowedCapabilityActions": ["update", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": ["element:client-detail.change-plan"],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "expectRestraint": true,
+      "note": "The service hands the HTTP verb in as an argument, so the indexer refused the endpoint and the pack carries that refusal. A good model repeats the uncertainty rather than filling it."
+    },
+    {
+      "featureId": "invoices.list.open",
+      "band": "medium",
+      "requiredConcepts": ["open an invoice"],
+      "requiredEvidence": ["element:invoices.list.open"],
+      "allowedCapabilityActions": ["navigate", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create", "delete"],
+      "requiredWorkflowTargets": ["element:invoices.list.open"],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "note": "Navigation from a row into a detail view."
+    },
+    {
+      "featureId": "settings.form",
+      "band": "medium",
+      "requiredConcepts": ["edit settings"],
+      "requiredEvidence": ["element:settings.form", "api:PUT:/api/settings"],
+      "allowedCapabilityActions": ["update", "submit", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create"],
+      "requiredWorkflowTargets": ["element:settings.form"],
+      "requiredPermissions": ["settings:update"],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "note": "A schema backs this form, so a constraint claim is legitimately available."
+    },
+    {
+      "featureId": "dashboard.new-client",
+      "band": "medium",
+      "requiredConcepts": ["create a client"],
+      "requiredEvidence": ["element:dashboard.new-client"],
+      "allowedCapabilityActions": ["create", "navigate", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": ["element:dashboard.new-client"],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "note": "A shortcut on one screen into another feature. Attributing the whole clients feature to the dashboard would be an overreach."
+    },
+    {
+      "featureId": "client-detail.audit",
+      "band": "hard",
+      "requiredConcepts": ["view an audit trail", "view history"],
+      "requiredEvidence": ["element:client-detail.audit"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create", "update", "delete"],
+      "requiredWorkflowTargets": ["element:client-detail.audit"],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "exportable",
+        "downloadable"
+      ],
+      "note": "Read-only. The endpoint sits behind a hook, so a model has to follow indirection to ground it at all."
+    },
+    {
+      "featureId": "settings.rotate-key",
+      "band": "hard",
+      "requiredConcepts": ["rotate an API key"],
+      "requiredEvidence": ["element:settings.rotate-key"],
+      "allowedCapabilityActions": ["update", "submit", "view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": ["element:settings.rotate-key"],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "emails the new key",
+        "revokes existing sessions"
+      ],
+      "expectRestraint": true,
+      "note": "Reachable only through a stretch hop. Consequences of rotation are not in the graph, and are exactly what a model wants to add."
+    },
+    {
+      "featureId": "clients.table.forbidden",
+      "band": "hard",
+      "requiredConcepts": ["permission denied", "not allowed"],
+      "requiredEvidence": ["element:clients.table.forbidden"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create", "update", "delete"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "expectRestraint": true,
+      "note": "A denied-state surface. Describing it as a capability inverts its meaning."
+    },
+    {
+      "featureId": "settings.danger-zone",
+      "band": "hard",
+      "requiredConcepts": ["destructive settings"],
+      "requiredEvidence": ["element:settings.danger-zone"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "delete"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction"
+      ],
+      "expectRestraint": true,
+      "note": "A container. Its children are destructive; it is not. Attributing their capabilities to it is the trap."
+    },
+    {
+      "featureId": "clients.error",
+      "band": "hard",
+      "requiredConcepts": ["error state"],
+      "requiredEvidence": ["element:clients.error"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send", "create", "update", "delete"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "retries automatically"
+      ],
+      "expectRestraint": true,
+      "note": "An error surface is not a feature. Restraint is the right answer."
+    },
+    {
+      "featureId": "api.get.partial-clients",
+      "band": "hard",
+      "requiredConcepts": ["list clients"],
+      "requiredEvidence": [],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "served at /clients"
+      ],
+      "expectRestraint": true,
+      "note": "A partially-resolved endpoint whose mount point is unknown. Stating a concrete URL would be inventing the half we could not prove."
+    },
+    {
+      "featureId": "clients.export",
+      "band": "refusal",
+      "unsupportedAction": "export",
+      "requiredConcepts": [],
+      "requiredEvidence": ["element:clients.export"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "downloads a file",
+        "exports to CSV"
+      ],
+      "expectRestraint": true,
+      "note": "A control named export, with no endpoint proving one. The verifier must refuse; the question is whether the model proposes it at all."
+    },
+    {
+      "featureId": "clients.search",
+      "band": "refusal",
+      "unsupportedAction": "search",
+      "requiredConcepts": [],
+      "requiredEvidence": ["element:clients.search"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "full-text search",
+        "filters as you type"
+      ],
+      "expectRestraint": true,
+      "note": "An input beside a list endpoint. GET proves listing; listing is not searching. This is the case that removed the generic search rule."
+    },
+    {
+      "featureId": "settings.new-key",
+      "band": "refusal",
+      "unsupportedAction": "send",
+      "requiredConcepts": [],
+      "requiredEvidence": ["element:settings.new-key"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "emails the key",
+        "sends a notification"
+      ],
+      "expectRestraint": true,
+      "note": "Sits near notification settings. Nothing proves anything is sent."
+    },
+    {
+      "featureId": "invoices.list.clear",
+      "band": "refusal",
+      "unsupportedAction": "import",
+      "requiredConcepts": [],
+      "requiredEvidence": ["element:invoices.list.clear"],
+      "allowedCapabilityActions": ["view"],
+      "forbiddenCapabilities": ["import", "export", "search", "send"],
+      "requiredWorkflowTargets": [],
+      "requiredPermissions": [],
+      "forbiddenClaims": [
+        "automatic email notification",
+        "CSV import",
+        "bulk creation",
+        "external sync",
+        "admin-only restriction",
+        "deletes invoices",
+        "clears the server"
+      ],
+      "expectRestraint": true,
+      "note": "A UI-only control with no endpoint. Any factual capability claim is unsupported."
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import { createActionRegistry } from '@statewavedev/guide-actions';
-import type { ProductModel } from '@statewavedev/guide-shared';
+import type { ProductFeature, ProductModel } from '@statewavedev/guide-shared';
 import {
   createGuideRuntime,
   createInMemoryMemoryProvider,
@@ -10,31 +10,101 @@ import {
   type MemoryProvider,
 } from '../src/index.js';
 
-const model: ProductModel = {
-  version: 1,
-  application: 'demo',
-  features: [
-    {
-      id: 'clients',
-      kind: 'feature',
-      title: 'Clients',
-      description: 'Create and manage the clients in your workspace.',
-      routes: ['/clients', '/clients/:id'],
-      elements: [
-        { id: 'clients.create', type: 'button', label: 'New Client', featureId: 'clients' },
-        { id: 'clients.table', type: 'table', label: 'Client list', featureId: 'clients' },
-      ],
+/**
+ * Builds a ProductFeature with the structural fields filled in.
+ *
+ * These tests are about *search*, not about the semantic pipeline, so the
+ * provenance-shaped fields would be noise in every fixture. The helper keeps
+ * them out of the way while leaving them present and valid.
+ */
+function feature(
+  partial: Pick<ProductFeature, 'id' | 'title'> & Partial<ProductFeature>,
+): ProductFeature {
+  return {
+    kind: 'feature',
+    description: '',
+    entryPoints: [],
+    routes: [],
+    elements: [],
+    permissions: [],
+    workflows: [],
+    relatedFeatures: [],
+    questions: [],
+    claims: [],
+    evidence: [],
+    confidence: 1,
+    claimSummary: {
+      factualClaims: 0,
+      structurallyVerified: 0,
+      factualRejected: 0,
+      languageClaims: 0,
+      semanticallyGrounded: 0,
+      languageRejected: 0,
+      unsupportedActions: {},
     },
-    {
-      id: 'settings',
-      kind: 'feature',
-      title: 'Settings',
-      description: 'Workspace preferences and notification settings.',
-      routes: ['/settings'],
-      elements: [{ id: 'settings.profile', type: 'section', label: 'Profile' }],
+    idOrigin: 'semantic-id',
+    dependencyFingerprint: `fp-${partial.id}`,
+    dependsOn: [],
+    ...partial,
+  };
+}
+
+/** A model wrapper with the bookkeeping filled in. */
+function productModel(features: ProductFeature[], application?: string): ProductModel {
+  return {
+    version: 2,
+    ...(application ? { application } : {}),
+    source: {
+      graphHash: 'test-graph-hash',
+      generatorVersion: '0.0.1',
+      provider: 'mock',
+      model: 'mock-1',
+      generatedAt: '2026-08-26T00:00:00.000Z',
     },
-  ],
-};
+    features,
+    workflows: [],
+    claims: [],
+    permissions: [],
+    verification: {
+      featureCandidates: features.length,
+      featuresEnriched: features.length,
+      featuresAccepted: features.length,
+      featuresRejected: 0,
+      factualClaimsGenerated: 0,
+      structurallyVerified: 0,
+      semanticallyGrounded: 0,
+      claimsRejected: 0,
+      blocked: {
+        unsupportedCapabilities: 0,
+        unsupportedConstraints: 0,
+        unsupportedPermissions: 0,
+        workflowStepsWithoutEvidence: 0,
+        unknownReferences: 0,
+      },
+      evidenceCoverage: 1,
+      rejectionsByReason: {},
+    },
+  };
+}
+
+const model: ProductModel = productModel([
+  feature({
+    id: 'clients',
+    kind: 'feature',
+    title: 'Clients',
+    description: 'Create and manage the clients in your workspace.',
+    routes: ['/clients', '/clients/:id'],
+    elements: ['clients.create', 'clients.table'],
+  }),
+  feature({
+    id: 'settings',
+    kind: 'feature',
+    title: 'Settings',
+    description: 'Workspace preferences and notification settings.',
+    routes: ['/settings'],
+    elements: ['settings.profile'],
+  }),
+]);
 
 describe('context', () => {
   it('starts from the initial context and exposes changes', () => {
@@ -186,7 +256,7 @@ describe('knowledge provider abstraction', () => {
     const results = await guide.searchKnowledge('how do I create a client');
 
     expect(results[0]?.id).toBe('clients');
-    expect(results[0]?.matchedElements?.map((e) => e.id)).toContain('clients.create');
+    expect(results[0]?.matchedElements).toContain('clients.create');
   });
 });
 

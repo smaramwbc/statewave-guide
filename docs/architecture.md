@@ -251,19 +251,82 @@ than silently filled in. The complete list is in [docs/refusals.md](refusals.md)
 
 ---
 
-## Product Model
+## The deterministic layer and the semantic layer
+
+Two layers, and which one is authoritative is the whole design.
+
+```
+SOURCE
+  ↓  deterministic analysis — ts-morph, no model
+FACT GRAPH            ApplicationGraph      ← authoritative
+  ↓  semantic enrichment — a model, bounded and checked
+VERIFIED PRODUCT MODEL  product.json        ← authoritative for meaning
+  ↓  projection
+DOCS · future chat · future tooltips · future guides
+```
+
+**The ApplicationGraph is authoritative for what exists.** Every node and edge
+came from source, carries evidence, and was produced without a model. Nothing in
+the semantic layer may contradict it, and nothing may add to it.
+
+**The Product Model is authoritative for what things mean** — and only to the
+extent each claim survived verification. It never _replaces_ the graph; every
+claim points back into it.
+
+> Code determines what exists. AI may explain what verified facts mean.
+
+The critical direction is that the ProductModel is the **render source**, not a
+staging area for documentation:
+
+```
+ApplicationGraph → verified ProductModel → ├── docs
+                                          ├── future chat
+                                          ├── future tooltips
+                                          └── future interactive guides
+```
+
+and **not**
+
+```
+ApplicationGraph → generated Markdown → future knowledge base
+```
+
+Markdown is one projection among several. Treating it as the asset would mean the
+next consumer parses prose to recover facts the model already holds structurally —
+which is how a documentation system becomes a second source of truth to maintain.
+See [ADR 0008](adr/0008-documentation-is-output-not-source-of-truth.md).
+
+### Claims, not documents
+
+`ProductClaim` is the unit. Factual claims (`capability`, `navigation`,
+`workflow_step`, `permission`, `constraint`) carry a machine-checkable assertion
+and are checked against a verification matrix. Language claims (`purpose`,
+`synonym`, `user_question`) interpret, and are never presented as facts.
+
+Three states, never collapsed:
+
+| State                   | Means                                                  |
+| ----------------------- | ------------------------------------------------------ |
+| `structurally_verified` | The assertion was checked against the graph and upheld |
+| `semantically_grounded` | Attached to real evidence — **not** proven true        |
+| `rejected`              | Refused, and persisted so the refusal stays visible    |
+
+There is no generic fallback. An assertion the matrix has no rule for is
+`EXPLICITLY_UNSUPPORTED`, which says _we did not check_ — different from _we
+checked and it is false_, and reported separately so an unverifiable claim never
+reads as disproven. Reasoning in
+[ADR 0007](adr/0007-ai-enriches-but-does-not-define-product-truth.md) and
+[ADR 0009](adr/0009-semantic-knowledge-is-claim-based.md).
+
+---
+
+## Product Model vocabulary
 
 **`@statewavedev/guide-shared` — the vocabulary everything agrees on.**
 
-The Product Model is plain data: `ProductFeature` (a user-facing capability),
-`ProductElement` (an addressable piece of UI), `ProvenanceReference` (where a fact
-came from). No behaviour, no environment assumptions.
-
-It sits between the indexer's `ApplicationGraph` — which is _structural_, in terms
-of files and components — and the runtime, which needs something _product-shaped_,
-in terms of features a user would name. Day 0 defines the model and a knowledge
-provider that searches it; generating a Product Model from the graph is roadmap
-Day 1.
+`ProductFeature`, `ProductClaim`, `ProductWorkflow`, `ProductPermission`,
+`SemanticEvidence`, `ProvenanceReference`. Plain data, no behaviour, no
+environment assumptions.
 
 `shared` also owns the semantic-id rules, and this is where the safety model is
 actually enforced:

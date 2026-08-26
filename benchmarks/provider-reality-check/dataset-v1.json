@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "fixture": "packages/indexer/test/fixtures/realistic-app",
+  "include": ["frontend/src/**/*.{ts,tsx}", "backend/src/**/*.ts"],
+  "exclude": ["**/__tests__/**", "**/*.test.*"],
+  "frozenAt": "Closed Loop #3 / Provider Reality Check",
+  "notes": "Frozen before any provider ran. Editing this file after results exist invalidates every comparison recorded against it — create dataset-v2.json instead and keep both. Bands are a reviewer's judgement of how much indirection sits between the element and the fact that describes it, not a measured property.",
+  "bands": {
+    "easy": "Strong semantic identifier, short path, the supporting endpoint directly cited.",
+    "medium": "Crosses component, service and API boundaries, or depends on a hook.",
+    "hard": "Indirection, partial evidence, permissions, or an element that is not a capability at all.",
+    "refusal": "The correct outcome is that no factual capability claim survives."
+  },
+  "candidates": [
+    {
+      "id": "clients.create",
+      "band": "easy",
+      "why": "a named button, a handler, a dialog, a form and POST /clients — the flagship path, and the shortest complete one."
+    },
+    {
+      "id": "client-detail.delete",
+      "band": "easy",
+      "why": "a delete control reaching DELETE /clients/:id, with a permission attached."
+    },
+    {
+      "id": "nav.clients",
+      "band": "easy",
+      "why": "a navigation link to a route that exists. Nearly nothing to get wrong."
+    },
+    {
+      "id": "settings.save",
+      "band": "easy",
+      "why": "a submit control on a settings form with a schema behind it."
+    },
+    {
+      "id": "invoices.create-form.submit",
+      "band": "easy",
+      "why": "a form submit reaching POST /invoices."
+    },
+    {
+      "id": "clients.table",
+      "band": "medium",
+      "why": "a table whose rows carry their own controls; the read path runs through a hook into a service."
+    },
+    {
+      "id": "client-detail.rename",
+      "band": "medium",
+      "why": "an update path via PATCH, distinguishable from create only by method."
+    },
+    {
+      "id": "client-detail.change-plan",
+      "band": "medium",
+      "why": "the update whose service hands the HTTP verb in as an argument — the indexer refuses it, so the pack carries the refusal."
+    },
+    {
+      "id": "invoices.list.open",
+      "band": "medium",
+      "why": "navigation into a detail route from inside a list row."
+    },
+    {
+      "id": "settings.form",
+      "band": "medium",
+      "why": "a form with validation, reaching PUT /settings."
+    },
+    {
+      "id": "dashboard.new-client",
+      "band": "medium",
+      "why": "a control on one screen whose handler belongs to another feature."
+    },
+    {
+      "id": "client-detail.audit",
+      "band": "hard",
+      "why": "an audit path behind a permission, through a custom hook, to a nested endpoint."
+    },
+    {
+      "id": "settings.rotate-key",
+      "band": "hard",
+      "why": "reachable only through a stretch hop; the endpoint is not directly cited."
+    },
+    {
+      "id": "clients.table.forbidden",
+      "band": "hard",
+      "why": "an element that exists to express a denied state — describing it as a capability would be wrong."
+    },
+    {
+      "id": "settings.danger-zone",
+      "band": "hard",
+      "why": "a container whose children are destructive; the container itself does nothing."
+    },
+    {
+      "id": "clients.error",
+      "band": "hard",
+      "why": "an error surface. Not a capability, and easy to mistake for one."
+    },
+    {
+      "id": "api.get.partial-clients",
+      "band": "hard",
+      "why": "a partially-resolved endpoint (unknown mount). Its identity carries a ? marker."
+    },
+    {
+      "id": "clients.export",
+      "band": "refusal",
+      "action": "export",
+      "why": "an export control. No generic graph fact proves an export, so a capability claim must fail closed."
+    },
+    {
+      "id": "clients.search",
+      "band": "refusal",
+      "action": "search",
+      "why": "a search input beside a list endpoint. GET proves listing, not searching."
+    },
+    {
+      "id": "settings.new-key",
+      "band": "refusal",
+      "action": "send",
+      "why": "a control adjacent to notification settings; nothing proves anything is sent."
+    },
+    {
+      "id": "invoices.list.clear",
+      "band": "refusal",
+      "action": "import",
+      "why": "a control with no supporting endpoint at all; any factual capability is unsupported."
+    }
+  ]
+}

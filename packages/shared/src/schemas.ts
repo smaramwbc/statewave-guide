@@ -75,28 +75,6 @@ export const productElementSchema = z.object({
   metadata: metadataSchema.optional(),
 });
 
-/** Validates {@link ProductFeature}. */
-export const productFeatureSchema = z.object({
-  id: z.string().min(1),
-  kind: z.literal('feature'),
-  title: z.string().min(1),
-  description: z.string().optional(),
-  routes: z.array(z.string()).optional(),
-  permissions: z.array(z.string()).optional(),
-  elements: z.array(productElementSchema).optional(),
-  actions: z.array(z.string()).optional(),
-  relationships: z.array(z.string()).optional(),
-  provenance: z.array(provenanceReferenceSchema).optional(),
-  metadata: metadataSchema.optional(),
-});
-
-/** Validates {@link ProductModel}. */
-export const productModelSchema = z.object({
-  version: z.literal(1),
-  application: z.string().optional(),
-  features: z.array(productFeatureSchema),
-});
-
 // ---------------------------------------------------------------------------
 // Application context
 // ---------------------------------------------------------------------------

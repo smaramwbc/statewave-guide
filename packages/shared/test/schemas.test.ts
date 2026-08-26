@@ -1,4 +1,5 @@
 import { describe, expect, expectTypeOf, it } from 'vitest';
+import { claimAssertionSchema } from '../src/semantic-schemas.js';
 import {
   appContextSchema,
   builtinActionSchemas,
@@ -9,6 +10,16 @@ import {
   productElementSchema,
   productFeatureSchema,
   productModelSchema,
+  featureEnrichmentSchema,
+  factualClaimEnrichmentSchema,
+  languageClaimEnrichmentSchema,
+  productClaimStatusSchema,
+  FACTUAL_CLAIM_TYPES,
+  LANGUAGE_CLAIM_TYPES,
+  isFactualClaimType,
+  findBuiltInRule,
+  BUILT_IN_VERIFICATION_RULES,
+  UNSUPPORTED_CAPABILITY_ACTIONS,
   provenanceReferenceSchema,
   scrollInputSchema,
   type AppContext,
@@ -64,28 +75,206 @@ describe('product model schemas', () => {
 
   it('validates a feature and requires the kind discriminator', () => {
     const feature: ProductFeature = {
-      id: 'clients',
+      id: 'clients.create',
       kind: 'feature',
-      title: 'Clients',
-      routes: ['/clients', '/clients/:id'],
-      elements: [{ id: 'clients.create', type: 'button' }],
+      title: 'Create a client',
+      description: 'Adds a new client to the directory.',
+      entryPoints: ['element:clients.create'],
+      routes: ['/clients'],
+      elements: ['clients.create'],
+      permissions: ['clients:create'],
+      workflows: ['clients.create#workflow'],
+      relatedFeatures: [],
+      questions: ['How do I create a client?'],
+      claims: ['clients.create#description:1'],
+      evidence: [{ ref: 'element:clients.create', kind: 'node' }],
+      confidence: 1,
+      claimSummary: {
+        factualClaims: 1,
+        structurallyVerified: 1,
+        factualRejected: 0,
+        languageClaims: 0,
+        semanticallyGrounded: 0,
+        languageRejected: 0,
+        unsupportedActions: {},
+      },
+      idOrigin: 'semantic-id',
+      dependencyFingerprint: 'abc123',
+      dependsOn: ['element:clients.create'],
     };
     expect(productFeatureSchema.parse(feature)).toEqual(feature);
     expect(productFeatureSchema.safeParse({ ...feature, kind: 'screen' }).success).toBe(false);
-    expect(productFeatureSchema.safeParse({ ...feature, title: '' }).success).toBe(false);
+    expect(productFeatureSchema.safeParse({ ...feature, confidence: 1.5 }).success).toBe(false);
+    expect(productFeatureSchema.safeParse({ ...feature, idOrigin: 'invented' }).success).toBe(
+      false,
+    );
   });
 
-  it('validates a whole product model', () => {
+  it('validates a whole product model and pins the schema version', () => {
     const model: ProductModel = {
-      version: 1,
+      version: 2,
       application: 'demo',
-      features: [{ id: 'clients', kind: 'feature', title: 'Clients' }],
+      source: {
+        graphHash: 'deadbeef',
+        generatorVersion: '0.0.1',
+        provider: 'mock',
+        model: 'mock-1',
+        generatedAt: '2026-08-26T00:00:00.000Z',
+      },
+      features: [],
+      workflows: [],
+      claims: [],
+      permissions: [],
+      verification: {
+        featureCandidates: 0,
+        featuresEnriched: 0,
+        featuresAccepted: 0,
+        featuresRejected: 0,
+        factualClaimsGenerated: 0,
+        structurallyVerified: 0,
+        semanticallyGrounded: 0,
+        claimsRejected: 0,
+        blocked: {
+          unsupportedCapabilities: 0,
+          unsupportedConstraints: 0,
+          unsupportedPermissions: 0,
+          workflowStepsWithoutEvidence: 0,
+          unknownReferences: 0,
+        },
+        evidenceCoverage: 1,
+        rejectionsByReason: {},
+      },
     };
     expect(productModelSchema.parse(model)).toEqual(model);
-    expect(productModelSchema.safeParse({ version: 2, features: [] }).success).toBe(false);
+    expect(productModelSchema.safeParse({ ...model, version: 1 }).success).toBe(false);
   });
 });
 
+describe('model response schemas — untrusted input', () => {
+  const valid = {
+    title: 'Create a client',
+    description: 'Adds a new client to the directory.',
+    factualClaims: [
+      {
+        type: 'capability' as const,
+        text: 'You can create a client from the Clients screen.',
+        subjectRef: 'feature:clients.create',
+        action: 'create' as const,
+        targets: ['element:clients.create', 'api:POST:/api/clients'],
+      },
+    ],
+    languageClaims: [
+      { type: 'user_question' as const, text: 'How do I create a client?', targets: [] },
+    ],
+    confidenceReason: 'the element and its endpoint are both present',
+  };
+
+  it('accepts a well-formed enrichment', () => {
+    expect(featureEnrichmentSchema.parse(valid)).toMatchObject({ title: 'Create a client' });
+  });
+
+  it('refuses a model that tries to set the feature id', () => {
+    // Identity is decided before the model is called. Failing the shape check is
+    // more informative than silently dropping the field.
+    expect(featureEnrichmentSchema.safeParse({ ...valid, id: 'clients.new' }).success).toBe(false);
+  });
+
+  it('refuses a model that tries to grade its own confidence', () => {
+    expect(featureEnrichmentSchema.safeParse({ ...valid, confidence: 0.99 }).success).toBe(false);
+  });
+
+  it('bounds the response so one call cannot balloon', () => {
+    expect(featureEnrichmentSchema.safeParse({ ...valid, title: 'x'.repeat(200) }).success).toBe(
+      false,
+    );
+    expect(
+      featureEnrichmentSchema.safeParse({
+        ...valid,
+        languageClaims: Array(50).fill({ type: 'synonym', text: 'x', targets: [] }),
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe('structured claims — the shape that makes verification possible', () => {
+  it('forces a factual claim to state what it asserts, not just say it', () => {
+    // This is the whole point of the structured layer. "Clients can be imported
+    // from CSV" cannot be checked as a sentence. Decomposed into a subject and an
+    // action it becomes a question the graph can answer.
+    const parsed = factualClaimEnrichmentSchema.parse({
+      type: 'capability',
+      text: 'Clients can be imported from CSV.',
+      subjectRef: 'feature:clients.create',
+      action: 'import',
+      targets: ['element:clients.create'],
+    });
+    expect(parsed.action).toBe('import');
+    expect(parsed.subjectRef).toBe('feature:clients.create');
+  });
+
+  it('refuses a factual claim that cites nothing', () => {
+    // A factual claim with no targets is an assertion with nowhere to check it.
+    expect(
+      factualClaimEnrichmentSchema.safeParse({
+        type: 'capability',
+        text: 'Clients can be imported from CSV.',
+        subjectRef: 'feature:clients.create',
+        action: 'import',
+        targets: [],
+      }).success,
+    ).toBe(false);
+  });
+
+  it('closes the verb set, so there is no assertion without a rule to check it', () => {
+    expect(
+      factualClaimEnrichmentSchema.safeParse({
+        type: 'capability',
+        text: 'Clients can be reticulated.',
+        subjectRef: 'feature:clients.create',
+        action: 'reticulate',
+        targets: ['element:clients.create'],
+      }).success,
+    ).toBe(false);
+  });
+
+  it('refuses a factual claim smuggled in as a language claim type', () => {
+    expect(
+      factualClaimEnrichmentSchema.safeParse({
+        type: 'purpose',
+        text: 'x',
+        subjectRef: 'feature:clients.create',
+        targets: ['element:clients.create'],
+      }).success,
+    ).toBe(false);
+    expect(
+      languageClaimEnrichmentSchema.safeParse({
+        type: 'capability',
+        text: 'x',
+        targets: [],
+      }).success,
+    ).toBe(false);
+  });
+
+  it('keeps factual and language claim types disjoint', () => {
+    const overlap = FACTUAL_CLAIM_TYPES.filter((type) =>
+      (LANGUAGE_CLAIM_TYPES as readonly string[]).includes(type),
+    );
+    expect(overlap).toEqual([]);
+    for (const type of FACTUAL_CLAIM_TYPES) expect(isFactualClaimType(type)).toBe(true);
+    for (const type of LANGUAGE_CLAIM_TYPES) expect(isFactualClaimType(type)).toBe(false);
+  });
+
+  it('distinguishes the three verification states', () => {
+    // "checked against the graph" and "a sentence we allowed through" are
+    // different guarantees; collapsing them would be the most misleading thing
+    // this model could do.
+    expect(productClaimStatusSchema.options).toEqual([
+      'structurally_verified',
+      'semantically_grounded',
+      'rejected',
+    ]);
+  });
+});
 describe('appContextSchema', () => {
   it('accepts an empty context — every field is optional', () => {
     expect(appContextSchema.parse({})).toEqual({});
@@ -173,5 +362,171 @@ describe('guideActionRequestSchema', () => {
     expect(guideActionRequestSchema.safeParse({ action: 'x', source: 'robot' }).success).toBe(
       false,
     );
+  });
+});
+
+describe('the verification matrix', () => {
+  it('has no rule for the verbs hallucinations reach for', () => {
+    // import/export/send exist in the taxonomy so the verifier can reject them
+    // *explicitly*. No generic graph fact proves an import: a POST endpoint is
+    // not an import, and a button labelled Upload is not an import.
+    for (const action of UNSUPPORTED_CAPABILITY_ACTIONS) {
+      expect(findBuiltInRule('capability', action)).toBeUndefined();
+    }
+  });
+
+  it('distinguishes create from view by HTTP method, not by target count', () => {
+    // The absence of a generic "has targets, therefore true" fallback is the
+    // whole design. A create claim is not satisfied by a GET endpoint.
+    expect(findBuiltInRule('capability', 'create')?.httpMethods).toContain('POST');
+    expect(findBuiltInRule('capability', 'create')?.httpMethods).not.toContain('GET');
+    expect(findBuiltInRule('capability', 'delete')?.httpMethods).toEqual(['DELETE']);
+    expect(findBuiltInRule('capability', 'view')?.httpMethods).toEqual(['GET']);
+  });
+
+  it('refuses to read search out of a list endpoint', () => {
+    // `GET /api/clients` proves clients can be LISTED. Listing is not searching,
+    // and neither is an input element, a query parameter, or a component whose
+    // name contains "Search" — every ordinary read screen has those shapes too.
+    // The graph carries no search signal at all, so there is nothing honest to
+    // build a rule on.
+    expect(findBuiltInRule('capability', 'search')).toBeUndefined();
+    expect(UNSUPPORTED_CAPABILITY_ACTIONS).toContain('search');
+  });
+
+  it('still verifies view from the same read evidence', () => {
+    // The point of removing search is not to weaken read claims. A route,
+    // component or GET endpoint genuinely does prove something is viewable.
+    const view = findBuiltInRule('capability', 'view');
+    expect(view).toBeDefined();
+    expect(view?.nodeKinds).toEqual(expect.arrayContaining(['route', 'component', 'api']));
+    expect(view?.httpMethods).toEqual(['GET']);
+  });
+
+  it('refuses to read creation out of a PUT', () => {
+    // `PUT /clients/:id` is replacement far more often than creation. Accepting
+    // it as create evidence would reclassify ordinary updates as create
+    // capabilities across most codebases — precision over recall says an
+    // uncommon valid PUT-upsert going unsupported is the cheaper mistake.
+    const create = findBuiltInRule('capability', 'create');
+    expect(create?.httpMethods).toEqual(['POST']);
+    expect(create?.httpMethods).not.toContain('PUT');
+  });
+
+  it('accepts PUT for update, because replacement IS an update', () => {
+    // The asymmetry with `create` is deliberate, not an oversight.
+    const update = findBuiltInRule('capability', 'update');
+    expect(update?.httpMethods).toEqual(['PATCH', 'PUT']);
+  });
+
+  it('requires a permission to be connected, not merely to exist', () => {
+    const rule = findBuiltInRule('permission');
+    expect(rule?.relationships).toContain('requires_permission');
+    expect(rule?.requirement).toMatch(/connecting it to the subject/);
+  });
+
+  it('covers every factual claim type or names the gap', () => {
+    for (const type of FACTUAL_CLAIM_TYPES) {
+      const hasRule =
+        BUILT_IN_VERIFICATION_RULES.some((rule) => rule.type === type) || type === 'capability';
+      expect(hasRule).toBe(true);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Empty is absence, not assertion
+//
+// Every field goes to a provider as `required`, because strict structured-output
+// modes reject a partial `required` list. A model with nothing to say therefore
+// answers `""`. Read literally that is a claim about the application, and the
+// verifier — correctly — calls it a fabrication. The first real provider run
+// produced 251 such rejections out of 363, none of which the model had actually
+// asserted.
+// ---------------------------------------------------------------------------
+
+describe('empty optional values from a model', () => {
+  const base = {
+    type: 'capability' as const,
+    text: 'Users can create a client.',
+    subjectRef: 'element:clients.create',
+    targets: ['rel:1'],
+  };
+
+  it('treats an empty route and permission as not stated', () => {
+    const parsed = factualClaimEnrichmentSchema.parse({
+      ...base,
+      route: '',
+      permission: '',
+      subjectLabel: '',
+      action: 'create',
+    });
+    expect(parsed.route).toBeUndefined();
+    expect(parsed.permission).toBeUndefined();
+    expect(parsed.subjectLabel).toBeUndefined();
+    // The rest of the claim is untouched — this is a fidelity fix, not a filter.
+    expect(parsed.action).toBe('create');
+    expect(parsed.targets).toEqual(['rel:1']);
+  });
+
+  it('treats null the same way', () => {
+    const parsed = factualClaimEnrichmentSchema.parse({ ...base, route: null, permission: null });
+    expect(parsed.route).toBeUndefined();
+    expect(parsed.permission).toBeUndefined();
+  });
+
+  it('still carries a real route through unchanged', () => {
+    // The safety-critical half: normalisation must not swallow a genuine value,
+    // or a fabricated route would silently stop being checked.
+    const parsed = factualClaimEnrichmentSchema.parse({ ...base, route: '/clients' });
+    expect(parsed.route).toBe('/clients');
+  });
+
+  it('refuses an empty value on the internal assertion type', () => {
+    // Past the model boundary an empty string is a bug in our own code, so it
+    // is rejected outright rather than normalised a second time.
+    const result = claimAssertionSchema.safeParse({
+      subjectRef: 'element:clients.create',
+      route: '',
+      targets: ['rel:1'],
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('the no-action sentinel', () => {
+  const base = {
+    type: 'navigation' as const,
+    text: 'The Clients page is at /clients.',
+    subjectRef: 'route:/clients',
+    targets: ['rel:1'],
+  };
+
+  it('turns the sentinel into absence, so rule lookup finds the action-free rule', () => {
+    const parsed = factualClaimEnrichmentSchema.parse({ ...base, action: 'none' });
+    expect(parsed.action).toBeUndefined();
+  });
+
+  it('leaves a real action untouched', () => {
+    // The half that must not regress: a capability claim's action still reaches
+    // the verifier, and a navigation claim that genuinely asserts one is still
+    // matched exactly — and still found to have no rule.
+    const parsed = factualClaimEnrichmentSchema.parse({
+      ...base,
+      type: 'capability' as const,
+      action: 'create',
+    });
+    expect(parsed.action).toBe('create');
+    const stillMismatched = factualClaimEnrichmentSchema.parse({ ...base, action: 'navigate' });
+    expect(stillMismatched.action).toBe('navigate');
+  });
+
+  it('never lets the sentinel reach the internal assertion type', () => {
+    const result = claimAssertionSchema.safeParse({
+      subjectRef: 'route:/clients',
+      action: 'none',
+      targets: ['rel:1'],
+    });
+    expect(result.success).toBe(false);
   });
 });
