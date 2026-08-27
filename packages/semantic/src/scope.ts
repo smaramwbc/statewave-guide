@@ -273,12 +273,35 @@ export function computeFeatureScope(input: FeatureScopeInput): FeatureScope {
   }
 
   /** How many nodes reach `target` along `type`. The shared-infrastructure test. */
+  /**
+   * How many independent things reach a node along one edge type.
+   *
+   * "Independent" is doing work in that sentence, and Closed Loop #8 is why it
+   * has to. Until element-to-element `contains` existed, every element had
+   * exactly one container — the component rendering it — so raw in-degree and
+   * independent-owner count were the same number. They are not any more: a field
+   * inside a form is now contained by the form *and* by the component that
+   * renders both, and that is one nesting described at two granularities rather
+   * than two owners.
+   *
+   * Counting it as two demoted every nested control to shared infrastructure.
+   * Measured on the fixture, `clients.create` lost all five of its dialog
+   * controls the moment the new edges appeared — a feature made poorer by
+   * evidence that a form contains its own fields, which is plainly the wrong
+   * direction.
+   *
+   * So containment is counted at its most specific level: where an element
+   * contains the target, the component that also contains it is the same fact
+   * one step further out, and does not vote twice. The rule this protects is
+   * unchanged — a control genuinely contained by two *different* parents is
+   * still shared, and a component rendered by eight pages is still the design
+   * system.
+   */
   const fanIn = (target: string, type: RelationshipType): number => {
-    let count = 0;
-    for (const edge of incoming.get(target) ?? []) {
-      if (edge.type === type) count += 1;
-    }
-    return count;
+    const edges = (incoming.get(target) ?? []).filter((edge) => edge.type === type);
+    if (type !== 'contains') return edges.length;
+    const specific = edges.filter((edge) => edge.source.startsWith('element:'));
+    return specific.length > 0 ? specific.length : edges.length;
   };
 
   const entries = new Map<string, ScopeEntry>();

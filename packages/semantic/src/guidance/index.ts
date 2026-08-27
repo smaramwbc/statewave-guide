@@ -22,7 +22,31 @@ export {
 export type { HumanLabel, LabelIndex, LabelOrigin } from './labels.js';
 export { WORKFLOW_ROLE_ORDER, isActionProposition, mergeProvenance } from './ir.js';
 export { isActionableNode, resolveActionTarget } from './action-target.js';
+export { isUserVisible, resolveTitle, titleEvidenceNode } from './title.js';
+export type { ResolveTitleInput, TitleCandidate, TitleOrigin, TitleOutcome } from './title.js';
 export { ACTION_SURFACE_RELATIONSHIPS, recoverActionTarget } from './action-recovery.js';
+export {
+  PRESENTATIONAL_TERMS,
+  auditLanguageEvidence,
+  buildGroundedTerms,
+  compilePurpose,
+  isPresentational,
+  realisePurpose,
+  singular,
+} from './language.js';
+export type {
+  CompiledQuestion,
+  CompilePurposeInput,
+  GroundedTerm,
+  GroundedTerms,
+  LanguageEvidenceAudit,
+  LanguageProposition,
+  LanguagePropositionType,
+  LanguageRefusal,
+  LanguageSupport,
+  PurposeIR,
+  WithheldProposition,
+} from './language.js';
 export type {
   ActionRecoveryProvenance,
   ActionRecoveryRule,

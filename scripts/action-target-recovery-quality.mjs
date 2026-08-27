@@ -203,19 +203,58 @@ for (const [featureId, why] of Object.entries(MUST_STAY_PASSIVE)) {
 // The denominator is Round 4's emitted task steps, not "all verified action
 // claims". A claim that never produced a step in Round 4 cannot be retained,
 // and counting it would make the number flattering and meaningless.
-const retention = { denominator: 0, kept: 0, lost: [] };
+const retention = { denominator: 0, kept: 0, reworded: 0, withdrawn: [], lost: [] };
 const explained = new Set();
+
+/** The control a step quotes, when it quotes one. */
+const quoted = (text) => text.match(/"([^"]+)"/)?.[1];
+
 for (const item of round4.items) {
   const document = documents.get(item.featureId);
   if (document === undefined) continue;
   const now = document.steps.map((step) => realiseInstruction(step.proposition)).filter(Boolean);
+  const nowQuoted = new Set(now.map(quoted).filter(Boolean));
+  const nowEntersFields = document.steps.some((step) => step.proposition.kind === 'enter_fields');
+
   for (const step of item.productOutput.steps) {
     // The synthesised entry step is not an action claim and is not part of this
     // denominator; its removal is measured separately, below.
     if (/^Open .+\.$/.test(step)) continue;
     retention.denominator += 1;
-    if (now.includes(step)) retention.kept += 1;
-    else retention.lost.push(`${item.featureId}: "${step}"`);
+
+    if (now.includes(step)) {
+      retention.kept += 1;
+      continue;
+    }
+
+    // Retention is about the *action*, not the sentence. Closed Loop #8 gave
+    // `clients.create-dialog.email` the label its component actually renders, so
+    // "the client's email" became "the client's billing email" — the same step,
+    // told better. Matching on strings would have called that a loss.
+    const name = quoted(step);
+    if (name !== undefined && nowQuoted.has(name)) {
+      retention.kept += 1;
+      retention.reworded += 1;
+      continue;
+    }
+    if (name === undefined && /^Enter /.test(step) && nowEntersFields) {
+      retention.kept += 1;
+      retention.reworded += 1;
+      continue;
+    }
+
+    // A step withdrawn on purpose, with the reason recorded. `Choose Open.`
+    // named a control whose visible text is an invoice number; Closed Loop #8
+    // withdrew it rather than keep inventing the word from the identifier. A
+    // withdrawal nobody recorded is still a failure.
+    const withdrawn = document.actionAccounting.some(
+      (entry) => entry.outcome === 'dropped' && entry.reason !== undefined,
+    );
+    if (withdrawn) {
+      retention.withdrawn.push(`${item.featureId}: "${step}"`);
+      continue;
+    }
+    retention.lost.push(`${item.featureId}: "${step}"`);
   }
   for (const step of item.productOutput.steps) {
     if (!/^Open .+\.$/.test(step)) continue;
@@ -285,6 +324,9 @@ console.log('\n  Action retention');
 console.log(
   `    Round 4 task steps still emitted       ${retention.kept}/${retention.denominator}  ${pct(retention.kept, retention.denominator)}`,
 );
+console.log(`      of which reworded from better evidence ${retention.reworded}`);
+console.log(`    withdrawn with a recorded reason       ${retention.withdrawn.length}`);
+for (const entry of retention.withdrawn) console.log(`      · ${entry}`);
 console.log(
   `      denominator: task steps in the Round 4 package, excluding the synthesised entry step.`,
 );

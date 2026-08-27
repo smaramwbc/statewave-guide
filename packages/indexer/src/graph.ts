@@ -11,6 +11,7 @@
  * @packageDocumentation
  */
 
+import type { LabelKind, LabelOrigin } from './extract/labels.js';
 import type { ProductElementType, ProvenanceReference } from '@statewavedev/guide-shared';
 import type { Evidence } from './evidence.js';
 import type { ApplicationNodeKind, HttpMethod } from './node-id.js';
@@ -61,6 +62,24 @@ export interface UIElementNode extends ApplicationNodeBase {
   elementId: string;
   type: ProductElementType;
   label?: string;
+  /**
+   * Where {@link label} came from.
+   *
+   * Recorded because the sources are not equally strong and a consumer has to be
+   * able to weigh them: an author's `data-guide-label` is a statement, a
+   * wrapping `<label>` is markup a user reads, and a prop proven to reach a text
+   * position is an inference — a sound one, and still an inference.
+   */
+  labelOrigin?: LabelOrigin;
+  /**
+   * Whether the control has a readable name at all.
+   *
+   * `dynamic` is the load-bearing value. `<button>{invoice.number}</button>` has
+   * a name that changes per row, and a consumer that cannot tell that from "no
+   * name" will fall back on the identifier and send a user looking for a control
+   * called `Open`. Round 6 shipped exactly that.
+   */
+  labelKind?: LabelKind;
   /** Which attribute declared it. */
   attribute: string;
   /** JSX tag exactly as written. */

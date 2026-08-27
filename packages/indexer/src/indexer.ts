@@ -59,6 +59,7 @@ import { extractCalls } from './extract/calls.js';
 import { extractComponents } from './extract/components.js';
 import { extractDialogs } from './extract/dialogs.js';
 import { sourceEvidence } from './extract/context.js';
+import { extractElementContainment } from './extract/containment.js';
 import { createElementIdRegistry, extractElements } from './extract/elements.js';
 import type { ElementIdRegistry, ExtractedElement } from './extract/elements.js';
 import { extractFunctions } from './extract/functions.js';
@@ -474,6 +475,13 @@ async function runIndex(options: ProjectIndexerOptions): Promise<IndexResult> {
   // Pass 1 — declarations. Every node the graph will hold, and nothing else.
   // -------------------------------------------------------------------------
 
+  // Every file, by path, so a label prop can be followed into the component that
+  // renders it. Built once: the lookup has to work whatever order files are
+  // visited in, because `ClientForm` reads `TextField` and neither is first.
+  const filesByPath = new Map(
+    sourceFiles.map(({ sourceFile, relativePath }) => [relativePath, sourceFile]),
+  );
+
   const registry: ElementIdRegistry = createElementIdRegistry();
   const facts: FileFacts[] = [];
   const routeRecords: { route: ExtractedRoute; file: string }[] = [];
@@ -553,6 +561,7 @@ async function runIndex(options: ProjectIndexerOptions): Promise<IndexResult> {
       relativePath,
       { byFunctionStart: componentIdsByFunctionStart },
       registry,
+      { resolver, filesByPath },
     );
     builder.diagnostics.push(...extracted.diagnostics);
 
@@ -644,6 +653,21 @@ async function runIndex(options: ProjectIndexerOptions): Promise<IndexResult> {
         ),
       );
     }
+
+    // And element inside element. A duplicate sighting contributes no parent,
+    // for the same reason it contributes no behaviour: one node with two parents
+    // answers "what contains this?" twice.
+    const containment = extractElementContainment(
+      file.elements
+        .filter((element) => element.duplicate !== true)
+        .map((element) => ({
+          nodeId: element.node.id,
+          elementId: element.node.elementId,
+          tag: element.tag,
+        })),
+      { relativePath: file.relativePath, elementIdsByTagStart: file.elementIdsByTagStart },
+    );
+    for (const relationship of containment.relationships) addRelationship(builder, relationship);
 
     for (const relationship of extractRenders(file.sourceFile, {
       relativePath: file.relativePath,

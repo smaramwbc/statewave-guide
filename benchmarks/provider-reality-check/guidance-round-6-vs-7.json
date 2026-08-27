@@ -1,0 +1,1230 @@
+{
+  "features": 21,
+  "propositions": 30,
+  "supported": 30,
+  "rows": [
+    {
+      "featureId": "api.get.partial-clients",
+      "before": {
+        "title": "Partial clients",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": []
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": []
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "api.get.partial-clients#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "api.get.partial-clients#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.audit",
+      "before": {
+        "title": "Audit trail",
+        "purpose": "Lets you view the audit trail for a client.",
+        "summary": "You can view a client using \"Audit trail\".",
+        "questions": [
+          "How do I view the audit trail for a client?",
+          "Why can't I see \"Audit trail\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ]
+      },
+      "after": {
+        "title": "Audit trail",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you view the audit trail for a client.",
+        "summary": "You can view a client using \"Audit trail\".",
+        "questions": [
+          "How do I view the audit trail for a client?",
+          "Why can't I see \"Audit trail\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ]
+      },
+      "propositions": [
+        {
+          "type": "action",
+          "value": "view",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.audit#capability:1",
+            "detail": "verified capability action \"view\""
+          }
+        },
+        {
+          "type": "object",
+          "value": "client",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:GET:/api/clients/:param/audit",
+            "attribute": "path",
+            "text": "/api/clients/:clientId/audit"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "audit trail",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:client-detail.audit",
+            "attribute": "label",
+            "text": "Audit trail"
+          }
+        },
+        {
+          "type": "action",
+          "value": "view",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.audit#capability:1",
+            "detail": "verified capability"
+          }
+        },
+        {
+          "type": "object",
+          "value": "client",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:GET:/api/clients/:param/audit",
+            "attribute": "path",
+            "text": "/api/clients/:clientId/audit"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "audit trail",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:client-detail.audit",
+            "attribute": "label",
+            "text": "Audit trail"
+          }
+        },
+        {
+          "type": "condition",
+          "value": "requires permission",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.audit#permission:1",
+            "detail": "verified permission"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "Audit trail",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:client-detail.audit",
+            "attribute": "label",
+            "text": "Audit trail"
+          }
+        }
+      ],
+      "withheld": [],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.audit#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.audit#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.change-plan",
+      "before": {
+        "title": "Upgrade",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Upgrade\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ]
+      },
+      "after": {
+        "title": "Upgrade",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Upgrade\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ]
+      },
+      "propositions": [
+        {
+          "type": "condition",
+          "value": "requires permission",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.change-plan#constraint:1",
+            "detail": "verified permission"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "Upgrade",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:client-detail.change-plan",
+            "attribute": "label",
+            "text": "Upgrade"
+          }
+        }
+      ],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.change-plan#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.change-plan#purpose:2",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.change-plan#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.delete",
+      "before": {
+        "title": "Delete",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Delete\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ]
+      },
+      "after": {
+        "title": "Delete",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Delete\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ]
+      },
+      "propositions": [
+        {
+          "type": "condition",
+          "value": "requires permission",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.delete#permission:1",
+            "detail": "verified permission"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "Delete",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:client-detail.delete",
+            "attribute": "label",
+            "text": "Delete"
+          }
+        }
+      ],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.delete#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.delete#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.rename",
+      "before": {
+        "title": "Rename",
+        "purpose": "Lets you change a client.",
+        "summary": "You can change a client using \"Rename\".",
+        "questions": [
+          "How do I change a client?",
+          "Why can't I see \"Rename\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ]
+      },
+      "after": {
+        "title": "Rename",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you change a client.",
+        "summary": "You can change a client using \"Rename\".",
+        "questions": [
+          "How do I change a client?",
+          "Why can't I see \"Rename\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ]
+      },
+      "propositions": [
+        {
+          "type": "action",
+          "value": "update",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.rename#capability:1",
+            "detail": "verified capability action \"update\""
+          }
+        },
+        {
+          "type": "object",
+          "value": "client",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:PUT:/api/clients/:param",
+            "attribute": "path",
+            "text": "/api/clients/:clientId"
+          }
+        },
+        {
+          "type": "action",
+          "value": "update",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.rename#capability:1",
+            "detail": "verified capability"
+          }
+        },
+        {
+          "type": "object",
+          "value": "client",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:PUT:/api/clients/:param",
+            "attribute": "path",
+            "text": "/api/clients/:clientId"
+          }
+        },
+        {
+          "type": "condition",
+          "value": "requires permission",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "client-detail.rename#constraint:1",
+            "detail": "verified permission"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "Rename",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:client-detail.rename",
+            "attribute": "label",
+            "text": "Rename"
+          }
+        }
+      ],
+      "withheld": [],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.rename#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "client-detail.rename#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.create",
+      "before": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "summary": "You can create a new client using \"New client\".",
+        "questions": [
+          "How do I create a new client?"
+        ],
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's email, name and plan.",
+          "Choose \"Create client\"."
+        ]
+      },
+      "after": {
+        "title": "New client",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you create a new client.",
+        "summary": "You can create a new client using \"New client\".",
+        "questions": [
+          "How do I create a new client?"
+        ],
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ]
+      },
+      "propositions": [
+        {
+          "type": "action",
+          "value": "create",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "clients.create#capability:1",
+            "detail": "verified capability action \"create\""
+          }
+        },
+        {
+          "type": "object",
+          "value": "client",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:POST:/api/clients",
+            "attribute": "path",
+            "text": "/api/clients"
+          }
+        },
+        {
+          "type": "action",
+          "value": "create",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "clients.create#capability:1",
+            "detail": "verified capability"
+          }
+        },
+        {
+          "type": "object",
+          "value": "client",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:POST:/api/clients",
+            "attribute": "path",
+            "text": "/api/clients"
+          }
+        }
+      ],
+      "withheld": [],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.create#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.create#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.create#user_question:2",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.error",
+      "before": {
+        "title": "Error",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.error#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "clients.error#user_question:1",
+          "detail": "Cites component:frontend/src/pages/ClientsPage.tsx#ClientsPage (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.export",
+      "before": {
+        "title": "Export CSV",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ]
+      },
+      "after": {
+        "title": "Export CSV",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.export#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.search",
+      "before": {
+        "title": "Search",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.search#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.search#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.table",
+      "before": {
+        "title": "Table",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.table#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "clients.table#user_question:1",
+          "detail": "Cites component:frontend/src/components/ClientTable.tsx#ClientTable (CONTEXTUAL), element:clients.table.forbidden (OUTSIDE), permission:clients:read (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.table.forbidden",
+      "before": {
+        "title": "You do not have access to the client list.",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": "You do not have access to the client list.",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "clients.table.forbidden#purpose:1",
+          "detail": "Cites component:frontend/src/components/ClientTable.tsx#ClientTable (CONTEXTUAL), permission:clients:read (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "clients.table.forbidden#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "dashboard.new-client",
+      "before": {
+        "title": "New client",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Dashboard."
+        ]
+      },
+      "after": {
+        "title": "New client",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"New client\"?"
+        ],
+        "steps": [
+          "Open Dashboard."
+        ]
+      },
+      "propositions": [
+        {
+          "type": "condition",
+          "value": "requires permission",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "dashboard.new-client#constraint:1",
+            "detail": "verified permission"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "New client",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:dashboard.new-client",
+            "attribute": "label",
+            "text": "New client"
+          }
+        }
+      ],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "dashboard.new-client#purpose:1",
+          "detail": "Cites component:frontend/src/pages/DashboardPage.tsx#DashboardPage (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "dashboard.new-client#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "invoices.create-form.submit",
+      "before": {
+        "title": "Raise invoice",
+        "purpose": "Lets you create a new invoice.",
+        "summary": "You can create a new invoice using \"Raise invoice\".",
+        "questions": [
+          "How do I create a new invoice?",
+          "Why can't I see \"Raise invoice\"?"
+        ],
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ]
+      },
+      "after": {
+        "title": "Raise invoice",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you create a new invoice.",
+        "summary": "You can create a new invoice using \"Raise invoice\".",
+        "questions": [
+          "How do I create a new invoice?",
+          "Why can't I see \"Raise invoice\"?"
+        ],
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ]
+      },
+      "propositions": [
+        {
+          "type": "action",
+          "value": "create",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "invoices.create-form.submit#capability:1",
+            "detail": "verified capability action \"create\""
+          }
+        },
+        {
+          "type": "object",
+          "value": "invoice",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:POST:/api/invoices",
+            "attribute": "path",
+            "text": "/api/invoices"
+          }
+        },
+        {
+          "type": "action",
+          "value": "create",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "invoices.create-form.submit#capability:1",
+            "detail": "verified capability"
+          }
+        },
+        {
+          "type": "object",
+          "value": "invoice",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "api:POST:/api/invoices",
+            "attribute": "path",
+            "text": "/api/invoices"
+          }
+        },
+        {
+          "type": "condition",
+          "value": "requires permission",
+          "support": {
+            "kind": "claim-assertion",
+            "claimId": "invoices.create-form.submit#permission:1",
+            "detail": "verified permission"
+          }
+        },
+        {
+          "type": "artifact",
+          "value": "Raise invoice",
+          "support": {
+            "kind": "owned-node",
+            "nodeId": "element:invoices.create-form.submit",
+            "attribute": "label",
+            "text": "Raise invoice"
+          }
+        }
+      ],
+      "withheld": [],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "invoices.create-form.submit#purpose:1",
+          "detail": "Cites element:invoices.create-form (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "invoices.create-form.submit#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "invoices.list.clear",
+      "before": {
+        "title": "Clear selection",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Choose \"Clear selection\"."
+        ]
+      },
+      "after": {
+        "title": "Clear selection",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Choose \"Clear selection\"."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "invoices.list.clear#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "invoices.list.clear#user_question:1",
+          "detail": "Cites element:invoices.list (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        }
+      ]
+    },
+    {
+      "featureId": "invoices.list.open",
+      "before": {
+        "title": "Open",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Choose Open."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": []
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "invoices.list.open#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "invoices.list.open#user_question:1",
+          "detail": "Cites element:invoices.list.row (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        }
+      ]
+    },
+    {
+      "featureId": "nav.clients",
+      "before": {
+        "title": "Clients",
+        "purpose": null,
+        "summary": "Open Clients.",
+        "questions": [],
+        "steps": [
+          "Choose \"Clients\"."
+        ]
+      },
+      "after": {
+        "title": "Clients",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": "Open Clients.",
+        "questions": [],
+        "steps": [
+          "Choose \"Clients\"."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "nav.clients#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "nav.clients#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.danger-zone",
+      "before": {
+        "title": "Danger zone",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "settings.danger-zone#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "settings.danger-zone#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.form",
+      "before": {
+        "title": "Form",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "settings.form#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "settings.form#user_question:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.new-key",
+      "before": {
+        "title": "New key",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "settings.new-key#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "settings.new-key#user_question:1",
+          "detail": "Cites element:settings.rotate-key (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.rotate-key",
+      "before": {
+        "title": "Rotate API key",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ]
+      },
+      "after": {
+        "title": "Rotate API key",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+          "subject": "settings.rotate-key#purpose:1",
+          "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead."
+        },
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "settings.rotate-key#user_question:1",
+          "detail": "Cites element:settings.new-key (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.save",
+      "before": {
+        "title": "Save changes",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "after": {
+        "title": "Save changes",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "propositions": [],
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ],
+      "diagnostics": [
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "settings.save#purpose:1",
+          "detail": "Cites element:settings.form (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        },
+        {
+          "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+          "subject": "settings.save#user_question:1",
+          "detail": "Cites permission:settings:update (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that."
+        }
+      ]
+    }
+  ]
+}

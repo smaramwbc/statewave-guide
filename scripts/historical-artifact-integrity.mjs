@@ -72,6 +72,14 @@ const CHECKS = [
   ['round-3-vs-4 audit', ['scripts/guidance-round-3-vs-4.mjs']],
   ['round-4-vs-5 audit', ['scripts/guidance-round-4-vs-5.mjs']],
   ['action-target-recovery', ['scripts/action-target-recovery-quality.mjs']],
+  ['round-5-vs-6 audit', ['scripts/guidance-round-5-vs-6.mjs']],
+  ['semantic-language-authority', ['scripts/semantic-language-authority-quality.mjs']],
+  ['review-fact-coverage', ['scripts/build-human-review-6.mjs', '--check']],
+  ['round-6-vs-7 audit', ['scripts/guidance-round-6-vs-7.mjs']],
+  ['title-authority', ['scripts/title-authority-quality.mjs']],
+  ['user-visible-labels', ['scripts/user-visible-label-quality.mjs']],
+  ['element-containment', ['scripts/element-containment-quality.mjs']],
+  ['review-action-fact-coverage', ['scripts/build-human-review-7.mjs', '--check']],
   ['guidance-quality', ['scripts/guidance-quality.mjs']],
   ['workflow-selection-quality', ['scripts/workflow-selection-quality.mjs']],
 ];
@@ -91,6 +99,34 @@ for (const [label, argv] of CHECKS) {
   }
 }
 
+/**
+ * The same artefacts, as git has them.
+ *
+ * Hashing before and after catches a check that mutates during the run, and it
+ * cannot catch a check that mutates *deterministically* — once the damage is
+ * done, the before and after hashes agree and the run goes green. That is not
+ * hypothetical: `test:review-fact-coverage` rewrote the issued Round 6 package
+ * on every invocation for a whole loop, because its `--check` exit sat below the
+ * writes, and this file reported PASS each time.
+ *
+ * So the working tree is also compared against what is committed. A historical
+ * artefact that differs from HEAD is a falsified record whether or not this run
+ * is the one that falsified it.
+ */
+function committedDifferences() {
+  const relative = historicalArtefacts().map((file) => path.relative(ROOT, file));
+  try {
+    const output = execFileSync('git', ['diff', '--name-only', 'HEAD', '--', ...relative], {
+      cwd: ROOT,
+      encoding: 'utf8',
+    });
+    return output.split('\n').filter((line) => line.trim().length > 0);
+  } catch {
+    // No git, or no HEAD yet. The before-and-after check still applies.
+    return [];
+  }
+}
+
 const after = snapshot();
 const changed = [];
 for (const [file, digest] of before) {
@@ -100,6 +136,14 @@ for (const [file, digest] of before) {
 }
 for (const file of after.keys()) {
   if (!before.has(file)) changed.push(`${path.basename(file)} was created`);
+}
+
+const uncommitted = committedDifferences();
+if (uncommitted.length > 0) {
+  console.log('');
+  for (const file of uncommitted) console.log(`    ✗ ${file} differs from the committed record`);
+  console.log('\nFAIL — a historical artefact no longer matches what was checkpointed.\n');
+  process.exit(1);
 }
 
 console.log('');

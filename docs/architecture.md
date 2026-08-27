@@ -410,6 +410,35 @@ out and one edge back, and there is no search: nearby is not ownership. See
 [ADR 0014](adr/0014-a-feature-reference-is-not-a-control.md) and
 [ADR 0015](adr/0015-action-target-recovery-is-bounded-structural-resolution.md).
 
+### What a sentence may say
+
+A `semantically_grounded` claim is _attached to evidence, not proven true_ — and that was enforced
+at the level of the claim, never at the level of what the claim **says**. A sentence is not a unit:
+_"Lets an account manager move a client onto the enterprise plan"_ is an actor, an action, an object
+and a target state sharing one full stop, and two evidence refs licensed all four.
+
+Measured across Round 5's twenty-one features: **194 user-facing propositions, 97 supported.** The
+split decided the design — the summary line, compiled from typed propositions since Closed Loop #4,
+was 82% supported; the purpose line, passed through from the model, was 38%.
+
+So no user-facing sentence is passed through. Each is built from propositions that carry their own
+support, on the layering the guidance layer already uses:
+
+```
+language claim → PurposeIR → realisePurpose
+```
+
+A language claim decides **whether** to speak and **which grounded word** to use. It cannot create a
+role, a plan tier, a navigation guarantee, a motive or an architectural status — not because a filter
+removes them, but because no path exists from a sentence to the page along which one could arrive.
+
+Vocabulary is owned. `settings.rotate-key` may say _API key_ because its own button carries the
+words; `settings.danger-zone`, the section wrapping that button, may not. An artifact must be named
+twice — by an owned label **and** an owned endpoint path — because a label alone is English on a
+button and a path segment alone is an identifier. Questions are compiled the same way: a question
+mark does not reduce factual authority. See
+[ADR 0017](adr/0017-semantic-language-is-a-projection-of-supported-propositions.md).
+
 ### Claims, not documents
 
 `ProductClaim` is the unit. Factual claims (`capability`, `navigation`,
