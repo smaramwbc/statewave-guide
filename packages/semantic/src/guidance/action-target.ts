@@ -45,7 +45,17 @@ export type ActionTargetSource =
   /** The candidate's own root, recorded by discovery. */
   | 'feature-root'
   /** An element the feature's scope owns, reached along its behaviour spine. */
-  | 'owned-action';
+  | 'owned-action'
+  /**
+   * A control the graph proves acts on a surface this feature owns.
+   *
+   * Only ever produced by {@link recoverActionTarget}, and only after direct
+   * resolution has declined. Recorded distinctly because a recovered target is
+   * a weaker kind of fact than a root: it is inferred from where the work
+   * happens rather than read off the candidate, and anything auditing the
+   * output should be able to tell the two apart without re-deriving them.
+   */
+  | 'recovered-action-surface';
 
 /** A control a user can act on, resolved from a claim's subject. */
 export interface WorkflowActionTarget {

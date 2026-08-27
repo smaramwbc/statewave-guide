@@ -70,6 +70,8 @@ function snapshot() {
 const CHECKS = [
   ['no-factual-expansion', ['scripts/guidance-snapshot.mjs']],
   ['round-3-vs-4 audit', ['scripts/guidance-round-3-vs-4.mjs']],
+  ['round-4-vs-5 audit', ['scripts/guidance-round-4-vs-5.mjs']],
+  ['action-target-recovery', ['scripts/action-target-recovery-quality.mjs']],
   ['guidance-quality', ['scripts/guidance-quality.mjs']],
   ['workflow-selection-quality', ['scripts/workflow-selection-quality.mjs']],
 ];

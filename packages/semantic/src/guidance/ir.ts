@@ -29,6 +29,7 @@
  */
 
 import type { CapabilityAction } from '@statewavedev/guide-shared';
+import type { ActionRecoveryProvenance } from './action-recovery.js';
 import type { HumanLabel } from './labels.js';
 
 /**
@@ -259,8 +260,10 @@ export interface GuidanceDiagnostic {
     | 'QUESTION_DISCARDED_AS_TECHNICAL'
     | 'NO_ACTIONABLE_TARGET'
     | 'AMBIGUOUS_WORKFLOW_TARGET'
+    | 'AMBIGUOUS_ACTION_TARGET'
     | 'PASSIVE_TARGET'
-    | 'ENTRY_ROUTE_AMBIGUOUS';
+    | 'ENTRY_ROUTE_AMBIGUOUS'
+    | 'REDUNDANT_ENTRY_STEP';
   detail: string;
   /** What it concerns, when it concerns something nameable. */
   subject?: string;
@@ -310,6 +313,16 @@ export interface GuidanceDocument {
   conditions: readonly GuidanceCondition[];
   /** Developer-facing. Never rendered into user copy. */
   diagnostics: readonly GuidanceDiagnostic[];
+  /**
+   * Every action target recovered rather than named, with the walk behind it.
+   *
+   * Separate from `actionAccounting` because it answers a different question. A
+   * reader auditing the guide wants to know which steps rest on an inference —
+   * *this control was not claimed, it was found* — and how far the inference
+   * reached. Empty for the great majority of features, and that is the point:
+   * it is a list of the places where the compiler went looking.
+   */
+  actionRecoveries: readonly ActionRecoveryProvenance[];
   completeness: GuidanceCompleteness;
   /** How far the steps take a user through the task. Diagnostic only. */
   taskCompletion: TaskCompletion;
@@ -332,6 +345,7 @@ export interface ActionAccountingEntry {
   reason?:
     | 'NO_ACTIONABLE_TARGET'
     | 'AMBIGUOUS_WORKFLOW_TARGET'
+    | 'AMBIGUOUS_ACTION_TARGET'
     | 'PASSIVE_TARGET'
     | 'DUPLICATE_ACTION'
     | 'UNSUPPORTED_PRESENTATION'
@@ -339,6 +353,15 @@ export interface ActionAccountingEntry {
   detail?: string;
   /** The control it resolved to, when it resolved. */
   targetNodeId?: string;
+  /**
+   * What recovery made of it, on the claims where direct resolution declined.
+   *
+   * Recorded on every such drop, including the ones recovery could not help
+   * with, so the funnel has an exact denominator: how many claims were offered
+   * to the rule, how many reached an eligible surface, and how many it refused.
+   * A rule whose refusals are invisible cannot be argued with.
+   */
+  recovery?: 'none' | 'ambiguous' | 'passive' | 'unsupported-relationship';
 }
 
 /** Merges provenance without duplicating refs, keeping order stable. */

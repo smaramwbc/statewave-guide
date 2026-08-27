@@ -33,6 +33,8 @@ import type { FeatureCandidate } from '../candidates.js';
 import { compareStrings } from '../compare.js';
 import { computeFeatureScope } from '../scope.js';
 import type { FeatureScope } from '../scope.js';
+import { recoverActionTarget } from './action-recovery.js';
+import type { ActionRecoveryProvenance } from './action-recovery.js';
 import { resolveActionTarget } from './action-target.js';
 import type { WorkflowActionTarget } from './action-target.js';
 import { createLabelIndex, entityNoun, fieldNoun, normaliseIdentifier } from './labels.js';
@@ -118,26 +120,48 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     });
 
   const accounting: ActionAccountingEntry[] = [];
-  /** Resolves one action claim to a control, recording whatever happens. */
+  /** Every recovery that fired, so a reader can argue with each one. */
+  const recoveries: ActionRecoveryProvenance[] = [];
+  /**
+   * Resolves one action claim to a control, recording whatever happens.
+   *
+   * Precedence is fixed and one-directional: a direct verified target wins, and
+   * recovery runs only where direct resolution has already declined. A recovered
+   * control may never displace one the claim named itself.
+   */
   const targetFor = (claim: ProductClaim): WorkflowActionTarget | undefined => {
     const subjectRef = claim.assertion?.subjectRef ?? '';
     const outcome = resolveActionTarget({ subjectRef, candidate, scope, graph });
     if (outcome.status === 'resolved') return outcome.target;
 
+    // Direct resolution declined. The subject may still be a passive surface
+    // whose action the graph proves belongs to a control — a `<form>` and the
+    // button that submits it are one act recorded as two nodes.
+    const recovered = recoverActionTarget({ subjectRef, candidate, scope, graph });
+    if (recovered.status === 'resolved') {
+      recoveries.push(recovered.provenance);
+      return recovered.target;
+    }
+
     const reason =
-      outcome.status === 'ambiguous'
-        ? 'AMBIGUOUS_WORKFLOW_TARGET'
-        : outcome.status === 'passive-target'
-          ? 'PASSIVE_TARGET'
-          : 'NO_ACTIONABLE_TARGET';
+      recovered.status === 'ambiguous'
+        ? 'AMBIGUOUS_ACTION_TARGET'
+        : outcome.status === 'ambiguous'
+          ? 'AMBIGUOUS_WORKFLOW_TARGET'
+          : outcome.status === 'passive-target'
+            ? 'PASSIVE_TARGET'
+            : 'NO_ACTIONABLE_TARGET';
+    const detail =
+      recovered.status === 'ambiguous' ? recovered.detail : `${outcome.detail} ${recovered.detail}`;
     accounting.push({
       claimId: claim.id,
       subjectRef,
       outcome: 'dropped',
       reason,
-      detail: outcome.detail,
+      detail,
+      recovery: recovered.status,
     });
-    diagnostics.push({ code: reason, detail: outcome.detail, subject: claim.id });
+    diagnostics.push({ code: reason, detail, subject: claim.id });
     return undefined;
   };
 
@@ -236,6 +260,7 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     entryScreen(feature, candidate, graph, labels, diagnostics),
     targetFor,
     accounting,
+    graph,
   );
 
   // --- Summary and purpose -------------------------------------------------
@@ -273,6 +298,7 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     completeness: 'EMPTY',
     taskCompletion,
     actionAccounting: accounting,
+    actionRecoveries: recoveries,
   };
   return { ...document, completeness: completenessOf(document) };
 }
@@ -346,6 +372,7 @@ function compileSteps(
   entry: { label: HumanLabel; nodeId: string } | undefined,
   targetFor: (claim: ProductClaim) => WorkflowActionTarget | undefined,
   accounting: ActionAccountingEntry[],
+  graph: ApplicationGraph,
 ): GuidanceStep[] {
   const actionClaims = factual.filter(
     (claim) =>
@@ -418,7 +445,34 @@ function compileSteps(
   // on, which the scope classifies as context — legitimate to name, and never
   // usable as evidence for a capability. Marked `synthetic-entry`, because
   // nobody claimed it and no metric should count it as something a user does.
-  if (entry !== undefined) {
+  //
+  // Unless a verified action already goes there. `nav.clients` produced
+  // "Open Clients." followed by 'Choose "Clients".' — one navigation act
+  // written twice, and the Round 4 reviewer's only `repetitive` flag. The test
+  // is structural: the control the verified step names carries `navigates_to`
+  // to the very route the entry step would announce. The verified action wins,
+  // because it names the control and the synthesised one only names the screen.
+  const entryRoute = entry?.nodeId;
+  const entryReachedByTask =
+    entryRoute !== undefined &&
+    [...seen.values()].some((candidate) =>
+      graph.relationships.some(
+        (edge) =>
+          edge.type === 'navigates_to' &&
+          edge.source === candidate.target.nodeId &&
+          edge.target === entryRoute,
+      ),
+    );
+
+  if (entry !== undefined && entryReachedByTask) {
+    diagnostics.push({
+      code: 'REDUNDANT_ENTRY_STEP',
+      detail: `A verified action already navigates to ${entry.nodeId}, so the synthesised "go here" step would say the same thing twice. The verified action is kept because it names the control.`,
+      subject: entry.nodeId,
+    });
+  }
+
+  if (entry !== undefined && !entryReachedByTask) {
     steps.push({
       index: index++,
       role: 'entry',
@@ -443,6 +497,34 @@ function compileSteps(
     // claim is ever *about* the email box.
     if (role === 'input') {
       const fields = collectFields(fieldNodes, labels);
+
+      // Whatever happens next, say what became of the claims that resolved to
+      // an input. This branch used to record nothing at all: `clients.search`
+      // resolved its only workflow step to the search box, `collectFields`
+      // declined to name a lone unlabelled input, and the claim vanished with
+      // no accounting entry and no diagnostic — a silent drop of exactly the
+      // kind Closed Loop #5 was written to end, surviving inside the fix.
+      for (const candidate of byRole.get('input') ?? []) {
+        if (fields.length > 0) {
+          accounting.push({
+            claimId: candidate.claim.id,
+            subjectRef: candidate.claim.assertion?.subjectRef ?? '',
+            outcome: 'emitted',
+            targetNodeId: candidate.target.nodeId,
+          });
+          continue;
+        }
+        accounting.push({
+          claimId: candidate.claim.id,
+          subjectRef: candidate.claim.assertion?.subjectRef ?? '',
+          outcome: 'dropped',
+          reason: 'UNSUPPORTED_PRESENTATION',
+          detail:
+            'The control resolved to an input, and nothing on screen names what goes in it. A lone unlabelled box can only be named from its identifier, which says what the box is for rather than what to type — "Enter the client\u2019s search".',
+          targetNodeId: candidate.target.nodeId,
+        });
+      }
+
       if (fields.length > 0) {
         const proposition: GuidanceProposition = {
           kind: 'enter_fields',

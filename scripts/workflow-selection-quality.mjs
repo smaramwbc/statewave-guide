@@ -56,6 +56,8 @@ const metrics = {
   emittedActionSteps: 0,
   droppedActionClaims: 0,
   deduplicated: 0,
+  /** Resolved to a real control that carries no name a reader could look for. */
+  resolvedButUnsayable: 0,
 };
 const dropReasons = {};
 const completeness = {};
@@ -94,9 +96,21 @@ for (const feature of model.features) {
     dropReasons[entry.reason] = (dropReasons[entry.reason] ?? 0) + 1;
     if (entry.reason === 'DUPLICATE_ACTION') metrics.deduplicated += 1;
 
-    // A claim that resolved to a control and is not a duplicate must appear.
-    // This is the Round 3 defect stated as a check.
-    if (entry.targetNodeId !== undefined && entry.reason !== 'DUPLICATE_ACTION') {
+    // A claim that resolved to a control, is not a duplicate, and can be
+    // phrased must appear. This is the Round 3 defect stated as a check, and
+    // the third condition is not the same as the first two: `clients.search`
+    // resolves to a real owned input carrying no text a reader could look for,
+    // and the only name available comes from the identifier — which is how
+    // "Enter the client's search" reached a reviewer. Resolvable is not
+    // sayable. Counted below rather than waved through.
+    if (entry.reason === 'UNSUPPORTED_PRESENTATION' && entry.targetNodeId !== undefined) {
+      metrics.resolvedButUnsayable += 1;
+    }
+    if (
+      entry.targetNodeId !== undefined &&
+      entry.reason !== 'DUPLICATE_ACTION' &&
+      entry.reason !== 'UNSUPPORTED_PRESENTATION'
+    ) {
       failures.push(
         `${feature.id}: ${entry.claimId} resolved to ${entry.targetNodeId} and was dropped anyway (${entry.reason})`,
       );
@@ -122,7 +136,13 @@ for (const feature of model.features) {
   }
 }
 
-const retainable = metrics.resolvedActionTargets - metrics.deduplicated;
+// The denominator, stated exactly. Not "all verified action claims": a claim
+// whose subject resolves to nothing is not retainable, a duplicate of another
+// claim must not be emitted twice, and a control the interface never names
+// cannot be spoken about. Retention over the wrong denominator is a number that
+// only ever goes up.
+const retainable =
+  metrics.resolvedActionTargets - metrics.deduplicated - metrics.resolvedButUnsayable;
 const retention = retainable === 0 ? 1 : metrics.emittedActionSteps / retainable;
 
 const say = (line = '') => console.log(line);
@@ -134,9 +154,12 @@ say(`  resolved action targets              ${metrics.resolvedActionTargets}`);
 say(`  emitted action steps                 ${metrics.emittedActionSteps}`);
 say(`  dropped action claims                ${metrics.droppedActionClaims}`);
 say('');
+say(`  resolved but unsayable               ${metrics.resolvedButUnsayable}`);
+say('');
 say(
-  `  action retention                     ${(retention * 100).toFixed(0)}%  (${metrics.emittedActionSteps}/${retainable}, de-duplicated excluded)`,
+  `  action retention                     ${(retention * 100).toFixed(0)}%  (${metrics.emittedActionSteps}/${retainable})`,
 );
+say('    denominator: resolved targets, minus de-duplicated, minus unsayable.');
 
 say('\n  Why a claim was dropped\n');
 for (const [reason, count] of Object.entries(dropReasons).sort()) {

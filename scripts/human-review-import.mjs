@@ -198,9 +198,11 @@ if (scored.scoredBy === null || scored.scoredBy === undefined || scored.scoredBy
  * Who reviewed, as a kind rather than as a name.
  *
  * Required, and required to be one of two values, because the distinction
- * decides what the result *is*. A capable model scoring this package produces
- * useful independent evidence and does not close the Human Usefulness Gate, and
- * a name alone does not reliably say which happened — the Round 2 reviewer
+ * decides which gate the result belongs to. A capable model scoring this
+ * package produces useful independent evidence, passes or fails
+ * `DEVELOPMENT_USEFULNESS_GATE`, and leaves `FORMAL_HUMAN_VALIDATION_GATE`
+ * exactly where it was — deferred, unattempted (ADR 0016). A name alone does
+ * not reliably say which happened — the Round 2 reviewer
  * identified itself honestly in prose, and prose is not something a script can
  * check. Recording the kind explicitly means a later reader cannot mistake one
  * for the other, and neither can a summary.
@@ -246,8 +248,9 @@ console.log(
   `  gate       ${issued.gateVersion ?? USEFULNESS_GATE.version}  ·  thresholds ${USEFULNESS_GATE.version}, frozen ${USEFULNESS_GATE.frozenOn}\n`,
 );
 if (scored.reviewerType !== 'human') {
-  console.log('  This is not the human gate. It is independent evidence, and the formal');
-  console.log('  Human Usefulness Gate stays open until a person scores the package.\n');
+  console.log('  This scores DEVELOPMENT_USEFULNESS_GATE, which accepts a non-human reviewer.');
+  console.log('  FORMAL_HUMAN_VALIDATION_GATE is DEFERRED_UNTIL_PRE_RELEASE and is not');
+  console.log('  affected by this result, whatever it says. See ADR 0016.\n');
 }
 
 console.log('  Usefulness\n');
@@ -338,11 +341,27 @@ const passed = checks.every((check) => check.passed);
 console.log(
   `\n  ${passed ? 'PASS' : 'FAIL'} — usefulness gate ${issued.gateVersion ?? USEFULNESS_GATE.version}, thresholds ${USEFULNESS_GATE.version}`,
 );
+// Both gates, named, every time. The thresholds and the arithmetic above are
+// untouched; what changed is that a reader can no longer take "the usefulness
+// gate passed" for validation, because the line never appears without the
+// other one beside it. ADR 0016.
+console.log('');
 console.log(
   scored.reviewerType === 'human'
-    ? '  Human Usefulness Gate: CLOSED by this review.\n'
-    : '  Human Usefulness Gate: STILL OPEN — this reviewer was not human.\n',
+    ? `  DEVELOPMENT_USEFULNESS_GATE     ${passed ? 'PASS' : 'FAIL'}   (human reviewer)`
+    : `  DEVELOPMENT_USEFULNESS_GATE     ${passed ? 'PASS' : 'FAIL'}   (non-human reviewer, permitted here)`,
 );
+console.log(
+  scored.reviewerType === 'human'
+    ? `  FORMAL_HUMAN_VALIDATION_GATE    ${passed ? 'PASS' : 'FAIL'}   (closed by this review)`
+    : '  FORMAL_HUMAN_VALIDATION_GATE    DEFERRED_UNTIL_PRE_RELEASE',
+);
+if (scored.reviewerType !== 'human') {
+  console.log('');
+  console.log('  This reviewer was not human. Nothing here is human validation, and no');
+  console.log('  number of rounds of it becomes any. The product is not validated.');
+}
+console.log('');
 
 // --- Correlations, now that scoring is done ---------------------------------
 

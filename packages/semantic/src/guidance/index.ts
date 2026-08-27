@@ -22,6 +22,13 @@ export {
 export type { HumanLabel, LabelIndex, LabelOrigin } from './labels.js';
 export { WORKFLOW_ROLE_ORDER, isActionProposition, mergeProvenance } from './ir.js';
 export { isActionableNode, resolveActionTarget } from './action-target.js';
+export { ACTION_SURFACE_RELATIONSHIPS, recoverActionTarget } from './action-recovery.js';
+export type {
+  ActionRecoveryProvenance,
+  ActionRecoveryRule,
+  ActionTargetRecoveryOutcome,
+  RecoverActionTargetInput,
+} from './action-recovery.js';
 export type {
   ActionTargetOutcome,
   ActionTargetSource,

@@ -375,6 +375,41 @@ Where nothing can be established, the output is silence and the reason becomes a
 developer diagnostic. See [ADR 0012](adr/0012-product-truth-and-user-guidance-are-different-projections.md)
 and [ADR 0013](adr/0013-internal-epistemic-state-is-not-user-copy.md).
 
+### Which control a user presses
+
+A verified action claim says something happens. It does not always say what to
+press: a `workflow_step` may name its subject as `feature:<id>`, and a
+`capability:submit` may sit on a `<form>` — and nobody presses a form. Resolving
+that gap is a separate job from verifying the claim, and it runs in three stages
+with a fixed precedence.
+
+| Stage        | Resolves                                            |
+| ------------ | --------------------------------------------------- |
+| **Direct**   | A subject naming an actionable node, to that node   |
+| **Root**     | A `feature:` subject, through the candidate's roots |
+| **Recovery** | A passive subject, to the control doing its work    |
+
+Nothing here consults the _text_ of an identifier. `feature:clients.export` does
+not become `element:clients.export` because the suffixes agree; it becomes that
+node only if discovery already recorded the mapping, the scope owns it, and the
+graph proves a user can act on it.
+
+Recovery is the third stage and the most tightly bounded. A passive element that
+carries `submits_to` or `invokes` to a node the feature **owns** — its _action
+surface_ — resolves to the unique actionable element carrying the same edge to
+the same surface. `settings.form` reaches **Save changes** because both submit to
+`saveSettings`. `settings.danger-zone` reaches nothing, because a `<section>`
+submits to nothing at all. Ownership is of the _action_, not of the control:
+recovery asks whether the feature owns the work, which is why it cannot borrow a
+button that does something else on the same screen.
+
+`navigates_to` is deliberately not an action surface. Two links to `/invoices`
+prove only that they lead to the same place. Ambiguity — two controls on one
+handler — emits nothing and records `AMBIGUOUS_ACTION_TARGET`. Depth is one edge
+out and one edge back, and there is no search: nearby is not ownership. See
+[ADR 0014](adr/0014-a-feature-reference-is-not-a-control.md) and
+[ADR 0015](adr/0015-action-target-recovery-is-bounded-structural-resolution.md).
+
 ### Claims, not documents
 
 `ProductClaim` is the unit. Factual claims (`capability`, `navigation`,
