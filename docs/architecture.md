@@ -319,13 +319,61 @@ Verifier                  the selected claim re-checked against the graph
       ↓
 ProductModel              accepted and rejected claims, both persisted
       ↓
-Renderer                  deterministic projection — Markdown, and whatever comes after it
+GuidanceIR                what a user should be told — selection and arrangement,
+                          never addition
+      ↓
+Renderer                  deterministic phrasing — Markdown, and whatever comes after it
 ```
 
 The model's position in that list is the design. It is handed a bounded set of
 things it is already known to be allowed to say, it chooses among them and writes
 the sentence, and what it chose is checked again on the way out. Everything before
 and after it is reproducible without a network call.
+
+### Guidance is a projection, not a printout
+
+The last two stages used to be one, and an independent usefulness review found
+out what that costs. Rendering a `ProductModel` straight into prose put its
+internal vocabulary in front of users: ten of twenty-one features carried the
+sentence _"No capability, route or permission has been verified for this
+feature"_, and every one of them was flagged as too technical. Two of them
+printed it directly above a confident description of what the control does, so
+the page disagreed with itself in consecutive lines.
+
+The four layers now answer four different questions.
+
+|                    | Question                           |
+| ------------------ | ---------------------------------- |
+| `ApplicationGraph` | What does the code do?             |
+| `ProductModel`     | What do we know about the product? |
+| `GuidanceIR`       | What should we tell the user?      |
+| Renderer           | How should we phrase it?           |
+
+`GuidanceIR` selects. A `ProductModel` holds more truth than a guide chooses to
+say, and that gap is the point rather than a loss: _"Input is validated before it
+is accepted"_ was verified, accurate, and flagged as irrelevant three times,
+because it answered no question anyone had asked.
+
+Three rules give the layer its shape. Guidance is assembled from typed
+propositions — `perform_action`, `navigate`, `enter_fields`, `confirm_action` and
+four more — rather than by joining fragments of claim text, which is how _"submit
+the invoices create form form"_ was once produced. Names come from a `HumanLabel`
+whose origin is recorded, so a control's visible text may be quoted back to a
+reader and a noun derived from an identifier may not. And step order comes from a
+role — entry, trigger, container, input, confirmation, result — rather than from
+how deep a node sits in the graph, because containment nests the opposite way
+from use: a form is _inside_ a dialog that is _opened by_ a button, so sorting by
+depth prints the procedure backwards.
+
+What the layer may not do is add. Every proposition carries provenance to the
+claims and graph facts behind it, and a check compares the compiled guidance
+against the accepted model for every feature. It earned its place on its first
+run, catching a step that had quietly defaulted its action to `navigate` and so
+asserted a navigation no claim established.
+
+Where nothing can be established, the output is silence and the reason becomes a
+developer diagnostic. See [ADR 0012](adr/0012-product-truth-and-user-guidance-are-different-projections.md)
+and [ADR 0013](adr/0013-internal-epistemic-state-is-not-user-copy.md).
 
 ### Claims, not documents
 

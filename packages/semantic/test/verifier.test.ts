@@ -666,10 +666,34 @@ describe('feature acceptance', () => {
     expect(result.accepted).toBe(false);
   });
 
-  it('refuses a feature whose description did not survive redaction', () => {
+  it('reports a description that did not survive redaction, and keeps the feature', () => {
+    // The model's own description never reaches a reader — the pipeline replaces
+    // it with prose composed from accepted claims — so a description that
+    // reduces entirely to a credential costs nothing that is presented. It is
+    // still a fact about the response worth surfacing, so it warns.
+    //
+    // Refusing the feature outright is what broke replay: a reused feature is
+    // reconstructed from the *stored* description, and the renderer now says
+    // nothing at all about a feature whose facts support no sentence. The gate
+    // read that considered silence as redaction damage and dropped the feature
+    // on the second run over an unchanged graph.
     const result = verifyFixture({
       factualClaims: [factual({ action: 'create', targets: [ID.post] })],
       enrichmentOverrides: { description: 'sk-ant-api03-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+    });
+    expect(result.accepted).toBe(true);
+    expect(result.warnings.join(' ')).toContain('did not survive redaction');
+    // The credential itself never survives into anything the feature carries.
+    expect(JSON.stringify(result)).not.toContain('sk-ant-api03-AAAA');
+  });
+
+  it('still refuses a feature whose title did not survive redaction', () => {
+    // The title has no composed replacement: it is what names the page, the
+    // workflow and the index row, so a feature that cannot be named cannot be
+    // presented.
+    const result = verifyFixture({
+      factualClaims: [factual({ action: 'create', targets: [ID.post] })],
+      enrichmentOverrides: { title: 'sk-ant-api03-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
     });
     expect(result.accepted).toBe(false);
     expect(result.warnings.join(' ')).toContain('did not survive redaction');

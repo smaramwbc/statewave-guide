@@ -385,17 +385,24 @@ function assertedValues(
 }
 
 /**
- * The sentence used when nothing the *description* is built from was verified.
+ * What a feature says when nothing about it could be established: nothing.
  *
- * Deliberately narrow. The description is assembled from `capability`,
- * `navigation`, `permission` and `constraint` claims; `workflow_step` claims
- * feed the workflow section instead. So a feature can reach here with verified
- * workflow steps, and saying "nothing has been verified" would be false —
- * precisely the kind of overstatement this pipeline exists to avoid, pointed the
- * other way.
+ * This used to be a sentence — *"No capability, route or permission has been
+ * verified for this feature."* — and the Day 2 usefulness review found it on
+ * ten of twenty-one features, every one of them flagged `too_technical`. On two
+ * it sat directly above a confident description of what the control does, so the
+ * page contradicted itself in consecutive lines.
+ *
+ * The sentence was accurate. It was also a statement about our own epistemology,
+ * shown to somebody who wanted to know how to use a product, in vocabulary they
+ * have no reason to know. ADR 0013 records the decision: internal uncertainty is
+ * a developer diagnostic, and the user-facing answer to "we could not establish
+ * anything" is silence.
+ *
+ * The information did not disappear. It moved to `GuidanceDiagnostic`, where a
+ * developer inspecting the feature sees `NO_VERIFIED_CAPABILITY` and the reason.
  */
-export const NO_VERIFIED_DESCRIPTION =
-  'No capability, route or permission has been verified for this feature.';
+export const NO_VERIFIED_DESCRIPTION = '';
 
 /**
  * Creates the default renderer.
@@ -423,21 +430,25 @@ export function createDeterministicRenderer(): ProseRenderer {
         const phrases = capabilities.map((entry) => entry.phrase);
         sentences.push(`You can ${joinList(phrases)}${screenSuffix(request.feature.routes)}.`);
       }
-      if (routes.length > 0) {
-        sentences.push(`It is reached at ${joinList(routes)}.`);
-      }
-      if (permissions.length > 0) {
-        sentences.push(
-          `It requires the ${joinList(permissions)} permission${permissions.length === 1 ? '' : 's'}.`,
-        );
-      }
-      if (constrained) {
-        // A constraint claim is upheld only against a schema, a `validates_with`
-        // edge or a permission requirement, so "validated" is the strongest
-        // thing the rule actually establishes — and the sentence says no more.
-        sentences.push('Input is validated before it is accepted.');
-      }
-      if (sentences.length === 0) sentences.push(NO_VERIFIED_DESCRIPTION);
+      // Routes, permissions and constraints are no longer spoken here, and each
+      // for its own reason from the Day 2 review.
+      //
+      // A route path is an address, not guidance: where a feature lives is a
+      // *step* — "Open Clients." — which the guidance layer produces from the
+      // same fact. A permission identifier is worse than unhelpful, because
+      // `clients:create` is a string the reader cannot look up; the guidance
+      // layer says "You need permission to create a client" instead and keeps
+      // the identifier in provenance. And "Input is validated before it is
+      // accepted" was flagged as irrelevant three separate times — true of
+      // nearly every form ever written, and an answer to a question nobody
+      // asked.
+      //
+      // All three facts remain in the ProductModel. The ProductModel holds more
+      // truth than a description chooses to say, which is the point of having
+      // both.
+      void routes;
+      void permissions;
+      void constrained;
 
       const description = sentences.join(' ');
       const steps = request.workflow?.steps.length ?? 0;

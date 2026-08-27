@@ -159,14 +159,20 @@ describe('the deterministic renderer invents none of the six', () => {
     expect(result.checked).toBe(11);
   });
 
-  it('renders exactly the three verified facts and nothing more', async () => {
+  it('speaks the one verified fact that is guidance, and holds the other two back', async () => {
     const rendered = await createDeterministicRenderer().render(REQUEST);
 
-    expect(rendered.description).toBe(
-      'You can create a new client from the Clients screen. ' +
-        'It is reached at /clients. ' +
-        'It requires the clients:create permission.',
-    );
+    expect(rendered.description).toBe('You can create a new client from the Clients screen.');
+
+    // All three facts were verified and all three are still in the claims this
+    // renderer was handed. Two of them are not answers to a user's question: a
+    // route path is an address rather than an instruction, and `clients:create`
+    // is a string a reader cannot look up. The guidance layer speaks both from
+    // the same facts — as a step to take and as a permission to hold — so a
+    // sentence here would be the identifier itself, offered to somebody who has
+    // no way to use it. Silence is not loss; the facts remain in the model.
+    expect(rendered.description).not.toContain('/clients');
+    expect(rendered.description).not.toContain('clients:create');
   });
 });
 

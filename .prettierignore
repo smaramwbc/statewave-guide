@@ -21,5 +21,11 @@ docs/benchmarks
 benchmarks/*/results/
 # Same: the human-review artefact is generated, and the next run rewrites it.
 benchmarks/*/review-*.json
+# The frozen ProductModel is a captured artefact, not source. Reformatting it
+# would change bytes that later rounds compare against.
+benchmarks/*/round-2-product-model.json
+benchmarks/*/guidance-round-2-vs-3.json
+benchmarks/*/guidance-round-2-vs-3.md
 benchmarks/*/human-review-*.json
+benchmarks/*/*.scored.json
 benchmarks/*/human-review-*.md

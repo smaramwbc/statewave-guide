@@ -1,0 +1,578 @@
+{
+  "features": 21,
+  "rows": [
+    {
+      "featureId": "api.get.partial-clients",
+      "before": {
+        "title": "Legacy client list endpoint",
+        "description": "Input is validated before it is accepted.",
+        "workflow": []
+      },
+      "after": {
+        "title": "Partial clients",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "Serves client data through a legacy route kept alongside the current client APIs.",
+        "steps": [],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why do I get an access error when calling the older clients endpoint?"
+        ],
+        "completeness": "DESCRIPTIVE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "client-detail.audit",
+      "before": {
+        "title": "Client audit trail",
+        "description": "You can view client detail audit.",
+        "workflow": [
+          "Select Audit trail on a client to load that client's recorded history."
+        ]
+      },
+      "after": {
+        "title": "Audit trail",
+        "titleOrigin": "ui-label",
+        "summary": "You can view a client using \"Audit trail\".",
+        "purpose": "Lets someone reviewing a client check what changed and when, without leaving the client detail page.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ],
+        "conditions": [
+          "You need permission to view a client."
+        ],
+        "questions": [
+          "How do I see the history of changes for this client?"
+        ],
+        "completeness": "COMPLETE",
+        "diagnostics": []
+      }
+    },
+    {
+      "featureId": "client-detail.change-plan",
+      "before": {
+        "title": "Upgrade a client's plan",
+        "description": "Input is validated before it is accepted.",
+        "workflow": [
+          "Select Upgrade on the client detail page to move the client onto the enterprise plan."
+        ]
+      },
+      "after": {
+        "title": "Upgrade",
+        "titleOrigin": "ui-label",
+        "summary": null,
+        "purpose": "Lets an account manager move a client onto the enterprise plan without editing the record by hand.",
+        "steps": [
+          "Open Client Detail."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "How do I upgrade a client to the enterprise plan?"
+        ],
+        "completeness": "COMPLETE",
+        "diagnostics": [
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "client-detail.delete",
+      "before": {
+        "title": "Delete a client",
+        "description": "Input is validated before it is accepted.",
+        "workflow": [
+          "Select Delete on the client detail page to begin removing the client."
+        ]
+      },
+      "after": {
+        "title": "Delete",
+        "titleOrigin": "ui-label",
+        "summary": null,
+        "purpose": "Removes a client record you no longer need from the client detail page.",
+        "steps": [
+          "Open Client Detail."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why can't I see the Delete button on a client?"
+        ],
+        "completeness": "COMPLETE",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "client-detail.rename",
+      "before": {
+        "title": "Rename a client",
+        "description": "You can update a client detail rename.",
+        "workflow": [
+          "Selecting Rename saves the new client name and reloads the client details."
+        ]
+      },
+      "after": {
+        "title": "Rename",
+        "titleOrigin": "ui-label",
+        "summary": "You can change a client using \"Rename\".",
+        "purpose": "Lets someone correct or change a client's display name without leaving the client detail page.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ],
+        "conditions": [
+          "You need permission to change a client."
+        ],
+        "questions": [
+          "How do I change a client's name?"
+        ],
+        "completeness": "COMPLETE",
+        "diagnostics": [
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT"
+        ]
+      }
+    },
+    {
+      "featureId": "clients.create",
+      "before": {
+        "title": "Add a new client",
+        "description": "You can create a new client and submit the client form.",
+        "workflow": [
+          "The client form asks for a name, billing email and plan, and offers Cancel or Create client.",
+          "The new client dialog holds the form used to enter the client's details.",
+          "Selecting \"New client\" opens the create client dialog."
+        ]
+      },
+      "after": {
+        "title": "New client",
+        "titleOrigin": "ui-label",
+        "summary": "You can create a new client using \"New client\".",
+        "purpose": "Lets an admin onboard a new client account with a name, billing email and plan.",
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "conditions": [
+          "You need permission to create a client."
+        ],
+        "questions": [
+          "How do I add a new client?",
+          "Why can't I see the New client button?"
+        ],
+        "completeness": "COMPLETE",
+        "diagnostics": []
+      }
+    },
+    {
+      "featureId": "clients.error",
+      "before": {
+        "title": "Client list error message",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": []
+      },
+      "after": {
+        "title": "Error",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": null,
+        "steps": [],
+        "conditions": [],
+        "questions": [
+          "Why am I seeing a red message on the Clients page?"
+        ],
+        "completeness": "IDENTIFICATION_ONLY",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY",
+          "LANGUAGE_CLAIM_UNSUPPORTED"
+        ]
+      }
+    },
+    {
+      "featureId": "clients.export",
+      "before": {
+        "title": "Export CSV from clients list",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "On the Clients page, select Export CSV to export the client list."
+        ]
+      },
+      "after": {
+        "title": "Export CSV",
+        "titleOrigin": "ui-label",
+        "summary": null,
+        "purpose": "Lets you take the client list out of the app as a CSV file for use elsewhere.",
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "clients.search",
+      "before": {
+        "title": "Search clients",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "Type into the search box on the Clients page to narrow the client list."
+        ]
+      },
+      "after": {
+        "title": "Search",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "Helps you find a specific client quickly instead of scrolling the full list.",
+        "steps": [
+          "Open Clients.",
+          "Enter the client's search."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I find a particular client?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "clients.table",
+      "before": {
+        "title": "Client list table",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "The client list is shown as a table of client rows on the clients page."
+        ]
+      },
+      "after": {
+        "title": "Table",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "The table is the main view of clients, with each row opening that client and offering a Delete action.",
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [
+          "Why do I see 'You do not have access to the client list'? The table only appears for people with client read access."
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "clients.table.forbidden",
+      "before": {
+        "title": "Client list access notice",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "If you lack access to the client list, the table area shows the message \"You do not have access to the client list.\""
+        ]
+      },
+      "after": {
+        "title": "You do not have access to the client list.",
+        "titleOrigin": "ui-label",
+        "summary": null,
+        "purpose": "Explains why the clients table appears empty for users without client read access.",
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [
+          "Why can't I see the client list?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "dashboard.new-client",
+      "before": {
+        "title": "New client button on the dashboard",
+        "description": "Input is validated before it is accepted.",
+        "workflow": [
+          "Starting from the dashboard, you begin adding a client by selecting \"New client\"."
+        ]
+      },
+      "after": {
+        "title": "New client",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "Gives a shortcut for adding a client straight from the dashboard instead of going to the clients list first.",
+        "steps": [
+          "Open Dashboard."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why can't I see the New client button on my dashboard?"
+        ],
+        "completeness": "COMPLETE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "invoices.create-form.submit",
+      "before": {
+        "title": "Raise invoice",
+        "description": "You can create a new invoices create form and submit the invoices create form form from the Invoices screen.",
+        "workflow": []
+      },
+      "after": {
+        "title": "Raise invoice",
+        "titleOrigin": "ui-label",
+        "summary": "You can create a new invoice using \"Raise invoice\".",
+        "purpose": "Lets a user record a new invoice for a client without leaving the invoices page.",
+        "steps": [],
+        "conditions": [
+          "You need permission to create an invoice."
+        ],
+        "questions": [
+          "Why can't I see the invoice form?"
+        ],
+        "completeness": "COMPLETE",
+        "diagnostics": []
+      }
+    },
+    {
+      "featureId": "invoices.list.clear",
+      "before": {
+        "title": "Clear selection in invoice list",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "Choose \"Clear selection\" above the invoice list to drop the currently selected invoice."
+        ]
+      },
+      "after": {
+        "title": "Clear selection",
+        "titleOrigin": "ui-label",
+        "summary": null,
+        "purpose": "Resets the invoice list so no row is highlighted as active.",
+        "steps": [
+          "Open Client Detail."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I stop viewing the invoice I clicked on?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "invoices.list.open",
+      "before": {
+        "title": "Open an invoice from the list",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "Select an invoice row in the list to open that invoice."
+        ]
+      },
+      "after": {
+        "title": "Open",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "The open button on an invoice row selects that invoice so its details can be viewed.",
+        "steps": [
+          "Open Client Detail."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I open a specific invoice?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "nav.clients",
+      "before": {
+        "title": "Clients Navigation Link",
+        "description": "You can open nav clients from the Clients screen.",
+        "workflow": []
+      },
+      "after": {
+        "title": "Clients",
+        "titleOrigin": "ui-label",
+        "summary": "Open Clients.",
+        "purpose": "Gives quick access to the client list from anywhere in the app.",
+        "steps": [],
+        "conditions": [],
+        "questions": [
+          "Where do I find my clients?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": []
+      }
+    },
+    {
+      "featureId": "settings.danger-zone",
+      "before": {
+        "title": "Danger Zone (API Key Rotation)",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "The Settings page includes a separate danger zone section for high-risk actions such as rotating the API key."
+        ]
+      },
+      "after": {
+        "title": "Danger zone",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "Groups irreversible actions, such as rotating the API key, away from everyday settings.",
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": [
+          "Where do I rotate my API key?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "settings.form",
+      "before": {
+        "title": "Settings form",
+        "description": "You can submit the setting form from the Settings screen.",
+        "workflow": []
+      },
+      "after": {
+        "title": "Form",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "The settings form collects organisation name and notification preferences in one place.",
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I change my organisation name or turn notifications on or off?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "settings.new-key",
+      "before": {
+        "title": "New API key display",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "The new API key appears on the Settings page in the danger zone after the key is rotated."
+        ]
+      },
+      "after": {
+        "title": "New key",
+        "titleOrigin": "normalised-identifier",
+        "summary": null,
+        "purpose": "Shows the freshly generated API key so it can be copied before leaving the page.",
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": [
+          "Where do I see the API key after I rotate it?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "settings.rotate-key",
+      "before": {
+        "title": "Rotate API key",
+        "description": "No capability, route or permission has been verified for this feature.",
+        "workflow": [
+          "In the Settings danger zone, choose \"Rotate API key\" to replace the current API key."
+        ]
+      },
+      "after": {
+        "title": "Rotate API key",
+        "titleOrigin": "ui-label",
+        "summary": null,
+        "purpose": "Lets an admin replace the organisation's API key when the old one may be compromised.",
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I get a new API key?"
+        ],
+        "completeness": "ACTIONABLE",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    },
+    {
+      "featureId": "settings.save",
+      "before": {
+        "title": "Save changes to settings",
+        "description": "You can submit the setting form from the Settings screen.",
+        "workflow": []
+      },
+      "after": {
+        "title": "Save changes",
+        "titleOrigin": "ui-label",
+        "summary": null,
+        "purpose": "Save changes commits edits made in the settings form on the Settings page.",
+        "steps": [],
+        "conditions": [],
+        "questions": [
+          "Why is the Save changes button greyed out? It is disabled unless you have permission to edit settings."
+        ],
+        "completeness": "DESCRIPTIVE",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      }
+    }
+  ]
+}

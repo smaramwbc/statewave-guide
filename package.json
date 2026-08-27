@@ -34,7 +34,11 @@
     "test:semantic-quality": "node scripts/semantic-quality.mjs",
     "benchmark:providers": "node scripts/benchmark-providers.mjs",
     "benchmark:human-review": "node scripts/human-review-import.mjs",
-    "benchmark:build-human-review": "node scripts/build-human-review.mjs"
+    "benchmark:build-human-review": "node scripts/build-human-review.mjs",
+    "test:guidance-quality": "node scripts/guidance-quality.mjs",
+    "benchmark:guidance-snapshot": "node scripts/guidance-snapshot.mjs",
+    "benchmark:build-human-review-3": "node scripts/build-human-review-3.mjs",
+    "test:no-factual-expansion": "node scripts/guidance-snapshot.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
