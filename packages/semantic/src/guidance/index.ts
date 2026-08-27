@@ -21,7 +21,15 @@ export {
 } from './labels.js';
 export type { HumanLabel, LabelIndex, LabelOrigin } from './labels.js';
 export { WORKFLOW_ROLE_ORDER, isActionProposition, mergeProvenance } from './ir.js';
+export { isActionableNode, resolveActionTarget } from './action-target.js';
 export type {
+  ActionTargetOutcome,
+  ActionTargetSource,
+  ResolveActionTargetInput,
+  WorkflowActionTarget,
+} from './action-target.js';
+export type {
+  ActionAccountingEntry,
   GuidanceCompleteness,
   GuidanceCondition,
   GuidanceDiagnostic,
@@ -31,5 +39,7 @@ export type {
   GuidanceQuestion,
   GuidanceSentence,
   GuidanceStep,
+  StepOrigin,
+  TaskCompletion,
   WorkflowRole,
 } from './ir.js';

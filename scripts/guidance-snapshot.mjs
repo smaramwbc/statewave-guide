@@ -23,7 +23,8 @@
  * @packageDocumentation
  */
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { createProjectIndexer } from '../packages/indexer/dist/index.js';
@@ -35,6 +36,22 @@ import {
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const BENCH = path.join(ROOT, 'benchmarks', 'provider-reality-check');
+
+/**
+ * Where the comparison is written.
+ *
+ * A temporary directory by default, and this is the whole point. These scripts
+ * run as gates, and a gate that rewrites a committed artefact destroys the
+ * evidence it was checking: running `test:no-factual-expansion` after a later
+ * change regenerated the Round 2-to-3 comparison with the *current* compiler's
+ * output, so a historical record acquired steps that round never produced. It
+ * would then have been committed by the next `git add -A` with nobody the wiser.
+ *
+ * Historical benchmark evidence is immutable. Regenerating one is a deliberate
+ * act — `--write` — not a side effect of running a check.
+ */
+const WRITE_IN_PLACE = process.argv.includes('--write');
+const OUT = WRITE_IN_PLACE ? BENCH : mkdtempSync(path.join(os.tmpdir(), 'statewave-compare-'));
 
 const captured = JSON.parse(readFileSync(path.join(BENCH, 'round-2-product-model.json'), 'utf8'));
 const dataset = JSON.parse(readFileSync(path.join(BENCH, 'dataset-v1.json'), 'utf8'));
@@ -166,7 +183,7 @@ function descriptionOf(text) {
 }
 
 writeFileSync(
-  path.join(BENCH, 'guidance-round-2-vs-3.json'),
+  path.join(OUT, 'guidance-round-2-vs-3.json'),
   `${JSON.stringify({ features: rows.length, rows }, null, 2)}\n`,
 );
 
@@ -189,11 +206,11 @@ for (const row of rows) {
   md.push(`- completeness: ${row.after.completeness}`);
   md.push('');
 }
-writeFileSync(path.join(BENCH, 'guidance-round-2-vs-3.md'), `${md.join('\n')}\n`);
+writeFileSync(path.join(OUT, 'guidance-round-2-vs-3.md'), `${md.join('\n')}\n`);
 
 console.log(`\nCompared ${rows.length} features.`);
-console.log('  benchmarks/provider-reality-check/guidance-round-2-vs-3.json');
-console.log('  benchmarks/provider-reality-check/guidance-round-2-vs-3.md\n');
+console.log(`  ${path.relative(ROOT, OUT)}/guidance-round-2-vs-3.json`);
+console.log(`  ${path.relative(ROOT, OUT)}/guidance-round-2-vs-3.md\n`);
 
 if (expansions.length > 0) {
   console.log('FAIL — guidance asserts something the ProductModel does not establish:\n');

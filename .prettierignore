@@ -24,6 +24,8 @@ benchmarks/*/review-*.json
 # The frozen ProductModel is a captured artefact, not source. Reformatting it
 # would change bytes that later rounds compare against.
 benchmarks/*/round-2-product-model.json
+benchmarks/*/guidance-round-*.json
+benchmarks/*/guidance-round-*.md
 benchmarks/*/guidance-round-2-vs-3.json
 benchmarks/*/guidance-round-2-vs-3.md
 benchmarks/*/human-review-*.json

@@ -38,7 +38,11 @@
     "test:guidance-quality": "node scripts/guidance-quality.mjs",
     "benchmark:guidance-snapshot": "node scripts/guidance-snapshot.mjs",
     "benchmark:build-human-review-3": "node scripts/build-human-review-3.mjs",
-    "test:no-factual-expansion": "node scripts/guidance-snapshot.mjs"
+    "test:no-factual-expansion": "node scripts/guidance-snapshot.mjs",
+    "test:workflow-selection-quality": "node scripts/workflow-selection-quality.mjs",
+    "benchmark:round-3-vs-4": "node scripts/guidance-round-3-vs-4.mjs",
+    "benchmark:build-human-review-4": "node scripts/build-human-review-4.mjs",
+    "test:artifact-integrity": "node scripts/historical-artifact-integrity.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
