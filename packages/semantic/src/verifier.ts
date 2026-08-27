@@ -1380,9 +1380,17 @@ export function verifyEnrichment(input: VerifyEnrichmentInput): SemanticVerifica
   }
 
   const warnings: string[] = [...gateWarnings];
-  if (redactedTitle === '' || description === '') {
+  if (redactedTitle === '') {
     warnings.push(
-      'The feature was refused: its title or description did not survive redaction, so there is nothing to present.',
+      'The feature was refused: its title did not survive redaction, so there is nothing to name it with.',
+    );
+  } else if (description === '') {
+    // Worth saying and not worth refusing over. The description a reader sees
+    // is composed from accepted claims, so a model whose own prose vanished
+    // costs nothing that is presented — but a whole description reducing to a
+    // credential is a fact about the response someone should see.
+    warnings.push(
+      'The model description did not survive redaction. The presented description is composed from accepted claims, so nothing was lost from what a reader sees.',
     );
   }
   if (pack.truncated) {
@@ -1405,7 +1413,20 @@ export function verifyEnrichment(input: VerifyEnrichmentInput): SemanticVerifica
   }
 
   return {
-    accepted: title !== '' && description !== '' && accepted.length > 0,
+    // Acceptance turns on the title and the claims, not on the model's own
+    // description.
+    //
+    // That description never reaches a reader: the pipeline replaces it with
+    // the renderer's output before the feature is stored. Gating on it guarded
+    // nothing user-facing, and it broke replay — a reused feature is
+    // reconstructed from what was *stored*, which is the rendered prose, and
+    // the renderer now deliberately says nothing about a feature whose facts
+    // support no sentence. The gate then read that considered silence as
+    // "redaction ate the prose" and dropped the feature on the second run,
+    // making the pipeline non-idempotent over an unchanged graph.
+    //
+    // The redaction signal is kept as a warning below, where it belongs.
+    accepted: title !== '' && accepted.length > 0,
     title,
     claims,
     rejectedClaims,

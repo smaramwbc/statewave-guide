@@ -269,3 +269,10 @@ export type {
   ClaimOpportunityContext,
   ClaimOpportunityDraft,
 } from './opportunity-registry.js';
+
+// --- Guidance compilation --------------------------------------------------
+// ProductModel -> GuidanceIR -> prose. See ADR 0012: verified product truth and
+// useful human communication are different concerns, and rendering the first
+// directly as the second is what the Day 2 usefulness review caught.
+export * from './guidance/index.js';
+export { formatGuidanceDiagnostics } from './reporter.js';

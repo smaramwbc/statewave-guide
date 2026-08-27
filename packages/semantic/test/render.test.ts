@@ -12,6 +12,10 @@
  *    claim's words cannot reach a page even if a caller passes one in.
  * 3. `checkRenderedPropositions` finds nothing in its output. That zero is the
  *    whole point of the templates.
+ * 4. What it no longer says. Routes, permissions and validation rules are still
+ *    in the Product Model; they stopped being spoken. Several tests below pin
+ *    that absence, because a fact finding its way back into a sentence is a
+ *    regression a "contains" assertion would never catch.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -76,11 +80,12 @@ describe('createDeterministicRenderer', () => {
   it('composes the exact sentence the brief specifies', async () => {
     const rendered = await renderClaims(clientCreationClaims());
 
-    expect(rendered.description).toBe(
-      'You can create a new client from the Clients screen. ' +
-        'It is reached at /clients. ' +
-        'It requires the clients:create permission.',
-    );
+    // Three claims go in — a capability, a route and a permission — and one is
+    // spoken. The other two are facts a reader cannot act on as prose: an
+    // address, and an identifier they have no way to look up.
+    expect(rendered.description).toBe('You can create a new client from the Clients screen.');
+    expect(rendered.description).not.toContain('/clients');
+    expect(rendered.description).not.toContain('clients:create');
   });
 
   it('produces the same bytes on every call', async () => {
@@ -171,9 +176,10 @@ describe('createDeterministicRenderer', () => {
       routes: ['/clients/:clientId'],
     });
 
-    expect(rendered.description).toBe(
-      'You can create a new client. It is reached at /clients. It requires the clients:create permission.',
-    );
+    // There is no screen to name, so the sentence ends after the capability
+    // rather than falling back to the path the navigation claim carries.
+    expect(rendered.description).toBe('You can create a new client.');
+    expect(rendered.description).not.toContain('/clients');
   });
 
   it('names the home screen when the feature lives at the root', async () => {
@@ -189,7 +195,7 @@ describe('createDeterministicRenderer', () => {
     expect(rendered.description).toBe('You can view dashboard from the home screen.');
   });
 
-  it('pluralises the permission sentence with the number of permissions', async () => {
+  it('says nothing about permissions, however many a feature requires', async () => {
     const rendered = await renderClaims([
       claim({
         id: 'clients.create#permission:1',
@@ -213,9 +219,11 @@ describe('createDeterministicRenderer', () => {
       }),
     ]);
 
-    expect(rendered.description).toBe(
-      'It requires the clients:create and clients:write permissions.',
-    );
+    // A permission identifier is a string a reader cannot look up, so no number
+    // of them adds up to a sentence worth showing them. Both remain on the
+    // feature and in claim provenance, and the guidance layer states the
+    // requirement in words a reader can act on.
+    expect(rendered.description).toBe('');
   });
 
   it('says only what a constraint rule actually establishes', async () => {
@@ -231,11 +239,14 @@ describe('createDeterministicRenderer', () => {
       }),
     ]);
 
-    // Not the model's sentence: the rule proves a schema exists, not what it says.
-    expect(rendered.description).toBe('Input is validated before it is accepted.');
+    // Which is nothing a reader needs. The rule proves a schema exists, not
+    // what it says, and the sentence that used to stand in for it — "Input is
+    // validated before it is accepted" — is true of nearly every form ever
+    // written. The claim stays in the model; the description says nothing.
+    expect(rendered.description).toBe('');
   });
 
-  it('says plainly when nothing was verified rather than writing around it', async () => {
+  it('says nothing when nothing was verified rather than writing around it', async () => {
     const rendered = await renderClaims([
       claim({
         id: 'clients.create#purpose:1',
@@ -247,6 +258,11 @@ describe('createDeterministicRenderer', () => {
       }),
     ]);
 
+    // Internal uncertainty is a developer diagnostic. Somebody who wants to
+    // know how to use the product has no use for a statement about our own
+    // epistemology, so the fallback is silence and the reason travels as a
+    // `GuidanceDiagnostic` instead.
+    expect(NO_VERIFIED_DESCRIPTION).toBe('');
     expect(rendered.description).toBe(NO_VERIFIED_DESCRIPTION);
   });
 });
@@ -275,11 +291,7 @@ describe('the renderer sees accepted claims and nothing else', () => {
 
     const rendered = await renderClaims(claims);
 
-    expect(rendered.description).toBe(
-      'You can create a new client from the Clients screen. ' +
-        'It is reached at /clients. ' +
-        'It requires the clients:create permission.',
-    );
+    expect(rendered.description).toBe('You can create a new client from the Clients screen.');
     expect(rendered.description).not.toContain('CSV');
     expect(rendered.description).not.toContain('import');
     expect(rendered.description).not.toContain('external');

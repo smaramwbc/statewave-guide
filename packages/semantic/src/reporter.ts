@@ -319,3 +319,67 @@ export function formatOpportunityReport(run: EnrichmentRun): string[] {
 
   return lines;
 }
+
+/**
+ * What the guidance compiler decided not to say, and why.
+ *
+ * The other half of ADR 0013. Internal uncertainty stopped appearing in user
+ * copy, and this is where it went — so a developer looking at a thin feature can
+ * still tell the two cases apart: *the graph proves nothing about this control*
+ * reads very differently from *we know things and chose not to say them*, and
+ * they have opposite fixes.
+ *
+ * Deliberately not sorted by severity. These are not errors; most of them are
+ * the compiler working correctly, and ranking them would invite someone to
+ * treat the list as a backlog.
+ */
+export function formatGuidanceDiagnostics(
+  documents: readonly {
+    featureId: string;
+    completeness: string;
+    diagnostics: readonly { code: string; detail: string; subject?: string }[];
+  }[],
+): string[] {
+  if (documents.length === 0) return [];
+
+  const lines: string[] = ['', 'Guidance compilation', ''];
+  const counts = new Map<string, number>();
+  for (const document of documents) {
+    for (const entry of document.diagnostics) {
+      counts.set(entry.code, (counts.get(entry.code) ?? 0) + 1);
+    }
+  }
+
+  const completeness = new Map<string, number>();
+  for (const document of documents) {
+    completeness.set(document.completeness, (completeness.get(document.completeness) ?? 0) + 1);
+  }
+  for (const level of ['COMPLETE', 'ACTIONABLE', 'DESCRIPTIVE', 'IDENTIFICATION_ONLY', 'EMPTY']) {
+    const count = completeness.get(level) ?? 0;
+    if (count > 0) lines.push(`  ${level.toLowerCase().replace(/_/g, ' ').padEnd(20)} ${count}`);
+  }
+
+  if (counts.size > 0) {
+    lines.push('', '  Withheld from user copy, kept here:', '');
+    for (const [code, count] of [...counts].sort(([a], [b]) => compareStrings(a, b))) {
+      lines.push(`    ${code.padEnd(36)} ${count}`);
+    }
+  }
+
+  const silent = documents.filter((document) =>
+    document.diagnostics.some((entry) => entry.code === 'NO_VERIFIED_CAPABILITY'),
+  );
+  if (silent.length > 0) {
+    lines.push(
+      '',
+      `  ${pluralise(silent.length, 'feature')} said nothing about what they do, because nothing`,
+      '  about what they do could be established. That is the intended outcome, not a failure —',
+      '  the alternative is telling a user about our verifier.',
+      '',
+    );
+    for (const document of silent.slice(0, 10)) lines.push(`    ○ ${document.featureId}`);
+    if (silent.length > 10) lines.push(`    … and ${silent.length - 10} more`);
+  }
+
+  return lines;
+}
