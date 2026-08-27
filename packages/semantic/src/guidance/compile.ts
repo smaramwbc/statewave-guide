@@ -34,10 +34,18 @@ import { compareStrings } from '../compare.js';
 import { computeFeatureScope } from '../scope.js';
 import type { FeatureScope } from '../scope.js';
 import { recoverActionTarget } from './action-recovery.js';
+import {
+  auditLanguageEvidence,
+  buildGroundedTerms,
+  compilePurpose,
+  compileQuestions as compileLanguageQuestions,
+  realisePurpose,
+} from './language.js';
+import type { LanguageProposition, WithheldProposition } from './language.js';
 import type { ActionRecoveryProvenance } from './action-recovery.js';
 import { resolveActionTarget } from './action-target.js';
 import type { WorkflowActionTarget } from './action-target.js';
-import { createLabelIndex, entityNoun, fieldNoun, normaliseIdentifier } from './labels.js';
+import { createLabelIndex, entityNoun, fieldNoun } from './labels.js';
 import type { HumanLabel, LabelIndex } from './labels.js';
 import type {
   ActionAccountingEntry,
@@ -55,6 +63,8 @@ import type {
 } from './ir.js';
 import { WORKFLOW_ROLE_ORDER, isActionProposition, mergeProvenance } from './ir.js';
 import { realiseInstruction, realiseProposition } from './realise.js';
+import { isUserVisible, resolveTitle } from './title.js';
+import type { TitleCandidate } from './title.js';
 
 /** What the compiler reads. */
 export interface CompileGuidanceInput {
@@ -97,7 +107,6 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
   const language = claims.filter((claim) => claim.status === 'semantically_grounded');
 
   const object = entityNoun(feature.id);
-  const title = titleFor(feature, labels, diagnostics);
 
   // The candidate and its scope decide what a `feature:` subject may resolve to.
   // Reconstructed here when a caller did not supply them, from the feature's own
@@ -118,6 +127,9 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
       nodes: graph.nodes,
       relationships: graph.relationships,
     });
+
+  const resolvedTitle = titleFor(feature, scope, graph, diagnostics);
+  const title = resolvedTitle?.label;
 
   const accounting: ActionAccountingEntry[] = [];
   /** Every recovery that fired, so a reader can argue with each one. */
@@ -180,14 +192,26 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     // is what they press, and the internal verb never has to appear. Suppression
     // now applies only where nothing on screen names the action, which is the
     // case the original rule was actually about.
-    if (action === 'submit' && control === undefined) {
+    if (action === 'submit') {
+      // Never a summary, control or no control. Closed Loop #5 relaxed this to
+      // "only when nothing names it", and the sentence that survived — *"You can
+      // submit a setting using \"Save changes\"."* — was flagged for natural
+      // language in both Round 4 and Round 5.
+      //
+      // The reason it cannot be repaired by rewording is that `submit` is the
+      // only thing verified. Nothing establishes that anything is *saved*: the
+      // handler is called `saveSettings`, which is an identifier, and the button
+      // reads "Save changes", which is English on a button. A summary here would
+      // have to either name the mechanism or invent the outcome. The title
+      // already reads "Save changes" and the step already says to choose it,
+      // so the reader loses nothing they were not being told twice.
       accounting.push({
         claimId: claim.id,
         subjectRef: claim.assertion?.subjectRef ?? '',
         outcome: 'dropped',
         reason: 'UNSUPPORTED_PRESENTATION',
         detail:
-          'A submit capability with no user-visible control. Naming it would mean saying "submit the form", which describes the mechanism rather than anything the reader can see.',
+          'A submit capability is the mechanism, not the outcome. Saying so names internal vocabulary; saying anything else asserts a result nothing verifies.',
       });
       continue;
     }
@@ -282,13 +306,94 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     });
   }
 
-  const purpose = purposeFrom(language, factual, diagnostics);
-  const questions = compileQuestions(language, diagnostics);
+  // --- Language, one proposition at a time --------------------------------
+  //
+  // Nothing the model wrote reaches a reader. Round 5 scored 17 of 18
+  // assessable items at correctness 1, and an audit of every user-facing
+  // proposition found only 52% of them supported — 38% on the purpose line,
+  // which was the one surface passed through verbatim. The summary line, which
+  // Closed Loop #4 already compiled, measured 82%. The difference is the whole
+  // argument for compiling this one too.
+  const terms = buildGroundedTerms({
+    featureId: feature.id,
+    scope,
+    nodes: graph.nodes,
+    claims,
+  });
+  const languageInput = { featureId: feature.id, scope, graph, claims, terms };
+
+  const purposeIR = compilePurpose(languageInput);
+  const purposeText = realisePurpose(purposeIR);
+  const purpose =
+    purposeText === undefined
+      ? undefined
+      : {
+          text: purposeText,
+          provenance: {
+            claims: purposeIR.propositions
+              .map((entry) =>
+                entry.support.kind === 'claim-assertion' ? entry.support.claimId : undefined,
+              )
+              .filter((id): id is string => id !== undefined),
+            facts: purposeIR.propositions
+              .map((entry) =>
+                entry.support.kind === 'owned-node'
+                  ? entry.support.nodeId
+                  : entry.support.kind === 'owned-edge'
+                    ? entry.support.edgeId
+                    : undefined,
+              )
+              .filter((ref): ref is string => ref !== undefined),
+          },
+        };
+
+  const compiledQuestions = compileLanguageQuestions(languageInput);
+  const questions: GuidanceQuestion[] = compiledQuestions.map((entry) => ({
+    text: entry.text,
+    provenance: {
+      claims: entry.propositions
+        .map((p) => (p.support.kind === 'claim-assertion' ? p.support.claimId : undefined))
+        .filter((id): id is string => id !== undefined),
+      facts: entry.propositions
+        .map((p) => (p.support.kind === 'owned-node' ? p.support.nodeId : undefined))
+        .filter((ref): ref is string => ref !== undefined),
+    },
+  }));
+
+  const languagePropositions: LanguageProposition[] = [
+    ...purposeIR.propositions,
+    ...compiledQuestions.flatMap((entry) => entry.propositions),
+  ];
+  const withheldLanguage: WithheldProposition[] = [...purposeIR.withheld];
+
+  // What the model wrote, and why it did not survive. Every language claim is
+  // accounted for rather than dropped: a claim that cited its neighbours is a
+  // different failure from one whose sentence could not be rebuilt, and the two
+  // want different fixes.
+  for (const claim of language) {
+    if (claim.type !== 'purpose' && claim.type !== 'user_question') continue;
+    const audit = auditLanguageEvidence(claim, scope);
+    if (audit.unowned.length > 0) {
+      diagnostics.push({
+        code: 'LANGUAGE_EVIDENCE_NOT_OWNED',
+        detail: `Cites ${audit.unowned.map((entry) => `${entry.ref} (${entry.scopeClass})`).join(', ')}, which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.`,
+        subject: claim.id,
+      });
+      continue;
+    }
+    diagnostics.push({
+      code: 'LANGUAGE_CLAIM_NOT_RENDERED',
+      detail:
+        'The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.',
+      subject: claim.id,
+    });
+  }
 
   const taskCompletion = taskCompletionOf(steps);
   const document: GuidanceDocument = {
     featureId: feature.id,
-    title,
+    ...(title === undefined ? {} : { title }),
+    ...(resolvedTitle === undefined ? {} : { titleEvidence: resolvedTitle.candidate }),
     ...(summary === undefined ? {} : { summary }),
     ...(purpose === undefined ? {} : { purpose }),
     steps,
@@ -299,6 +404,8 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     taskCompletion,
     actionAccounting: accounting,
     actionRecoveries: recoveries,
+    languagePropositions,
+    withheldLanguage,
   };
   return { ...document, completeness: completenessOf(document) };
 }
@@ -307,26 +414,42 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
 // Titles
 // ---------------------------------------------------------------------------
 
+/**
+ * The feature's name, or nothing.
+ *
+ * The identifier fallback is gone. It used to produce `Search`, `Table`,
+ * `Danger zone` and `Error` — words nobody wrote for a reader, spaced out of an
+ * address and capitalised until they looked like copy. Round 6 scored the nine
+ * features carrying one at mean usefulness 0.67 against 2.25 for the twelve
+ * named by their own controls, and six of the seven remaining correctness
+ * failures were exactly this.
+ *
+ * A feature with no readable control now has no title, and the renderer is
+ * expected to cope. `Untitled` would be the same mistake with a blander word.
+ */
 function titleFor(
   feature: ProductFeature,
-  labels: LabelIndex,
+  scope: FeatureScope,
+  graph: ApplicationGraph,
   diagnostics: GuidanceDiagnostic[],
-): HumanLabel {
-  for (const entry of feature.entryPoints ?? []) {
-    const found = labels.label(entry);
-    if (found !== undefined && found.origin === 'ui-label') return found;
-  }
-  for (const elementId of feature.elements ?? []) {
-    const found = labels.label(`element:${elementId}`);
-    if (found !== undefined && found.origin === 'ui-label') return found;
+): { label: HumanLabel; candidate: TitleCandidate } | undefined {
+  const outcome = resolveTitle({ feature, scope, graph });
+  if (outcome.status === 'resolved') {
+    return {
+      label: {
+        text: outcome.candidate.text,
+        origin: outcome.candidate.origin,
+        nodeId: outcome.candidate.evidence,
+      },
+      candidate: outcome.candidate,
+    };
   }
   diagnostics.push({
-    code: 'NO_USER_VISIBLE_LABEL',
-    detail:
-      'No control in this feature carries text a user can read, so the title is a cautious noun derived from the identifier.',
+    code: outcome.status === 'ambiguous' ? 'AMBIGUOUS_TITLE' : 'NO_USER_VISIBLE_LABEL',
+    detail: outcome.detail,
     subject: feature.id,
   });
-  return { text: normaliseIdentifier(feature.id), origin: 'normalised-identifier' };
+  return undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -622,7 +745,17 @@ function propositionForStep(
   // reader tracing it back should not have to guess which button was meant.
   const provenance = mergeProvenance(provenanceOf(claim), { claims: [], facts: [target.nodeId] });
   const nodeId = target.nodeId;
-  const label = target.label ?? labels.label(nodeId);
+  const found = target.label ?? labels.label(nodeId);
+
+  // A step may name a control only with text a user can find on screen.
+  //
+  // Round 6 shipped `Choose Open.` for a button whose content is
+  // `{invoice.number}` — the word came from the last segment of the semantic id,
+  // and the review package carried no fact about it because there was none to
+  // carry. A reader would have gone looking for a control called Open and found
+  // invoice numbers. An identifier is an address; it is not what anything is
+  // called, and a step is exactly where that distinction bites.
+  const label = isUserVisible(found) ? found : undefined;
 
   switch (role) {
     case 'entry':
@@ -789,63 +922,18 @@ function entryScreen(
 // ---------------------------------------------------------------------------
 
 /**
- * A purpose sentence, but only where it does not smuggle in a new fact.
+ * Purpose and questions used to be compiled here, from the model's own prose.
  *
- * A grounded purpose may explain *why* something exists. It may not tell a user
- * what the application does, because a purpose was never checked against the
- * graph: a button reading `Rotate API key` does not establish that the old key
- * stops working. Where a purpose asserts an effect no factual claim supports,
- * it is withheld and the reason is recorded.
+ * `purposeFrom()` withheld a purpose only when a feature had no verified claim
+ * at all, and otherwise handed the sentence through whole. `compileQuestions()`
+ * dropped a question only if it contained something shaped like an identifier.
+ * Both checks were about the sentence as a unit, and a sentence is not a unit —
+ * it is several propositions sharing one full stop, and the checks passed as
+ * long as one of them was fine.
+ *
+ * They now live in `language.ts`, which decides proposition by proposition and
+ * builds the sentence rather than inspecting it.
  */
-function purposeFrom(
-  language: readonly ProductClaim[],
-  factual: readonly ProductClaim[],
-  diagnostics: GuidanceDiagnostic[],
-): { text: string; provenance: GuidanceProvenance } | undefined {
-  const purpose = language.find((claim) => claim.type === 'purpose');
-  if (purpose === undefined) return undefined;
-
-  if (factual.length === 0) {
-    diagnostics.push({
-      code: 'LANGUAGE_CLAIM_UNSUPPORTED',
-      detail:
-        'A purpose was generated for a feature with no verified factual claim. It is withheld rather than rendered, because nothing checks whether it is true.',
-      subject: purpose.id,
-    });
-    return undefined;
-  }
-
-  return { text: purpose.text, provenance: provenanceOf(purpose) };
-}
-
-/** Questions about user intent, minus the ones about our own vocabulary. */
-function compileQuestions(
-  language: readonly ProductClaim[],
-  diagnostics: GuidanceDiagnostic[],
-): GuidanceQuestion[] {
-  const kept: GuidanceQuestion[] = [];
-  const seen = new Set<string>();
-
-  for (const claim of language) {
-    if (claim.type !== 'user_question') continue;
-    const text = claim.text.trim();
-
-    if (mentionsIdentifier(text)) {
-      diagnostics.push({
-        code: 'QUESTION_DISCARDED_AS_TECHNICAL',
-        detail: 'The question names an internal identifier rather than something a user would say.',
-        subject: claim.id,
-      });
-      continue;
-    }
-
-    const fingerprint = text.toLowerCase().replace(/[^a-z0-9 ]/g, '');
-    if (seen.has(fingerprint)) continue;
-    seen.add(fingerprint);
-    kept.push({ text, provenance: provenanceOf(claim) });
-  }
-  return kept;
-}
 
 /** True when a sentence contains something shaped like a semantic id. */
 export function mentionsIdentifier(text: string): boolean {
@@ -940,7 +1028,7 @@ function completenessOf(document: GuidanceDocument): GuidanceCompleteness {
     if (hasEntry) return 'ENTRY_ONLY';
     if (hasExplanation) return 'DESCRIPTIVE';
     if (document.questions.length > 0) return 'IDENTIFICATION_ONLY';
-    return document.title.origin === 'normalised-identifier' ? 'EMPTY' : 'IDENTIFICATION_ONLY';
+    return document.title === undefined ? 'EMPTY' : 'IDENTIFICATION_ONLY';
   }
   if (hasExplanation && document.conditions.length > 0) return 'COMPLETE';
   return 'ACTIONABLE';

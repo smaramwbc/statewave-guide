@@ -30,6 +30,8 @@
 
 import type { CapabilityAction } from '@statewavedev/guide-shared';
 import type { ActionRecoveryProvenance } from './action-recovery.js';
+import type { LanguageProposition, WithheldProposition } from './language.js';
+import type { TitleCandidate } from './title.js';
 import type { HumanLabel } from './labels.js';
 
 /**
@@ -263,7 +265,11 @@ export interface GuidanceDiagnostic {
     | 'AMBIGUOUS_ACTION_TARGET'
     | 'PASSIVE_TARGET'
     | 'ENTRY_ROUTE_AMBIGUOUS'
-    | 'REDUNDANT_ENTRY_STEP';
+    | 'REDUNDANT_ENTRY_STEP'
+    | 'LANGUAGE_EVIDENCE_NOT_OWNED'
+    | 'LANGUAGE_CLAIM_NOT_RENDERED'
+    | 'AMBIGUOUS_TITLE'
+    | 'CONTROL_NAME_NOT_USER_VISIBLE';
   detail: string;
   /** What it concerns, when it concerns something nameable. */
   subject?: string;
@@ -305,7 +311,19 @@ export type GuidanceCompleteness =
 /** Everything decided about one feature, before phrasing. */
 export interface GuidanceDocument {
   featureId: string;
-  title: HumanLabel;
+  /**
+   * What the interface calls this feature, when the interface says.
+   *
+   * Optional, and the optionality is the decision. It used to fall back to
+   * `normaliseIdentifier(feature.id)`, which turned an address into something
+   * indistinguishable from copy somebody wrote — `Search`, `Table`, `Error`.
+   * Round 6 scored the nine features carrying such a title at mean usefulness
+   * 0.67 against 2.25 for those named by their own controls. A missing title is
+   * a gap a renderer can show honestly; a fabricated one is not.
+   */
+  title?: HumanLabel;
+  /** The control the title was read from, and how. Absent when withheld. */
+  titleEvidence?: TitleCandidate;
   summary?: GuidanceSentence;
   purpose?: GuidanceSentence;
   steps: readonly GuidanceStep[];
@@ -323,6 +341,19 @@ export interface GuidanceDocument {
    * it is a list of the places where the compiler went looking.
    */
   actionRecoveries: readonly ActionRecoveryProvenance[];
+  /**
+   * Every factual proposition the user-facing language makes, and its support.
+   *
+   * The invariant this layer exists to make checkable: a sentence shown to a
+   * reader may contain no proposition that is not on this list, and no entry on
+   * this list may carry empty support. Round 5's audit found 194 propositions
+   * across twenty-one features and could support 97 of them — the other half
+   * shipped anyway, because one evidence ref on a whole sentence licensed
+   * everything inside it.
+   */
+  languagePropositions: readonly LanguageProposition[];
+  /** What the language wanted to say and could not, with the reason. */
+  withheldLanguage: readonly WithheldProposition[];
   completeness: GuidanceCompleteness;
   /** How far the steps take a user through the task. Diagnostic only. */
   taskCompletion: TaskCompletion;

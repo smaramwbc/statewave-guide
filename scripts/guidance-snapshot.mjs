@@ -153,8 +153,8 @@ for (const feature of model.features) {
       workflow: before?.workflow ?? [],
     },
     after: {
-      title: document.title.text,
-      titleOrigin: document.title.origin,
+      title: document.title?.text ?? null,
+      titleOrigin: document.title?.origin ?? null,
       summary: document.summary?.text ?? null,
       purpose: document.purpose?.text ?? null,
       steps: document.steps.map((step) => realiseInstruction(step.proposition)).filter(Boolean),

@@ -45,7 +45,18 @@
     "benchmark:round-4-vs-5": "node scripts/guidance-round-4-vs-5.mjs",
     "benchmark:build-human-review-5": "node scripts/build-human-review-5.mjs",
     "test:action-target-recovery-quality": "node scripts/action-target-recovery-quality.mjs",
-    "test:artifact-integrity": "node scripts/historical-artifact-integrity.mjs"
+    "benchmark:round-5-vs-6": "node scripts/guidance-round-5-vs-6.mjs",
+    "benchmark:build-human-review-6": "node scripts/build-human-review-6.mjs",
+    "test:semantic-language-authority-quality": "node scripts/semantic-language-authority-quality.mjs",
+    "test:review-fact-coverage": "node scripts/build-human-review-6.mjs --check",
+    "benchmark:round-6-vs-7": "node scripts/guidance-round-6-vs-7.mjs",
+    "benchmark:build-human-review-7": "node scripts/build-human-review-7.mjs",
+    "test:user-visible-label-quality": "node scripts/user-visible-label-quality.mjs",
+    "test:title-authority-quality": "node scripts/title-authority-quality.mjs",
+    "test:element-containment-quality": "node scripts/element-containment-quality.mjs",
+    "test:review-action-fact-coverage": "node scripts/build-human-review-7.mjs --check",
+    "test:artifact-integrity": "node scripts/historical-artifact-integrity.mjs",
+    "test:tree-clean": "node scripts/tree-clean.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

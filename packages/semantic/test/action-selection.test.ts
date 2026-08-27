@@ -419,7 +419,15 @@ describe('every action claim is accounted for', () => {
           .map((entry) => entry.claimId),
       )
       .sort();
-    expect(unsayable).toEqual(['clients.search#workflow_step:1']);
+    // Two, and the second is Closed Loop #8's doing. `invoices.list.open`
+    // resolves to a real owned button whose visible text is `{invoice.number}` —
+    // a name that exists and changes per row. Round 6 called it `Open` from the
+    // identifier and sent a reviewer looking for a control that is not there.
+    // Resolvable is not sayable, and a dynamic name is the clearest case of it.
+    expect(unsayable).toEqual([
+      'clients.search#workflow_step:1',
+      'invoices.list.open#workflow_step:1',
+    ]);
   });
 
   it('never drops a resolvable claim without saying so', () => {

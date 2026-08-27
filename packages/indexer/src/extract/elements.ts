@@ -34,6 +34,9 @@ import type {
   ProvenanceReference,
 } from '@statewavedev/guide-shared';
 import type { IndexerDiagnostic, UIElementNode } from '../graph.js';
+import type { SymbolResolver } from '../resolve/symbols.js';
+import { resolveElementLabel } from './labels.js';
+import type { ResolvedLabel } from './labels.js';
 import { elementId as toElementId } from '../node-id.js';
 import { bindingNames } from '../resolve/symbols.js';
 import { nodeProvenance } from '../provenance.js';
@@ -90,6 +93,19 @@ const TAG_TYPES: ReadonlyMap<string, ProductElementType> = new Map([
 export interface ComponentLookup {
   /** Component id keyed by the start offset of its function-like body. */
   byFunctionStart: ReadonlyMap<number, string>;
+}
+
+/**
+ * What the full label rules need, when the caller can supply it.
+ *
+ * Optional so the extractor stays usable from a test with nothing but a source
+ * file. Without it the three attribute-and-text sources still apply; with it a
+ * wrapping `<label>`, an `aria-labelledby` and a proven prop become readable
+ * too.
+ */
+export interface LabelResolution {
+  resolver: SymbolResolver;
+  filesByPath: ReadonlyMap<string, SourceFile>;
 }
 
 /** Mutable state threaded across files so duplicate ids can be detected. */
@@ -208,6 +224,20 @@ function resolveType(node: JsxTagNode, tagName: string): ProductElementType {
 }
 
 /** Resolves the label: `data-guide-label`, then `aria-label`, then text. */
+/**
+ * Kept for the case where no label context is supplied.
+ *
+ * The three original sources and no more. A caller that can resolve components
+ * — which is every caller inside the indexer — gets the full set from
+ * {@link resolveElementLabel} instead, including wrapping `<label>` elements,
+ * `aria-labelledby` and props proven to reach a text position. The Round 6
+ * review measured eight visible labels this narrower version was missing.
+ */
+function legacyLabel(node: JsxTagNode): ResolvedLabel {
+  const text = resolveLabel(node);
+  return text === undefined ? { kind: 'none' } : { kind: 'static', text };
+}
+
 function resolveLabel(node: JsxTagNode): string | undefined {
   return (
     getStringAttributeValue(node, LABEL_ATTRIBUTE) ??
@@ -247,6 +277,7 @@ export function extractElements(
   relativePath: string,
   lookup: ComponentLookup,
   registry: ElementIdRegistry,
+  labels?: LabelResolution,
 ): ExtractedElements {
   const elements: ExtractedElement[] = [];
   const diagnostics: IndexerDiagnostic[] = [];
@@ -288,7 +319,16 @@ export function extractElements(
     // Key order is fixed by this literal, and optional keys are spread in
     // conditionally so an absent value is an absent key rather than
     // `"label": undefined` — same meaning, different bytes.
-    const label = resolveLabel(node);
+    const resolved =
+      labels === undefined
+        ? legacyLabel(node)
+        : resolveElementLabel(node, {
+            sourceFile,
+            relativePath,
+            resolver: labels.resolver,
+            filesByPath: labels.filesByPath,
+          });
+    const label = resolved.text;
     elements.push({
       node: {
         kind: 'element',
@@ -296,6 +336,12 @@ export function extractElements(
         elementId: found.id,
         type: resolveType(node, tagName),
         ...(label !== undefined ? { label } : {}),
+        ...(resolved.origin !== undefined ? { labelOrigin: resolved.origin } : {}),
+        // Recorded even when it is `none`, because "this control has no readable
+        // name" and "nobody looked" are different facts and a consumer must be
+        // able to tell them apart. `dynamic` is the one that stops a compiler
+        // inventing "Choose Open." for a button showing an invoice number.
+        labelKind: resolved.kind,
         attribute: found.attribute,
         tagName,
         featureId: guideElementNamespace(found.id),

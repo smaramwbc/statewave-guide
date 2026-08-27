@@ -176,7 +176,7 @@ for (const feature of model.features) {
     featureId: feature.id,
     userContext: { screen: screenOf(feature.id), goal: 'Understand or use this feature' },
     productOutput: {
-      title: document.title.text,
+      title: document.title?.text ?? null,
       summary: document.summary?.text ?? null,
       purpose: document.purpose?.text ?? null,
       steps: document.steps.map((step) => realiseInstruction(step.proposition)).filter(Boolean),

@@ -92,7 +92,18 @@ export function labelForNode(node: ApplicationNode | undefined): HumanLabel | un
 
   const record = node as unknown as Record<string, unknown>;
   const visible = typeof record['label'] === 'string' ? record['label'].trim() : '';
-  if (visible.length > 0) return { text: visible, origin: 'ui-label', nodeId: node.id };
+  if (visible.length > 0) {
+    // The indexer now says where the text came from, and the two accessibility
+    // sources are a weaker kind of evidence than words printed on the control:
+    // a screen reader reaches them and a reader looking at the page may not. The
+    // distinction is recorded rather than flattened, because a guide telling
+    // somebody to press a control they cannot see the name of is a different
+    // quality of instruction.
+    const source = typeof record['labelOrigin'] === 'string' ? record['labelOrigin'] : '';
+    const origin: LabelOrigin =
+      source === 'aria-label' || source === 'aria-labelledby' ? 'accessible-name' : 'ui-label';
+    return { text: visible, origin, nodeId: node.id };
+  }
 
   const accessible = typeof record['accessibleName'] === 'string' ? record['accessibleName'] : '';
   if (accessible.trim().length > 0) {

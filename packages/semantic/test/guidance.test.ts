@@ -50,7 +50,7 @@ function userCopy(featureId: string): string {
   const document = documents.get(featureId);
   if (document === undefined) throw new Error(`no document for ${featureId}`);
   const parts = [
-    document.title.text,
+    document.title?.text,
     document.summary?.text ?? '',
     document.purpose?.text ?? '',
     ...document.steps.map((step) => realiseInstruction(step.proposition) ?? ''),
@@ -267,7 +267,12 @@ describe('properties that must hold for every feature', () => {
 
   it('emits no empty section', () => {
     for (const [featureId, document] of documents) {
-      expect(document.title.text.length, featureId).toBeGreaterThan(0);
+      // A title may now be absent — Closed Loop #8 removed the identifier
+      // fallback, so a feature the interface does not name goes without. What it
+      // may never be is present and empty.
+      if (document.title !== undefined) {
+        expect(document.title.text.trim().length, featureId).toBeGreaterThan(0);
+      }
       for (const question of document.questions) {
         expect(question.text.trim().length, featureId).toBeGreaterThan(0);
       }

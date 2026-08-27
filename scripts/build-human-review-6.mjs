@@ -1,34 +1,27 @@
 /**
- * The blinded review package for Round 3, and the instrument fixes it needed.
+ * The blinded review package for Round 6, and the instrument fix it needed.
  *
- * Round 2's package had a flaw that its own results exposed. Six features
- * produced no checkable facts, because their only owned node is an unlabelled
- * display element and the fact renderer had nothing to say about one. The
- * reviewer scored correctness **0** on all six, unanimously — and then flagged
- * `incorrect_fact` on none of them. They were not saying the output was wrong.
- * They were saying they could not tell, and zero was the only box available.
+ * Same twenty-one features, same frozen Product Model, same gate v2 rubric, no
+ * provider call. What changed underneath is that user-facing language is now
+ * compiled from supported propositions rather than passed through from the
+ * model, and one thing changed *here*, in the instrument.
  *
- * So gate v2 makes two changes and leaves everything else alone:
+ * Round 5 exposed it. `settings.form` emitted *Choose "Save changes"* through
+ * bounded action-target recovery, and the fact list handed to the reviewer read,
+ * in full: *"The Settings screen contains a form."* The control the step names
+ * was reached through a shared handler rather than through the feature's own
+ * claims, so the fact renderer — which built its list from claim targets — never
+ * mentioned it. The reviewer scored a step they had no way to check.
  *
- * - **Correctness gains `not_assessable`.** A reviewer who cannot check a claim
- *   says so, and that answer is excluded from the correctness mean rather than
- *   counted as a failure. Usefulness scoring is untouched, because usefulness
- *   was never the confounded measure.
- * - **An empty fact list says what it means.** Instead of an absent section,
- *   the item carries "No independently checkable facts were available for this
- *   item" — which is a statement about our evidence, not about the output.
- *
- * Section 27's other request is handled too: an unlabelled element can still
- * support a neutral structural fact — *the screen contains a read-only code
- * display* — drawn from the tag the indexer actually recorded. What it may not
- * support is a guess at what the element is *for*.
- *
- * No provider is called. Guidance is compiled from the frozen Round 2
- * ProductModel, which is the whole point: the only variable that moved between
- * rounds is the presentation.
+ * A review fact is not additional authority. It is a projection of authority the
+ * output already used, and if the projection is incomplete then correctness is
+ * being scored against a partial view. So the list is now built from **what was
+ * emitted** rather than from what the claims happened to cite: every node a step
+ * cites, every node a language proposition rests on, every permission a condition
+ * names. Generation fails if any emitted proposition has no fact behind it.
  *
  * Usage:
- *   node scripts/build-human-review-3.mjs [--seed 20260827]
+ *   node scripts/build-human-review-6.mjs [--seed 20260830]
  *
  * @packageDocumentation
  */
@@ -55,7 +48,17 @@ function flag(name, fallback) {
 }
 
 /** A different seed from Round 2, so position carries no memory between rounds. */
-const SEED = Number(flag('seed', '20260828'));
+const SEED = Number(flag('seed', '20260830'));
+
+/**
+ * Check the fact coverage without issuing a package.
+ *
+ * The coverage invariant is a property of the compiler, not of a particular
+ * build, so it runs as a gate — and a gate that rewrites an issued review
+ * package as a side effect is the failure `test:artifact-integrity` exists to
+ * catch.
+ */
+const CHECK_ONLY = process.argv.includes('--check');
 
 function seededRandom(seed) {
   let state = seed >>> 0;
@@ -145,6 +148,7 @@ function describeFact(ref, featureId) {
 
 const items = [];
 const key = [];
+const coverage = { required: 0, covered: 0, missing: [], unnameable: [] };
 
 const candidates = discoverFeatureCandidates(graph);
 
@@ -176,10 +180,93 @@ for (const feature of model.features) {
   }
   for (const element of feature.elements ?? []) refs.add(`element:${element}`);
 
+  // Everything the output actually rests on. This is the Round 5 fix: a control
+  // reached through action-target recovery, or a noun taken from an endpoint
+  // path, is cited by the guidance and was invisible to the reviewer.
+  const required = new Set();
+  /** A relationship is evidence through its endpoints, which are what a user sees. */
+  const cite = (ref) => {
+    refs.add(ref);
+    required.add(ref);
+    if (!ref.includes('|')) return;
+    const [source, , target] = ref.split('|');
+    if (source) {
+      refs.add(source);
+      required.add(source);
+    }
+    if (target) {
+      refs.add(target);
+      required.add(target);
+    }
+  };
+  for (const step of document.steps) {
+    for (const ref of step.provenance.facts) cite(ref);
+  }
+  for (const entry of document.actionRecoveries) {
+    refs.add(entry.control);
+    required.add(entry.control);
+    refs.add(entry.actionSurface);
+  }
+  for (const proposition of document.languagePropositions) {
+    const support = proposition.support;
+    if (support.kind === 'owned-node') {
+      refs.add(support.nodeId);
+      required.add(support.nodeId);
+    }
+    if (support.kind === 'claim-assertion') {
+      const claim = model.claims.find((entry) => entry.id === support.claimId);
+      if (claim?.assertion?.subjectRef !== undefined) {
+        refs.add(claim.assertion.subjectRef);
+        required.add(claim.assertion.subjectRef);
+      }
+      for (const target of claim?.assertion?.targets ?? []) refs.add(target);
+    }
+  }
+  for (const condition of document.conditions) {
+    for (const ref of condition.provenance.facts) cite(ref);
+  }
+
   const facts = [];
   for (const ref of [...refs].sort()) {
     const sentence = describeFact(ref, feature.id);
     if (sentence !== undefined && !facts.includes(sentence)) facts.push(sentence);
+  }
+
+  // Every emitted proposition must be checkable, and the denominator is stated
+  // rather than assumed.
+  //
+  // Out of it, for reasons rather than convenience:
+  //
+  //   Relationships. `element:x|submits_to|function:y` is not something anybody
+  //   looks at. Its endpoints are, and they are added to the fact list, so the
+  //   evidence is present in the form a reviewer can use.
+  //
+  //   Functions, services, hooks. Not on screen. Nothing user-facing rests on
+  //   one of these without also resting on something visible.
+  //
+  //   Controls with no visible text. `invoices.list.open` is emitted as
+  //   `Choose Open.` — unquoted, because the quoting rule says a reader may only
+  //   be sent looking for text the interface actually shows. There is nothing to
+  //   check, and manufacturing a fact about it would be inventing the evidence
+  //   as well as the claim. These are counted and reported rather than hidden.
+  const CHECKABLE = new Set(['element', 'route', 'api', 'permission']);
+  for (const ref of [...required].sort()) {
+    if (ref.includes('|')) continue;
+    const kind = ref.split(':')[0];
+    if (!CHECKABLE.has(kind)) continue;
+    const node = nodeById.get(ref);
+    if (
+      node?.kind === 'element' &&
+      !(typeof node.label === 'string' && node.label.trim().length > 0) &&
+      describeFact(ref, feature.id) === undefined
+    ) {
+      coverage.unnameable.push(`${feature.id}: ${ref}`);
+      continue;
+    }
+    const sentence = describeFact(ref, feature.id);
+    coverage.required += 1;
+    if (sentence !== undefined && facts.includes(sentence)) coverage.covered += 1;
+    else coverage.missing.push(`${feature.id}: ${ref}`);
   }
 
   items.push({
@@ -223,8 +310,54 @@ for (const feature of model.features) {
     ),
     hasWorkflow: document.steps.length > 0,
     stepCount: document.steps.length,
+    taskStepCount: document.steps.filter((step) => step.origin !== 'synthetic-entry').length,
+    // What Closed Loop #6 changed, recorded per feature so the scores can be
+    // correlated against it afterwards. Never shown to the reviewer.
+    recoveredTargets: document.actionRecoveries.map((entry) => ({
+      rule: entry.rule,
+      from: entry.from,
+      relationship: entry.relationship,
+      actionSurface: entry.actionSurface,
+      control: entry.control,
+    })),
+    languagePropositions: document.languagePropositions.length,
+    withheldLanguage: document.withheldLanguage.length,
+    hasCompiledPurpose: document.purpose !== undefined,
+    questionCount: document.questions.length,
+    entryStepSuppressed: document.diagnostics.some(
+      (entry) => entry.code === 'REDUNDANT_ENTRY_STEP',
+    ),
     diagnostics: document.diagnostics.map((entry) => entry.code),
   });
+}
+
+const rate0 = coverage.required === 0 ? 1 : coverage.covered / coverage.required;
+console.log(
+  `\nReview fact coverage: ${coverage.covered}/${coverage.required}  ${(rate0 * 100).toFixed(1)}%`,
+);
+console.log(
+  `  outside the denominator: ${coverage.unnameable.length} control(s) the interface gives no readable text`,
+);
+for (const entry of coverage.unnameable) console.log(`    · ${entry}`);
+if (coverage.missing.length > 0) {
+  console.log('\nFAIL — an emitted proposition has no fact a reviewer could check it against:\n');
+  for (const entry of coverage.missing.slice(0, 30)) console.log(`  ✗ ${entry}`);
+  console.log('');
+  process.exit(1);
+}
+
+// Nothing is written past this point when only the coverage question was asked.
+//
+// This exit used to sit *below* the three `writeFileSync` calls, so
+// `test:review-fact-coverage` rewrote the issued package on every run — and it
+// rewrote it with the current compiler's output, which is how Round 6's
+// artefact acquired a Closed Loop #8 title of `null` where the reviewer had been
+// shown `Search`. `test:artifact-integrity` could not catch it: the rewrite is
+// deterministic, so once it had happened the before-and-after hashes agreed.
+// A gate that quietly edits the evidence it is checking is worse than no gate.
+if (CHECK_ONLY) {
+  console.log(`\nPASS — every emitted proposition has a fact a reviewer can check it against.\n`);
+  process.exit(0);
 }
 
 const shuffled = shuffle(items, seededRandom(SEED));
@@ -265,7 +398,7 @@ const RUBRIC = {
 };
 
 const artefact = {
-  package: 'human-review-round-4',
+  package: 'human-review-round-6',
   gateVersion: 'v2',
   scoredBy: null,
   /**
@@ -292,11 +425,11 @@ const artefact = {
 };
 
 writeFileSync(
-  path.join(BENCH, 'human-review-round-4.json'),
+  path.join(BENCH, 'human-review-round-6.json'),
   `${JSON.stringify(artefact, null, 2)}\n`,
 );
 writeFileSync(
-  path.join(BENCH, 'human-review-round-4.key.json'),
+  path.join(BENCH, 'human-review-round-6.key.json'),
   `${JSON.stringify(
     {
       warning:
@@ -312,7 +445,7 @@ writeFileSync(
 );
 
 const md = [
-  '# Human review — Round 4',
+  '# Human review — Round 6',
   '',
   '> Judge the output as if you were an end user encountering this help inside an application.',
   '>',
@@ -388,12 +521,12 @@ for (const item of shuffled) {
   );
 }
 
-writeFileSync(path.join(BENCH, 'human-review-round-4.md'), `${md.join('\n')}\n`);
+writeFileSync(path.join(BENCH, 'human-review-round-6.md'), `${md.join('\n')}\n`);
 
 const withFacts = shuffled.filter((item) => item.knownSupportedFacts.length > 0).length;
 console.log(`\nWrote ${shuffled.length} blinded review items (gate v2).`);
 console.log(`  items carrying checkable facts: ${withFacts}/${shuffled.length}`);
-console.log('  benchmarks/provider-reality-check/human-review-round-4.json');
-console.log('  benchmarks/provider-reality-check/human-review-round-4.md');
-console.log('  benchmarks/provider-reality-check/human-review-round-4.key.json  (do not share)');
+console.log('  benchmarks/provider-reality-check/human-review-round-6.json');
+console.log('  benchmarks/provider-reality-check/human-review-round-6.md');
+console.log('  benchmarks/provider-reality-check/human-review-round-6.key.json  (do not share)');
 console.log(`Seed: ${SEED}\n`);
