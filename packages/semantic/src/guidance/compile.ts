@@ -29,10 +29,16 @@
 
 import type { ApplicationGraph } from '@statewavedev/guide-indexer';
 import type { ProductClaim, ProductFeature, ProductModel } from '@statewavedev/guide-shared';
+import type { FeatureCandidate } from '../candidates.js';
 import { compareStrings } from '../compare.js';
+import { computeFeatureScope } from '../scope.js';
+import type { FeatureScope } from '../scope.js';
+import { resolveActionTarget } from './action-target.js';
+import type { WorkflowActionTarget } from './action-target.js';
 import { createLabelIndex, entityNoun, fieldNoun, normaliseIdentifier } from './labels.js';
 import type { HumanLabel, LabelIndex } from './labels.js';
 import type {
+  ActionAccountingEntry,
   GuidanceCompleteness,
   GuidanceCondition,
   GuidanceDiagnostic,
@@ -41,6 +47,8 @@ import type {
   GuidanceProvenance,
   GuidanceQuestion,
   GuidanceStep,
+  StepOrigin,
+  TaskCompletion,
   WorkflowRole,
 } from './ir.js';
 import { WORKFLOW_ROLE_ORDER, isActionProposition, mergeProvenance } from './ir.js';
@@ -51,6 +59,18 @@ export interface CompileGuidanceInput {
   model: ProductModel;
   feature: ProductFeature;
   graph: ApplicationGraph;
+  /**
+   * The candidate this feature was discovered as, and its roots.
+   *
+   * Required to resolve a `feature:` subject to a control: the roots are the
+   * mapping discovery recorded, and they are the only thing that may establish
+   * it. Optional so existing callers keep compiling; without it a feature
+   * subject cannot resolve and the claim is accounted for as dropped rather
+   * than silently lost.
+   */
+  candidate?: FeatureCandidate;
+  /** What this feature owns. Required to refuse a control it does not. */
+  scope?: FeatureScope;
 }
 
 const EMPTY_PROVENANCE: GuidanceProvenance = { claims: [], facts: [] };
@@ -77,6 +97,50 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
   const object = entityNoun(feature.id);
   const title = titleFor(feature, labels, diagnostics);
 
+  // The candidate and its scope decide what a `feature:` subject may resolve to.
+  // Reconstructed here when a caller did not supply them, from the feature's own
+  // entry points — never from the shape of an identifier.
+  const candidate: FeatureCandidate =
+    input.candidate ??
+    ({
+      id: feature.id,
+      idOrigin: feature.idOrigin === 'semantic-id' ? 'semantic-id' : 'derived',
+      rootNodes: [...(feature.entryPoints ?? [])],
+      discoveredBy: 'guide-element',
+    } as FeatureCandidate);
+  const scope =
+    input.scope ??
+    computeFeatureScope({
+      featureId: feature.id,
+      roots: candidate.rootNodes,
+      nodes: graph.nodes,
+      relationships: graph.relationships,
+    });
+
+  const accounting: ActionAccountingEntry[] = [];
+  /** Resolves one action claim to a control, recording whatever happens. */
+  const targetFor = (claim: ProductClaim): WorkflowActionTarget | undefined => {
+    const subjectRef = claim.assertion?.subjectRef ?? '';
+    const outcome = resolveActionTarget({ subjectRef, candidate, scope, graph });
+    if (outcome.status === 'resolved') return outcome.target;
+
+    const reason =
+      outcome.status === 'ambiguous'
+        ? 'AMBIGUOUS_WORKFLOW_TARGET'
+        : outcome.status === 'passive-target'
+          ? 'PASSIVE_TARGET'
+          : 'NO_ACTIONABLE_TARGET';
+    accounting.push({
+      claimId: claim.id,
+      subjectRef,
+      outcome: 'dropped',
+      reason,
+      detail: outcome.detail,
+    });
+    diagnostics.push({ code: reason, detail: outcome.detail, subject: claim.id });
+    return undefined;
+  };
+
   // --- Capabilities, as things a user can do -------------------------------
   const capabilities: GuidanceProposition[] = [];
   for (const claim of factual) {
@@ -85,11 +149,24 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     if (action === undefined) continue;
     const control = controlFor(claim, labels);
 
-    // `submit` on its own says nothing a user recognises — it names the
-    // mechanism, not the outcome. Day 2 rendered exactly that and produced
-    // "submit the invoices create form form". It is kept only as the
-    // confirmation step of a workflow, where the control gives it meaning.
-    if (action === 'submit') continue;
+    // `submit` is the mechanism, not the outcome. Spoken on its own it produced
+    // "submit the invoices create form form", so Closed Loop #4 suppressed it
+    // outright — and that was too broad. A submit claim attached to a control a
+    // user can read is perfectly sayable *through the control*: `Save changes`
+    // is what they press, and the internal verb never has to appear. Suppression
+    // now applies only where nothing on screen names the action, which is the
+    // case the original rule was actually about.
+    if (action === 'submit' && control === undefined) {
+      accounting.push({
+        claimId: claim.id,
+        subjectRef: claim.assertion?.subjectRef ?? '',
+        outcome: 'dropped',
+        reason: 'UNSUPPORTED_PRESENTATION',
+        detail:
+          'A submit capability with no user-visible control. Naming it would mean saying "submit the form", which describes the mechanism rather than anything the reader can see.',
+      });
+      continue;
+    }
     // `navigate` is handled below as a destination. Rendered as a bare
     // capability it produced "You can open a nav." — the namespace of a
     // navigation link is not a thing anybody has.
@@ -156,7 +233,9 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     labels,
     object,
     diagnostics,
-    entryScreen(feature, graph, labels),
+    entryScreen(feature, candidate, graph, labels, diagnostics),
+    targetFor,
+    accounting,
   );
 
   // --- Summary and purpose -------------------------------------------------
@@ -181,6 +260,7 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
   const purpose = purposeFrom(language, factual, diagnostics);
   const questions = compileQuestions(language, diagnostics);
 
+  const taskCompletion = taskCompletionOf(steps);
   const document: GuidanceDocument = {
     featureId: feature.id,
     title,
@@ -191,6 +271,8 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     conditions,
     diagnostics,
     completeness: 'EMPTY',
+    taskCompletion,
+    actionAccounting: accounting,
   };
   return { ...document, completeness: completenessOf(document) };
 }
@@ -262,23 +344,70 @@ function compileSteps(
   object: string | undefined,
   diagnostics: GuidanceDiagnostic[],
   entry: { label: HumanLabel; nodeId: string } | undefined,
+  targetFor: (claim: ProductClaim) => WorkflowActionTarget | undefined,
+  accounting: ActionAccountingEntry[],
 ): GuidanceStep[] {
-  const stepClaims = factual.filter((claim) => claim.type === 'workflow_step');
-  if (stepClaims.length === 0) return [];
+  const actionClaims = factual.filter(
+    (claim) =>
+      claim.type === 'workflow_step' ||
+      (claim.type === 'capability' && claim.assertion?.action !== undefined),
+  );
 
-  const byRole = new Map<WorkflowRole, { claim: ProductClaim; nodeId: string }[]>();
-  for (const claim of stepClaims) {
-    const subject = claim.assertion?.subjectRef ?? '';
-    const role = roleOf(subject, labels);
-    const bucket = byRole.get(role) ?? [];
-    bucket.push({ claim, nodeId: subject });
-    byRole.set(role, bucket);
+  // Resolve every action claim to the control a user would press, before any
+  // question of ordering. A `feature:` subject is not a node id and never was;
+  // treating it as one is what dropped ten features' only step.
+  const resolved: { claim: ProductClaim; target: WorkflowActionTarget; role: WorkflowRole }[] = [];
+  for (const claim of actionClaims) {
+    const target = targetFor(claim);
+    if (target === undefined) continue;
+    resolved.push({ claim, target, role: roleOf(target.nodeId, labels) });
+  }
+
+  // One action per control. A capability, a workflow step and a submit claim
+  // routinely name the same button; emitting each would tell a user to press
+  // "Create client" three times in a row. Identity is the control and the role,
+  // never the similarity of two sentences.
+  const seen = new Map<
+    string,
+    { claim: ProductClaim; target: WorkflowActionTarget; role: WorkflowRole }
+  >();
+  for (const candidate of resolved) {
+    const key = `${candidate.target.nodeId}|${candidate.role}`;
+    const existing = seen.get(key);
+    if (existing === undefined) {
+      seen.set(key, candidate);
+      continue;
+    }
+    // Kept: the claim that carries an action, because it can say what the
+    // control accomplishes rather than only that it is pressed.
+    const better =
+      existing.claim.assertion?.action === undefined &&
+      candidate.claim.assertion?.action !== undefined
+        ? candidate
+        : existing;
+    if (better !== existing) seen.set(key, better);
+    const dropped = better === existing ? candidate : existing;
+    accounting.push({
+      claimId: dropped.claim.id,
+      subjectRef: dropped.claim.assertion?.subjectRef ?? '',
+      outcome: 'dropped',
+      reason: 'DUPLICATE_ACTION',
+      detail: `Another claim already puts ${dropped.target.nodeId} in this guide as the same kind of step.`,
+      targetNodeId: dropped.target.nodeId,
+    });
+  }
+
+  const byRole = new Map<WorkflowRole, typeof resolved>();
+  for (const candidate of seen.values()) {
+    const bucket = byRole.get(candidate.role) ?? [];
+    bucket.push(candidate);
+    byRole.set(candidate.role, bucket);
   }
 
   // Fields are gathered into one instruction rather than one step each: a user
   // filling in a form does it once, and "Enter the name. Enter the email.
   // Enter the plan." is a list of the same step three times.
-  const fieldNodes = stepClaims
+  const fieldNodes = actionClaims
     .flatMap((claim) => claim.assertion?.targets ?? [])
     .filter((target) => isFieldNode(target, labels));
 
@@ -287,12 +416,14 @@ function compileSteps(
 
   // Where the user has to be standing. Taken from the screen the feature lives
   // on, which the scope classifies as context — legitimate to name, and never
-  // usable as evidence for a capability.
+  // usable as evidence for a capability. Marked `synthetic-entry`, because
+  // nobody claimed it and no metric should count it as something a user does.
   if (entry !== undefined) {
     steps.push({
       index: index++,
       role: 'entry',
       kind: 'action',
+      origin: 'synthetic-entry',
       proposition: {
         kind: 'navigate',
         destination: entry.label,
@@ -318,7 +449,7 @@ function compileSteps(
           fields,
           ...(object === undefined ? {} : { object }),
           provenance: mergeProvenance(
-            ...stepClaims
+            ...actionClaims
               .filter((claim) =>
                 (claim.assertion?.targets ?? []).some((target) => fieldNodes.includes(target)),
               )
@@ -329,31 +460,48 @@ function compileSteps(
           index: index++,
           role,
           kind: 'action',
+          origin: 'verified-workflow',
           proposition,
           provenance: proposition.provenance,
         });
       }
       continue;
     }
-    const entries = (byRole.get(role) ?? []).sort((a, b) => compareStrings(a.nodeId, b.nodeId));
-    for (const entry of entries) {
+
+    const entries = (byRole.get(role) ?? []).sort((a, b) =>
+      compareStrings(a.target.nodeId, b.target.nodeId),
+    );
+    for (const candidate of entries) {
       const proposition = propositionForStep(
         role,
-        entry.claim,
-        entry.nodeId,
+        candidate.claim,
+        candidate.target,
         labels,
         object,
         fieldNodes,
       );
-      if (proposition === undefined) continue;
-      // A step that cannot be phrased as an instruction is not a step. The
-      // container propositions fall out here, which is the intended outcome:
-      // "the dialog holds the form" is context, and nobody performs it.
-      if (realiseInstruction(proposition) === undefined) continue;
+      if (proposition === undefined || realiseInstruction(proposition) === undefined) {
+        accounting.push({
+          claimId: candidate.claim.id,
+          subjectRef: candidate.claim.assertion?.subjectRef ?? '',
+          outcome: 'dropped',
+          reason: 'UNSUPPORTED_PRESENTATION',
+          detail: 'The control resolved, but nothing about it could be phrased as an instruction.',
+          targetNodeId: candidate.target.nodeId,
+        });
+        continue;
+      }
+      accounting.push({
+        claimId: candidate.claim.id,
+        subjectRef: candidate.claim.assertion?.subjectRef ?? '',
+        outcome: 'emitted',
+        targetNodeId: candidate.target.nodeId,
+      });
       steps.push({
         index: index++,
         role,
         kind: isActionProposition(proposition) ? 'action' : 'informational',
+        origin: originOf(candidate.claim),
         proposition,
         provenance: proposition.provenance,
       });
@@ -371,16 +519,28 @@ function compileSteps(
   return steps;
 }
 
+/** Which kind of verified claim produced a step. */
+function originOf(claim: ProductClaim): StepOrigin {
+  if (claim.type === 'workflow_step') return 'verified-workflow';
+  if (claim.type === 'navigation') return 'verified-navigation';
+  if (claim.assertion?.action === 'submit') return 'verified-submit';
+  return 'verified-capability';
+}
+
 function propositionForStep(
   role: WorkflowRole,
   claim: ProductClaim,
-  nodeId: string,
+  target: WorkflowActionTarget,
   labels: LabelIndex,
   object: string | undefined,
   fieldNodes: readonly string[],
 ): GuidanceProposition | undefined {
-  const provenance = provenanceOf(claim);
-  const label = labels.label(nodeId);
+  // Provenance carries the claim, the control it resolved to, and the evidence
+  // behind it — the resolution is part of how the sentence came to exist, and a
+  // reader tracing it back should not have to guess which button was meant.
+  const provenance = mergeProvenance(provenanceOf(claim), { claims: [], facts: [target.nodeId] });
+  const nodeId = target.nodeId;
+  const label = target.label ?? labels.label(nodeId);
 
   switch (role) {
     case 'entry':
@@ -449,6 +609,18 @@ function collectFields(fieldNodes: readonly string[], labels: LabelIndex): Human
       nodeId: field,
     });
   }
+
+  // A lone field with no visible label is not named.
+  //
+  // Where several unlabelled inputs sit in a form, their identifier segments
+  // are genuinely the names of what goes in them — `name`, `email`, `plan` — and
+  // listing them helps. A single one is different: the segment names what the
+  // box is *for* rather than what to type in it, which is how `clients.search`
+  // produced "Enter the client's search". The distinction is structural rather
+  // than a judgement about the words, and where it cannot be made the step is
+  // omitted instead of guessed at.
+  const named = fields.filter((field) => field.origin === 'ui-label');
+  if (named.length === 0 && fields.length === 1) return [];
   return fields;
 }
 
@@ -463,30 +635,70 @@ function collectFields(fieldNodes: readonly string[], labels: LabelIndex): Human
  */
 function entryScreen(
   feature: ProductFeature,
+  candidate: FeatureCandidate,
   graph: ApplicationGraph,
   labels: LabelIndex,
+  diagnostics: GuidanceDiagnostic[],
 ): { label: HumanLabel; nodeId: string } | undefined {
-  const declared = (feature.routes ?? [])[0];
-  if (declared !== undefined) {
+  // 1. A route the feature itself records — but only when it records exactly
+  //    one. `invoices.list.*` declares both `/invoices` and `/clients/:clientId`
+  //    because the list component is rendered on both screens, and taking the
+  //    first told users to open the client detail page to clear an invoice
+  //    selection. Sorted-first is sorted-first wherever it is written.
+  const declaredRoutes = feature.routes ?? [];
+  if (declaredRoutes.length === 1) {
+    const declared = declaredRoutes[0]!;
     const found = labels.label(`route:${declared}`);
     if (found !== undefined) return { label: found, nodeId: `route:${declared}` };
   }
+  if (declaredRoutes.length > 1) {
+    diagnostics.push({
+      code: 'ENTRY_ROUTE_AMBIGUOUS',
+      detail: `This feature appears on ${declaredRoutes.length} screens (${[...declaredRoutes].sort(compareStrings).join(', ')}), so none is named as the place to start.`,
+      subject: feature.id,
+    });
+    return undefined;
+  }
 
-  // Otherwise: up from an entry point to the component holding it, then to the
-  // route rendering that component. Upward only, never back down into siblings.
-  const roots = feature.entryPoints ?? [];
+  // 2. Otherwise: up from a root to the component holding it, then to the routes
+  //    rendering that component. Upward only, never back down into siblings.
+  const roots = candidate.rootNodes;
   const containers = graph.relationships
     .filter((edge) => edge.type === 'contains' && roots.includes(edge.target))
     .map((edge) => edge.source);
-  for (const container of containers.sort(compareStrings)) {
-    const route = graph.relationships.find(
-      (edge) =>
-        edge.type === 'renders' && edge.target === container && edge.source.startsWith('route:'),
-    );
-    if (route === undefined) continue;
-    const found = labels.label(route.source);
-    if (found !== undefined) return { label: found, nodeId: route.source };
+
+  const routes = new Set<string>();
+  for (const container of containers) {
+    for (const edge of graph.relationships) {
+      if (edge.type !== 'renders') continue;
+      if (edge.target !== container) continue;
+      if (!edge.source.startsWith('route:')) continue;
+      routes.add(edge.source);
+    }
   }
+
+  if (routes.size === 1) {
+    const nodeId = [...routes][0]!;
+    const found = labels.label(nodeId);
+    return found === undefined ? undefined : { label: found, nodeId };
+  }
+
+  if (routes.size > 1) {
+    // Refused, not guessed. This resolver used to take the first match in sort
+    // order, and `InvoiceList` is rendered by both the invoices page and the
+    // client detail page — so two invoice features instructed users to "Open
+    // Client Detail". A route that merely *can* host a component is not the
+    // route a feature lives on, and namespace similarity is a hint rather than
+    // evidence: acting on it would be the suffix-matching this layer refuses
+    // everywhere else.
+    diagnostics.push({
+      code: 'ENTRY_ROUTE_AMBIGUOUS',
+      detail: `More than one route renders the component holding this feature (${[...routes].sort(compareStrings).join(', ')}), so no screen is named. Naming one would mean choosing by sort order.`,
+      subject: feature.id,
+    });
+    return undefined;
+  }
+
   return undefined;
 }
 
@@ -626,19 +838,54 @@ function article(noun: string): string {
 // Completeness
 // ---------------------------------------------------------------------------
 
+/**
+ * How far a guide takes a reader.
+ *
+ * `ACTIONABLE` now means a task action, not any step at all. The previous
+ * definition counted the synthesised `Open Clients.` — so eleven features were
+ * classified as offering the user something to do, and an independent reviewer
+ * scored them 1.18 on average. A metric that flatters the output is worse than
+ * no metric, because it is the thing you check the output against.
+ */
 function completenessOf(document: GuidanceDocument): GuidanceCompleteness {
-  const hasAction =
-    document.steps.some((step) => step.kind === 'action') || document.summary !== undefined;
+  const taskSteps = document.steps.filter(
+    (step) => step.kind === 'action' && step.origin !== 'synthetic-entry',
+  );
+  const hasEntry = document.steps.some((step) => step.origin === 'synthetic-entry');
   const hasExplanation = document.purpose !== undefined || document.summary !== undefined;
 
-  if (!hasAction && !hasExplanation && document.questions.length === 0) {
+  if (taskSteps.length === 0) {
+    if (hasEntry) return 'ENTRY_ONLY';
+    if (hasExplanation) return 'DESCRIPTIVE';
+    if (document.questions.length > 0) return 'IDENTIFICATION_ONLY';
     return document.title.origin === 'normalised-identifier' ? 'EMPTY' : 'IDENTIFICATION_ONLY';
   }
-  if (!hasAction) return hasExplanation ? 'DESCRIPTIVE' : 'IDENTIFICATION_ONLY';
-  if (hasAction && document.purpose !== undefined && document.conditions.length > 0) {
-    return 'COMPLETE';
-  }
+  if (hasExplanation && document.conditions.length > 0) return 'COMPLETE';
   return 'ACTIONABLE';
+}
+
+/**
+ * How far the steps carry the task itself.
+ *
+ * Separate from completeness because they answer different questions: one is
+ * about how much the guide says, the other about whether a reader who follows
+ * it finishes. A feature can be `COMPLETE` — purpose, action, condition — and
+ * still stop before the button that commits the change.
+ */
+function taskCompletionOf(steps: readonly GuidanceStep[]): TaskCompletion {
+  if (steps.length === 0) return 'NO_TASK';
+  const task = steps.filter((step) => step.kind === 'action' && step.origin !== 'synthetic-entry');
+  if (task.length === 0) return 'ENTRY_ONLY';
+
+  // A task ends where the graph says it ends: at the control that commits it.
+  // Not at the deepest node, and not at the last one in the list — neither of
+  // those is a fact about what a user finished doing.
+  const terminal = task.some(
+    (step) => step.role === 'confirmation' || step.origin === 'verified-submit',
+  );
+  const hasEntry = steps.some((step) => step.origin === 'synthetic-entry');
+  if (!terminal) return 'PARTIAL';
+  return hasEntry && task.length > 1 ? 'COMPLETE_PATH' : 'TERMINAL_ACTION_REACHED';
 }
 
 export { mergeProvenance, EMPTY_PROVENANCE };

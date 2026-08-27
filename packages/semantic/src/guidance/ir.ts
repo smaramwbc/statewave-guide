@@ -166,6 +166,47 @@ export const WORKFLOW_ROLE_ORDER: readonly WorkflowRole[] = [
 ];
 
 /**
+ * Where a step came from.
+ *
+ * Recorded on the step rather than inferred from its text afterwards, because a
+ * metric that has to read English to decide whether a user was given something
+ * to do will eventually read it wrong. It already did: `Open Clients.` is a
+ * synthesised convenience — nobody claimed it, the graph merely knows which
+ * screen the feature sits on — and counting it as a user action let eleven
+ * features be classified `ACTIONABLE` while averaging 1.18 in review.
+ */
+export type StepOrigin =
+  /** Composed from the feature's containing route. No claim asserts it. */
+  | 'synthetic-entry'
+  /** A verified `workflow_step` claim. */
+  | 'verified-workflow'
+  /** A verified `capability` claim. */
+  | 'verified-capability'
+  /** A verified `navigation` claim. */
+  | 'verified-navigation'
+  /** A verified `capability/submit` claim, spoken through its control. */
+  | 'verified-submit';
+
+/**
+ * How far the guidance takes a user through the task.
+ *
+ * Diagnostic only, and never shown to a reader. It answers the question the
+ * Round 3 review kept asking in prose — *"the only step is Open Clients"* —
+ * with something a metric can count.
+ */
+export type TaskCompletion =
+  /** Nothing to do. */
+  | 'NO_TASK'
+  /** Only the synthesised "go here" step. */
+  | 'ENTRY_ONLY'
+  /** At least one real action, but the task does not reach its end. */
+  | 'PARTIAL'
+  /** The action that finishes the task is present. */
+  | 'TERMINAL_ACTION_REACHED'
+  /** Entry, the steps between, and the finishing action. */
+  | 'COMPLETE_PATH';
+
+/**
  * A step, and whether it is something to do or something to know.
  *
  * *The dialog holds the form* is true, and it is not a step: nobody performs
@@ -176,6 +217,8 @@ export interface GuidanceStep {
   index: number;
   role: WorkflowRole;
   kind: 'action' | 'informational';
+  /** What produced it. A synthetic entry is not a user action. */
+  origin: StepOrigin;
   proposition: GuidanceProposition;
   provenance: GuidanceProvenance;
 }
@@ -213,7 +256,11 @@ export interface GuidanceDiagnostic {
     | 'NO_WORKFLOW_ORDER'
     | 'CONSTRAINT_WITHHELD_AS_IRRELEVANT'
     | 'LANGUAGE_CLAIM_UNSUPPORTED'
-    | 'QUESTION_DISCARDED_AS_TECHNICAL';
+    | 'QUESTION_DISCARDED_AS_TECHNICAL'
+    | 'NO_ACTIONABLE_TARGET'
+    | 'AMBIGUOUS_WORKFLOW_TARGET'
+    | 'PASSIVE_TARGET'
+    | 'ENTRY_ROUTE_AMBIGUOUS';
   detail: string;
   /** What it concerns, when it concerns something nameable. */
   subject?: string;
@@ -237,9 +284,19 @@ export type GuidanceCompleteness =
   | 'IDENTIFICATION_ONLY'
   /** We can explain it, but not what to do. */
   | 'DESCRIPTIVE'
-  /** At least one thing the user can do. */
+  /**
+   * We can say where it lives, and nothing a user does there.
+   *
+   * New, and the reason the old taxonomy was misleading. `ACTIONABLE` used to
+   * cover this case, because a synthesised `Open Clients.` counted as an
+   * action — so eleven features were classified as offering the user something
+   * to do while a reviewer scored them 1.18 on average. Splitting the class out
+   * costs nothing and stops the metric flattering the output.
+   */
+  | 'ENTRY_ONLY'
+  /** At least one action that is not merely "go to this screen". */
   | 'ACTIONABLE'
-  /** Actions, purpose, and the conditions that govern them. */
+  /** Entry, a real action, and the conditions that govern it. */
   | 'COMPLETE';
 
 /** Everything decided about one feature, before phrasing. */
@@ -254,6 +311,34 @@ export interface GuidanceDocument {
   /** Developer-facing. Never rendered into user copy. */
   diagnostics: readonly GuidanceDiagnostic[];
   completeness: GuidanceCompleteness;
+  /** How far the steps take a user through the task. Diagnostic only. */
+  taskCompletion: TaskCompletion;
+  /** Verified action claims this feature had, and what became of each. */
+  actionAccounting: readonly ActionAccountingEntry[];
+}
+
+/**
+ * One verified action claim, and what the compiler did with it.
+ *
+ * Every drop carries a reason. The Round 3 defect was not that steps were
+ * dropped — some should be — it was that they were dropped *silently*, so a
+ * whole class of missing guidance looked from the inside like a feature with
+ * nothing to say.
+ */
+export interface ActionAccountingEntry {
+  claimId: string;
+  subjectRef: string;
+  outcome: 'emitted' | 'dropped';
+  reason?:
+    | 'NO_ACTIONABLE_TARGET'
+    | 'AMBIGUOUS_WORKFLOW_TARGET'
+    | 'PASSIVE_TARGET'
+    | 'DUPLICATE_ACTION'
+    | 'UNSUPPORTED_PRESENTATION'
+    | 'ENTRY_ROUTE_AMBIGUOUS';
+  detail?: string;
+  /** The control it resolved to, when it resolved. */
+  targetNodeId?: string;
 }
 
 /** Merges provenance without duplicating refs, keeping order stable. */

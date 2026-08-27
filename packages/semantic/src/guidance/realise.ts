@@ -112,6 +112,11 @@ export function tryRealise(proposition: GuidanceProposition): string | undefined
     case 'confirm_action': {
       const { control, action, object } = proposition;
       if (action === undefined || object === undefined) return `Choose ${name(control)}.`;
+      // `submit` is the mechanism. A control labelled "Save changes" already
+      // tells a reader what pressing it does, and appending the internal verb
+      // produces "Choose \"Save changes\" to submit a setting" — the vocabulary
+      // the user was never supposed to meet, arriving through the back door.
+      if (action === 'submit') return `Choose ${name(control)}.`;
       return `Choose ${name(control)} to ${ACTION_PHRASES[action](object)}.`;
     }
 
@@ -165,9 +170,10 @@ export function realiseInstruction(proposition: GuidanceProposition): string | u
     }
     case 'confirm_action': {
       const { control, action, object } = proposition;
-      return action === undefined || object === undefined
-        ? `Choose ${name(control)}.`
-        : `Choose ${name(control)} to ${ACTION_PHRASES[action](object)}.`;
+      if (action === undefined || object === undefined || action === 'submit') {
+        return `Choose ${name(control)}.`;
+      }
+      return `Choose ${name(control)} to ${ACTION_PHRASES[action](object)}.`;
     }
     case 'enter_fields':
       return tryRealise(proposition);
