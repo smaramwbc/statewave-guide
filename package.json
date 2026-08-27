@@ -42,6 +42,9 @@
     "test:workflow-selection-quality": "node scripts/workflow-selection-quality.mjs",
     "benchmark:round-3-vs-4": "node scripts/guidance-round-3-vs-4.mjs",
     "benchmark:build-human-review-4": "node scripts/build-human-review-4.mjs",
+    "benchmark:round-4-vs-5": "node scripts/guidance-round-4-vs-5.mjs",
+    "benchmark:build-human-review-5": "node scripts/build-human-review-5.mjs",
+    "test:action-target-recovery-quality": "node scripts/action-target-recovery-quality.mjs",
     "test:artifact-integrity": "node scripts/historical-artifact-integrity.mjs"
   },
   "devDependencies": {

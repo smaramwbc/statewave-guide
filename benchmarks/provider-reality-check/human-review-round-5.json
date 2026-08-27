@@ -1,0 +1,746 @@
+{
+  "package": "human-review-round-5",
+  "gateVersion": "v2",
+  "scoredBy": null,
+  "reviewerType": null,
+  "scoredAt": null,
+  "instructions": [
+    "Judge the output as if you were an end user encountering this help inside an application.",
+    "Do not award points because the output is technically safe, evidence-backed, or generated through an impressive architecture.",
+    "The only question is whether the resulting help is correct and useful.",
+    "Score every item. Leave nothing null.",
+    "Score correctness as \"not_assessable\" when no checkable facts were supplied — do NOT score it 0. Zero means you found something untrue.",
+    "\"knownSupportedFacts\" lists what the application genuinely does, so you can judge correctness without reading source code. It is not part of the output being scored.",
+    "An item that is accurate but tells a user nothing is not a good item. Say so with a low usefulness score.",
+    "Silence is a deliberate choice in this system. A feature that says less than you expected may be correct to do so — judge whether what IS said helps, and whether what is missing was needed.",
+    "Set \"reviewerType\" to \"human\" or \"non_human_independent\". The formal Human Usefulness Gate closes only on a human review."
+  ],
+  "rubric": {
+    "usefulness": {
+      "0": "Useless. Accurate or not, this would not meaningfully help a user — repeats technical identifiers, or contains no understandable purpose or actionable guidance.",
+      "1": "Minimally useful. The user can roughly understand what the feature is, but guidance is incomplete, awkward, or too technical.",
+      "2": "Useful. A normal end user could understand the feature and get meaningful help. Accurate, understandable, sufficiently actionable.",
+      "3": "Excellent. Clear, concise, natural and genuinely helpful. Explains the purpose well and provides strong supported guidance without unnecessary technical language."
+    },
+    "correctness": {
+      "0": "Says something untrue of the application, judged against knownSupportedFacts.",
+      "1": "Acceptable: nothing untrue, but imprecise or overreaching in places.",
+      "2": "Strong: everything it says is supported by the facts supplied.",
+      "not_assessable": "No checkable facts were supplied for this item. Use this rather than 0 — it is not a judgement about the output."
+    },
+    "dimensions": {
+      "scale": {
+        "0": "poor",
+        "1": "acceptable",
+        "2": "strong"
+      },
+      "clarity": "Would a non-technical user understand it on one read?",
+      "actionability": "Could a user act on it, or does it only describe?",
+      "naturalLanguage": "Does it read like a person wrote it for a user?"
+    },
+    "flags": [
+      "too_technical",
+      "too_vague",
+      "missing_capability",
+      "missing_workflow",
+      "incorrect_fact",
+      "irrelevant_information",
+      "repetitive",
+      "good_as_is"
+    ]
+  },
+  "itemCount": 21,
+  "items": [
+    {
+      "reviewId": "R01",
+      "featureId": "settings.form",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Form",
+        "summary": null,
+        "purpose": "The settings form collects organisation name and notification preferences in one place.",
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I change my organisation name or turn notifications on or off?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The Settings screen contains a form."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R02",
+      "featureId": "client-detail.rename",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Rename",
+        "summary": "You can change a client using \"Rename\".",
+        "purpose": "Lets someone correct or change a client's display name without leaving the client detail page.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ],
+        "conditions": [
+          "You need permission to change a client."
+        ],
+        "questions": [
+          "How do I change a client's name?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a PUT request to /api/clients/:clientId.",
+        "The screen has a control labelled \"Rename\".",
+        "Using this requires the \"clients:update\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R03",
+      "featureId": "invoices.list.open",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Open",
+        "summary": null,
+        "purpose": "The open button on an invoice row selects that invoice so its details can be viewed.",
+        "steps": [
+          "Choose Open."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I open a specific invoice?"
+        ]
+      },
+      "knownSupportedFacts": [],
+      "factsNote": "No independently checkable facts were available for this item. This says nothing about whether the output is correct — score correctness as \"not_assessable\".",
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R04",
+      "featureId": "client-detail.delete",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Delete",
+        "summary": null,
+        "purpose": "Removes a client record you no longer need from the client detail page.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why can't I see the Delete button on a client?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Delete\".",
+        "Using this requires the \"clients:delete\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R05",
+      "featureId": "settings.save",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Save changes",
+        "summary": "You can submit a setting using \"Save changes\".",
+        "purpose": "Save changes commits edits made in the settings form on the Settings page.",
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ],
+        "conditions": [],
+        "questions": [
+          "Why is the Save changes button greyed out? It is disabled unless you have permission to edit settings."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Save changes\"."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R06",
+      "featureId": "clients.create",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "New client",
+        "summary": "You can create a new client using \"New client\".",
+        "purpose": "Lets an admin onboard a new client account with a name, billing email and plan.",
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "conditions": [
+          "You need permission to create a client."
+        ],
+        "questions": [
+          "How do I add a new client?",
+          "Why can't I see the New client button?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a POST request to /api/clients.",
+        "The screen has a control labelled \"New client\".",
+        "The screen has a control labelled \"Cancel\".",
+        "The Clients screen contains a text input.",
+        "The Clients screen contains a form.",
+        "The Clients screen contains a dropdown.",
+        "The screen has a control labelled \"Create client\".",
+        "Using this requires the \"clients:create\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R07",
+      "featureId": "clients.table.forbidden",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "You do not have access to the client list.",
+        "summary": null,
+        "purpose": "Explains why the clients table appears empty for users without client read access.",
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [
+          "Why can't I see the client list?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"You do not have access to the client list.\"."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R08",
+      "featureId": "client-detail.change-plan",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Upgrade",
+        "summary": null,
+        "purpose": "Lets an account manager move a client onto the enterprise plan without editing the record by hand.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "How do I upgrade a client to the enterprise plan?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Upgrade\".",
+        "Using this requires the \"clients:update\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R09",
+      "featureId": "invoices.create-form.submit",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Raise invoice",
+        "summary": "You can create a new invoice using \"Raise invoice\".",
+        "purpose": "Lets a user record a new invoice for a client without leaving the invoices page.",
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ],
+        "conditions": [
+          "You need permission to create an invoice."
+        ],
+        "questions": [
+          "Why can't I see the invoice form?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a POST request to /api/invoices.",
+        "The screen has a control labelled \"Raise invoice\".",
+        "Using this requires the \"invoices:create\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R10",
+      "featureId": "api.get.partial-clients",
+      "userContext": {
+        "screen": "Api",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Partial clients",
+        "summary": null,
+        "purpose": "Serves client data through a legacy route kept alongside the current client APIs.",
+        "steps": [],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why do I get an access error when calling the older clients endpoint?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a GET request to ?/clients.",
+        "Using this requires the \"clients:read\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R11",
+      "featureId": "nav.clients",
+      "userContext": {
+        "screen": "Nav",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Clients",
+        "summary": "Open Clients.",
+        "purpose": "Gives quick access to the client list from anywhere in the app.",
+        "steps": [
+          "Choose \"Clients\"."
+        ],
+        "conditions": [],
+        "questions": [
+          "Where do I find my clients?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"New client\".",
+        "The screen has a control labelled \"Export CSV\".",
+        "The screen has a control labelled \"Refresh\".",
+        "The Nav screen contains a text input.",
+        "The screen has a control labelled \"Clients\".",
+        "There is a screen at /clients."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R12",
+      "featureId": "clients.export",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Export CSV",
+        "summary": null,
+        "purpose": "Lets you take the client list out of the app as a CSV file for use elsewhere.",
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Export CSV\"."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R13",
+      "featureId": "clients.table",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Table",
+        "summary": null,
+        "purpose": "The table is the main view of clients, with each row opening that client and offering a Delete action.",
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [
+          "Why do I see 'You do not have access to the client list'? The table only appears for people with client read access."
+        ]
+      },
+      "knownSupportedFacts": [
+        "The Clients screen contains a table."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R14",
+      "featureId": "dashboard.new-client",
+      "userContext": {
+        "screen": "Dashboard",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "New client",
+        "summary": null,
+        "purpose": "Gives a shortcut for adding a client straight from the dashboard instead of going to the clients list first.",
+        "steps": [
+          "Open Dashboard."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why can't I see the New client button on my dashboard?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "Using this requires the \"clients:create\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R15",
+      "featureId": "clients.search",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Search",
+        "summary": null,
+        "purpose": "Helps you find a specific client quickly instead of scrolling the full list.",
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I find a particular client?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The Clients screen contains a text input."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R16",
+      "featureId": "clients.error",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Error",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [
+          "Why am I seeing a red message on the Clients page?"
+        ]
+      },
+      "knownSupportedFacts": [],
+      "factsNote": "No independently checkable facts were available for this item. This says nothing about whether the output is correct — score correctness as \"not_assessable\".",
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R17",
+      "featureId": "client-detail.audit",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Audit trail",
+        "summary": "You can view a client using \"Audit trail\".",
+        "purpose": "Lets someone reviewing a client check what changed and when, without leaving the client detail page.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ],
+        "conditions": [
+          "You need permission to view a client."
+        ],
+        "questions": [
+          "How do I see the history of changes for this client?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a GET request to /api/clients/:clientId/audit.",
+        "The screen has a control labelled \"Audit trail\".",
+        "Using this requires the \"clients:read\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R18",
+      "featureId": "invoices.list.clear",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Clear selection",
+        "summary": null,
+        "purpose": "Resets the invoice list so no row is highlighted as active.",
+        "steps": [
+          "Choose \"Clear selection\"."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I stop viewing the invoice I clicked on?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Clear selection\"."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R19",
+      "featureId": "settings.new-key",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "New key",
+        "summary": null,
+        "purpose": "Shows the freshly generated API key so it can be copied before leaving the page.",
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": [
+          "Where do I see the API key after I rotate it?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The Settings screen contains a read-only code display."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R20",
+      "featureId": "settings.danger-zone",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Danger zone",
+        "summary": null,
+        "purpose": "Groups irreversible actions, such as rotating the API key, away from everyday settings.",
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": [
+          "Where do I rotate my API key?"
+        ]
+      },
+      "knownSupportedFacts": [],
+      "factsNote": "No independently checkable facts were available for this item. This says nothing about whether the output is correct — score correctness as \"not_assessable\".",
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R21",
+      "featureId": "settings.rotate-key",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Rotate API key",
+        "summary": null,
+        "purpose": "Lets an admin replace the organisation's API key when the old one may be compromised.",
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I get a new API key?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Rotate API key\"."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    }
+  ]
+}

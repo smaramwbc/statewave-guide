@@ -378,20 +378,59 @@ describe('every action claim is accounted for', () => {
     }
   });
 
-  it('emits every resolvable non-duplicate claim', () => {
-    // The retention invariant. A claim that resolved to a control and was not a
-    // duplicate of another must appear in the guide.
+  it('emits every resolvable, non-duplicate, sayable claim', () => {
+    // The retention invariant, and the denominator matters. A claim that
+    // resolved to a control, is not a duplicate of another, and can be phrased
+    // must appear in the guide.
+    //
+    // `UNSUPPORTED_PRESENTATION` is excluded because those three conditions are
+    // not the same one. `clients.search` resolves its only workflow step to the
+    // search box — a real control, owned, actionable — and the box carries no
+    // text a reader could look for. Naming it means naming it from the
+    // identifier, which produced "Enter the client's search". Resolvable is not
+    // sayable, and pretending otherwise is how that sentence shipped.
+    //
+    // The exclusion is bounded by the test below rather than left open.
     for (const document of documents.values()) {
       const lost = document.actionAccounting.filter(
         (entry) =>
           entry.outcome === 'dropped' &&
           entry.targetNodeId !== undefined &&
-          entry.reason !== 'DUPLICATE_ACTION',
+          entry.reason !== 'DUPLICATE_ACTION' &&
+          entry.reason !== 'UNSUPPORTED_PRESENTATION',
       );
       expect(
         lost.map((entry) => entry.claimId),
         document.featureId,
       ).toEqual([]);
     }
+  });
+
+  it('keeps the unsayable set to the cases that are genuinely unsayable', () => {
+    // The bound on the exclusion above. If a future change starts dropping
+    // resolvable claims as "unsayable", this fails and names them.
+    const unsayable = [...documents.values()]
+      .flatMap((document) =>
+        document.actionAccounting
+          .filter(
+            (entry) =>
+              entry.reason === 'UNSUPPORTED_PRESENTATION' && entry.targetNodeId !== undefined,
+          )
+          .map((entry) => entry.claimId),
+      )
+      .sort();
+    expect(unsayable).toEqual(['clients.search#workflow_step:1']);
+  });
+
+  it('never drops a resolvable claim without saying so', () => {
+    // The defect this loop found in the previous one's fix. `clients.search`
+    // resolved, reached the input branch, produced no nameable field and left
+    // no accounting entry at all — a silent drop inside the change written to
+    // end silent drops. Every claim that resolves now has an outcome.
+    const search = docFor('clients.search').actionAccounting;
+    expect(search.map((entry) => entry.claimId)).toContain('clients.search#workflow_step:1');
+    expect(search.every((entry) => entry.outcome === 'emitted' || entry.detail !== undefined)).toBe(
+      true,
+    );
   });
 });

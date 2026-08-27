@@ -1,0 +1,858 @@
+{
+  "features": 21,
+  "rows": [
+    {
+      "featureId": "api.get.partial-clients",
+      "before": {
+        "steps": []
+      },
+      "after": {
+        "steps": [],
+        "completeness": "DESCRIPTIVE",
+        "taskCompletion": "NO_TASK",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": []
+    },
+    {
+      "featureId": "client-detail.audit",
+      "before": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": []
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "client-detail.audit#workflow_step:1",
+          "reason": "DUPLICATE_ACTION",
+          "recovery": null,
+          "detail": "Another claim already puts element:client-detail.audit in this guide as the same kind of step."
+        }
+      ],
+      "provenance": [
+        {
+          "text": "Choose \"Audit trail\".",
+          "origin": "verified-capability",
+          "claims": [
+            "client-detail.audit#capability:1"
+          ],
+          "facts": [
+            "api:GET:/api/clients/:param/audit",
+            "element:client-detail.audit"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.change-plan",
+      "before": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose \"Upgrade\".",
+          "origin": "verified-workflow",
+          "claims": [
+            "client-detail.change-plan#workflow_step:1"
+          ],
+          "facts": [
+            "element:client-detail.change-plan"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.delete",
+      "before": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose \"Delete\".",
+          "origin": "verified-workflow",
+          "claims": [
+            "client-detail.delete#workflow_step:1"
+          ],
+          "facts": [
+            "element:client-detail.delete"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.rename",
+      "before": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "client-detail.rename#workflow_step:1",
+          "reason": "DUPLICATE_ACTION",
+          "recovery": null,
+          "detail": "Another claim already puts element:client-detail.rename in this guide as the same kind of step."
+        }
+      ],
+      "provenance": [
+        {
+          "text": "Choose \"Rename\".",
+          "origin": "verified-capability",
+          "claims": [
+            "client-detail.rename#capability:1"
+          ],
+          "facts": [
+            "api:PUT:/api/clients/:param",
+            "element:client-detail.rename",
+            "function:frontend/src/services/clientService.ts#clientService.update|calls_api|api:PUT:/api/clients/:param"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "clients.create",
+      "before": {
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's email, name and plan.",
+          "Choose \"Create client\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "COMPLETE_PATH",
+        "diagnostics": [
+          "PASSIVE_TARGET",
+          "PASSIVE_TARGET"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "clients.create#workflow_step:2",
+          "reason": "PASSIVE_TARGET",
+          "recovery": "none",
+          "detail": "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog is something the interface shows, not something a user acts on. component:frontend/src/components/NewClientDialog.tsx#NewClientDialog offers no passive element this feature owns to recover from."
+        },
+        {
+          "claimId": "clients.create#workflow_step:3",
+          "reason": "PASSIVE_TARGET",
+          "recovery": "none",
+          "detail": "component:frontend/src/components/ClientForm.tsx#ClientForm is something the interface shows, not something a user acts on. component:frontend/src/components/ClientForm.tsx#ClientForm offers no passive element this feature owns to recover from."
+        },
+        {
+          "claimId": "clients.create#capability:2",
+          "reason": "DUPLICATE_ACTION",
+          "recovery": null,
+          "detail": "Another claim already puts element:clients.create in this guide as the same kind of step."
+        },
+        {
+          "claimId": "clients.create#workflow_step:1",
+          "reason": "DUPLICATE_ACTION",
+          "recovery": null,
+          "detail": "Another claim already puts element:clients.create in this guide as the same kind of step."
+        }
+      ],
+      "provenance": [
+        {
+          "text": "Choose \"New client\".",
+          "origin": "verified-capability",
+          "claims": [
+            "clients.create#capability:1"
+          ],
+          "facts": [
+            "api:POST:/api/clients",
+            "component:frontend/src/components/ClientForm.tsx#ClientForm",
+            "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+            "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+            "element:clients.create",
+            "element:clients.create-dialog",
+            "element:clients.create-dialog.cancel",
+            "element:clients.create-dialog.email"
+          ]
+        },
+        {
+          "text": "Enter the client's email, name and plan.",
+          "origin": "verified-workflow",
+          "claims": [
+            "clients.create#capability:1",
+            "clients.create#capability:2",
+            "clients.create#workflow_step:1",
+            "clients.create#workflow_step:2",
+            "clients.create#workflow_step:3"
+          ],
+          "facts": [
+            "api:POST:/api/clients",
+            "component:frontend/src/components/ClientForm.tsx#ClientForm",
+            "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+            "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+            "element:clients.create",
+            "element:clients.create-dialog",
+            "element:clients.create-dialog.cancel",
+            "element:clients.create-dialog.email",
+            "element:clients.create-dialog.form",
+            "element:clients.create-dialog.name",
+            "element:clients.create-dialog.plan",
+            "element:clients.create-dialog.submit"
+          ]
+        },
+        {
+          "text": "Choose \"Create client\".",
+          "origin": "verified-workflow",
+          "claims": [
+            "clients.create#workflow_step:4"
+          ],
+          "facts": [
+            "api:POST:/api/clients",
+            "element:clients.create-dialog.submit"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "clients.error",
+      "before": {
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Clients."
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY",
+          "LANGUAGE_CLAIM_UNSUPPORTED"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": []
+    },
+    {
+      "featureId": "clients.export",
+      "before": {
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose \"Export CSV\".",
+          "origin": "verified-workflow",
+          "claims": [
+            "clients.export#workflow_step:1"
+          ],
+          "facts": [
+            "element:clients.export"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "clients.search",
+      "before": {
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Clients."
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "clients.search#workflow_step:1",
+          "reason": "UNSUPPORTED_PRESENTATION",
+          "recovery": null,
+          "detail": "The control resolved to an input, and nothing on screen names what goes in it. A lone unlabelled box can only be named from its identifier, which says what the box is for rather than what to type — \"Enter the client’s search\"."
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "featureId": "clients.table",
+      "before": {
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Clients."
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_ACTIONABLE_TARGET",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "clients.table#workflow_step:1",
+          "reason": "NO_ACTIONABLE_TARGET",
+          "recovery": "passive",
+          "detail": "clients.table owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:clients.table has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts."
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "featureId": "clients.table.forbidden",
+      "before": {
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Clients."
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "diagnostics": [
+          "NO_ACTIONABLE_TARGET",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "clients.table.forbidden#workflow_step:1",
+          "reason": "NO_ACTIONABLE_TARGET",
+          "recovery": "passive",
+          "detail": "clients.table.forbidden owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:clients.table.forbidden has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts."
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "featureId": "dashboard.new-client",
+      "before": {
+        "steps": [
+          "Open Dashboard."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Dashboard."
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+          "NO_ACTIONABLE_TARGET",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "dashboard.new-client#workflow_step:1",
+          "reason": "NO_ACTIONABLE_TARGET",
+          "recovery": "unsupported-relationship",
+          "detail": "dashboard.new-client owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:dashboard.new-client carries only requires_permission, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action."
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "featureId": "invoices.create-form.submit",
+      "before": {
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "TERMINAL_ACTION_REACHED",
+        "diagnostics": []
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "invoices.create-form.submit#capability:2",
+          "reason": "DUPLICATE_ACTION",
+          "recovery": null,
+          "detail": "Another claim already puts element:invoices.create-form.submit in this guide as the same kind of step."
+        }
+      ],
+      "provenance": [
+        {
+          "text": "Choose \"Raise invoice\" to create a new invoice.",
+          "origin": "verified-capability",
+          "claims": [
+            "invoices.create-form.submit#capability:1"
+          ],
+          "facts": [
+            "api:POST:/api/invoices",
+            "element:invoices.create-form.submit",
+            "element:invoices.create-form.submit|submits_to|function:frontend/src/pages/InvoicesPage.tsx#createInvoice",
+            "function:frontend/src/services/invoiceService.ts#create|calls_api|api:POST:/api/invoices"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "invoices.list.clear",
+      "before": {
+        "steps": [
+          "Choose \"Clear selection\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Choose \"Clear selection\"."
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "ENTRY_ROUTE_AMBIGUOUS",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose \"Clear selection\".",
+          "origin": "verified-workflow",
+          "claims": [
+            "invoices.list.clear#workflow_step:1"
+          ],
+          "facts": [
+            "element:invoices.list.clear"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "invoices.list.open",
+      "before": {
+        "steps": [
+          "Choose Open."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Choose Open."
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "ENTRY_ROUTE_AMBIGUOUS",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose Open.",
+          "origin": "verified-workflow",
+          "claims": [
+            "invoices.list.open#workflow_step:1"
+          ],
+          "facts": [
+            "element:invoices.list.open"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "nav.clients",
+      "before": {
+        "steps": [
+          "Open Clients.",
+          "Choose \"Clients\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Choose \"Clients\"."
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "REDUNDANT_ENTRY_STEP"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [
+        "Open Clients."
+      ],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose \"Clients\".",
+          "origin": "verified-capability",
+          "claims": [
+            "nav.clients#capability:1"
+          ],
+          "facts": [
+            "element:nav.clients",
+            "element:nav.clients|navigates_to|route:/clients",
+            "route:/clients"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "settings.danger-zone",
+      "before": {
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Settings."
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_ACTIONABLE_TARGET",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "settings.danger-zone#workflow_step:1",
+          "reason": "NO_ACTIONABLE_TARGET",
+          "recovery": "passive",
+          "detail": "settings.danger-zone owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:settings.danger-zone has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts."
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "featureId": "settings.form",
+      "before": {
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "TERMINAL_ACTION_REACHED",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [
+        "Choose \"Save changes\"."
+      ],
+      "actionsRemoved": [],
+      "recoveries": [
+        {
+          "subject": "element:settings.form",
+          "from": "element:settings.form",
+          "rule": "passive-subject-shared-action-surface",
+          "relationship": "submits_to",
+          "actionSurface": "function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+          "control": "element:settings.save",
+          "actionSurfaceScope": "OWNED",
+          "controlScope": "OUTSIDE",
+          "traversed": [
+            "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+          ],
+          "actionabilityEvidence": "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+          "why": "element:settings.save is the only control the graph proves acts on function:frontend/src/pages/SettingsPage.tsx#saveSettings, which settings.form owns."
+        },
+        {
+          "subject": "feature:settings.form",
+          "from": "element:settings.form",
+          "rule": "passive-subject-shared-action-surface",
+          "relationship": "submits_to",
+          "actionSurface": "function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+          "control": "element:settings.save",
+          "actionSurfaceScope": "OWNED",
+          "controlScope": "OUTSIDE",
+          "traversed": [
+            "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+          ],
+          "actionabilityEvidence": "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+          "why": "element:settings.save is the only control the graph proves acts on function:frontend/src/pages/SettingsPage.tsx#saveSettings, which settings.form owns."
+        }
+      ],
+      "reasons": [
+        {
+          "claimId": "settings.form#capability:1",
+          "reason": "UNSUPPORTED_PRESENTATION",
+          "recovery": null,
+          "detail": "A submit capability with no user-visible control. Naming it would mean saying \"submit the form\", which describes the mechanism rather than anything the reader can see."
+        },
+        {
+          "claimId": "settings.form#workflow_step:1",
+          "reason": "DUPLICATE_ACTION",
+          "recovery": null,
+          "detail": "Another claim already puts element:settings.save in this guide as the same kind of step."
+        }
+      ],
+      "provenance": [
+        {
+          "text": "Choose \"Save changes\".",
+          "origin": "verified-submit",
+          "claims": [
+            "settings.form#capability:1"
+          ],
+          "facts": [
+            "element:settings.form",
+            "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "element:settings.save"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "settings.new-key",
+      "before": {
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Settings."
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "diagnostics": [
+          "NO_USER_VISIBLE_LABEL",
+          "NO_ACTIONABLE_TARGET",
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [
+        {
+          "claimId": "settings.new-key#workflow_step:1",
+          "reason": "NO_ACTIONABLE_TARGET",
+          "recovery": "passive",
+          "detail": "settings.new-key owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:settings.new-key has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts."
+        }
+      ],
+      "provenance": []
+    },
+    {
+      "featureId": "settings.rotate-key",
+      "before": {
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "diagnostics": [
+          "NO_VERIFIED_CAPABILITY"
+        ]
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose \"Rotate API key\".",
+          "origin": "verified-workflow",
+          "claims": [
+            "settings.rotate-key#workflow_step:1"
+          ],
+          "facts": [
+            "element:settings.rotate-key"
+          ]
+        }
+      ]
+    },
+    {
+      "featureId": "settings.save",
+      "before": {
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "after": {
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "TERMINAL_ACTION_REACHED",
+        "diagnostics": []
+      },
+      "actionsAdded": [],
+      "actionsRemoved": [],
+      "recoveries": [],
+      "reasons": [],
+      "provenance": [
+        {
+          "text": "Choose \"Save changes\".",
+          "origin": "verified-submit",
+          "claims": [
+            "settings.save#capability:1"
+          ],
+          "facts": [
+            "element:settings.save",
+            "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+          ]
+        }
+      ]
+    }
+  ]
+}
