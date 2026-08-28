@@ -1,0 +1,49 @@
+# The gates, run automatically.
+#
+# Closed Loop #17's audit found that none of this repository's quality gates ran
+# without somebody typing the command. This file fixes that, and it deliberately
+# contains no list of gates: `scripts/gates.mjs` derives the manifest from the
+# `test:` scripts in package.json, so a gate added locally runs here on the next
+# push with no second place to update.
+#
+# It also never runs a `capture:` command. Those regenerate frozen review
+# artifacts, and a CI job that rewrote the evidence a review was scored against
+# would destroy the thing it exists to protect.
+
+name: quality gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: build, typecheck, unit tests, lint, format
+        run: pnpm verify
+      - name: quality gates
+        run: pnpm gates --json gate-results.json
+      - name: the tree is exactly as it was
+        # A gate that wrote something would have been caught by test:tree-clean
+        # inside the run; this is the belt-and-braces version, because CI is the
+        # one place nobody watches the working directory.
+        run: git diff --exit-code && test -z "$(git status --porcelain)"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-results
+          path: gate-results.json
+          if-no-files-found: ignore

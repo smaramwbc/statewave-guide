@@ -23,3 +23,12 @@ pnpm-debug.log*
 # of your product model.
 !examples/react-demo/.statewave-guide/
 !examples/react-demo/.statewave-guide/application.json
+
+# Built output of the interactive host. Rebuilt by `pnpm test:guide-ui-e2e`.
+examples/guide-e2e/dist/
+
+# Agent scratch: transcripts, and the throwaway git worktrees a workflow runs in.
+# They contain full copies of the repository, so leaving them visible makes every
+# lint and format check scan the tree several times over.
+.claude/
+gate-results.json

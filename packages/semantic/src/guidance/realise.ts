@@ -59,6 +59,13 @@ const ACTION_PHRASES: Record<CapabilityAction, (object: string) => string> = {
   export: (object) => `export ${object}s`,
   import: (object) => `import ${object}s`,
   send: (object) => `send ${article(object)}`,
+  // Closed Loop #10, and the plural matters. Filtering acts on the collection,
+  // not on one member — "filter a client" would be a different and unproven
+  // claim about picking one out.
+  filter: (object) => `filter ${object}s`,
+  reveal: (object) => `show ${article(object)}`,
+  open: (object) => `open ${article(object)}`,
+  select: (object) => `select ${article(object)}`,
 };
 
 /** `a, b and c`, with no serial comma, because product copy rarely wants one. */

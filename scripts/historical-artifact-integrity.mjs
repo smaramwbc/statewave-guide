@@ -48,6 +48,12 @@ function historicalArtefacts() {
       if (name.startsWith('guidance-round-')) return true;
       if (name.startsWith('review-round-')) return true;
       if (name === 'round-2-product-model.json') return true;
+      // What a browser watched, on one build, once. The claims that rest on it
+      // cite it by trace id, so an edit here rewrites the evidence behind seven
+      // Product Model claims without touching a line of source.
+      if (name === 'runtime-evidence-v1.json') return true;
+      if (name.startsWith('interactive-review-v1')) return true;
+      if (name.startsWith('interactive-review-v2')) return true;
       if (name === 'dataset-v1.json' || name === 'gold-v1.json') return true;
       if (name.startsWith('prompt-v')) return true;
       return false;
@@ -82,6 +88,31 @@ const CHECKS = [
   ['review-action-fact-coverage', ['scripts/build-human-review-7.mjs', '--check']],
   ['guidance-quality', ['scripts/guidance-quality.mjs']],
   ['workflow-selection-quality', ['scripts/workflow-selection-quality.mjs']],
+  ['round-7-vs-8 audit', ['scripts/guidance-round-7-vs-8.mjs']],
+  ['runtime-productmodel-integration', ['scripts/runtime-productmodel-integration.mjs']],
+  ['runtime-claim-provenance', ['scripts/runtime-claim-provenance.mjs']],
+  ['runtime-context-preservation', ['scripts/runtime-context-preservation.mjs']],
+  ['runtime-static-contradiction', ['scripts/runtime-static-contradiction.mjs']],
+  ['runtime-review-fact-coverage', ['scripts/build-human-review-8.mjs', '--check']],
+  ['runtime-review-fact-attribution', ['scripts/runtime-review-fact-attribution.mjs']],
+  ['round-8-r1 revision', ['scripts/build-human-review-8-r1.mjs', '--check']],
+  ['runtime-collection-semantics', ['scripts/runtime-collection-semantics.mjs']],
+  ['runtime-selection-semantics', ['scripts/runtime-selection-semantics.mjs']],
+  ['registry-consistency', ['scripts/capability-verification-registry-consistency.mjs']],
+  ['guide-bundle', ['scripts/build-guide-bundle.mjs', '--check']],
+  ['query-contract', ['scripts/query-contract-quality.mjs']],
+  ['query-runtime', ['scripts/query-runtime-quality.mjs']],
+  ['guide-ui', ['scripts/guide-ui-quality.mjs']],
+  ['interactive-review-integrity', ['scripts/interactive-review-integrity.mjs']],
+  ['interactive-review-freeze', ['scripts/interactive-review-freeze.mjs']],
+  ['interactive-review-package', ['scripts/build-interactive-review-package.mjs', '--check']],
+  ['interactive-review-validity', ['scripts/interactive-review-validity.mjs']],
+  ['interactive-review-r2-package', ['scripts/build-interactive-review-r2-package.mjs', '--check']],
+  ['interactive-review-v2-package', ['scripts/build-interactive-review-v2-package.mjs', '--check']],
+  ['interactive-review-v2-integrity', ['scripts/interactive-review-v2-integrity.mjs']],
+  ['interactive-review-v2-freeze', ['scripts/interactive-review-v2-freeze.mjs']],
+  ['runtime-instance-grounding', ['scripts/runtime-instance-quality.mjs']],
+  ['guide-theme', ['scripts/guide-theme-quality.mjs']],
 ];
 
 const before = snapshot();

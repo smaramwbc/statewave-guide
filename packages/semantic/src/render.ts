@@ -302,6 +302,10 @@ const ACTION_TEMPLATES: Record<CapabilityAction, (phrase: string) => string> = {
   export: (phrase) => `export ${phrase}`,
   import: (phrase) => `import ${phrase}`,
   send: (phrase) => `send ${phrase}`,
+  filter: (phrase) => `filter ${phrase}`,
+  reveal: (phrase) => `show ${phrase}`,
+  open: (phrase) => `open ${phrase}`,
+  select: (phrase) => `select ${phrase}`,
 };
 
 // ---------------------------------------------------------------------------

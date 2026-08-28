@@ -28,6 +28,7 @@
  */
 
 import type { ApplicationGraph } from '@statewavedev/guide-indexer';
+import { isVerifiedClaim } from '@statewavedev/guide-shared';
 import type { ProductClaim, ProductFeature, ProductModel } from '@statewavedev/guide-shared';
 import type { FeatureCandidate } from '../candidates.js';
 import { compareStrings } from '../compare.js';
@@ -35,6 +36,7 @@ import { computeFeatureScope } from '../scope.js';
 import type { FeatureScope } from '../scope.js';
 import { recoverActionTarget } from './action-recovery.js';
 import {
+  MECHANISM_ACTIONS,
   auditLanguageEvidence,
   buildGroundedTerms,
   compilePurpose,
@@ -102,7 +104,13 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
 
   const claims = model.claims.filter((claim) => claim.featureId === feature.id);
   const factual = claims.filter(
-    (claim) => claim.status === 'structurally_verified' && claim.assertion !== undefined,
+    // Verified by either route. Closed Loop #10 added `behaviorally_verified`,
+    // and the language rules are unchanged: support is still an assertion that
+    // was checked and held, still never a claim's text, and still has to be
+    // owned. What widened is the set of things that count as checked — a
+    // browser watching an effect is a different guarantee from a graph proof,
+    // and both are guarantees.
+    (claim) => isVerifiedClaim(claim) && claim.assertion !== undefined,
   );
   const language = claims.filter((claim) => claim.status === 'semantically_grounded');
 
@@ -192,7 +200,13 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
     // is what they press, and the internal verb never has to appear. Suppression
     // now applies only where nothing on screen names the action, which is the
     // case the original rule was actually about.
-    if (action === 'submit') {
+    // The same list the purpose and question compilers use, because it was not
+    // the same list and the divergence shipped: Closed Loop #10 added `reveal`
+    // to the language layer, which withheld *"Lets you show a setting."* — and
+    // this loop, running off its own hard-coded `submit`, emitted the summary
+    // *"You can show a setting using \"Rotate API key\"."* from the very same
+    // claim. One rule stated twice is one rule that will disagree with itself.
+    if (action !== 'navigate' && MECHANISM_ACTIONS.has(action)) {
       // Never a summary, control or no control. Closed Loop #5 relaxed this to
       // "only when nothing names it", and the sentence that survived — *"You can
       // submit a setting using \"Save changes\"."* — was flagged for natural
@@ -211,7 +225,9 @@ export function compileGuidance(input: CompileGuidanceInput): GuidanceDocument {
         outcome: 'dropped',
         reason: 'UNSUPPORTED_PRESENTATION',
         detail:
-          'A submit capability is the mechanism, not the outcome. Saying so names internal vocabulary; saying anything else asserts a result nothing verifies.',
+          action === 'submit'
+            ? 'A submit capability is the mechanism, not the outcome. Saying so names internal vocabulary; saying anything else asserts a result nothing verifies.'
+            : `A ${action} capability is the mechanism, not the outcome. What appeared is established; what it means is not, and the object noun would come from the feature's own namespace rather than from anything on screen.`,
       });
       continue;
     }

@@ -1,0 +1,55 @@
+{
+  "purpose": "design review; not an evaluation artefact",
+  "frames": [
+    {
+      "file": "A-guide-closed.png",
+      "state": "The demo application with the guide collapsed to its launcher.",
+      "sha256": "b04a032a1e77d1f82cd4d1ce56b8e063dedcb9ef27511d5077da872e49953497"
+    },
+    {
+      "file": "B-guide-open-empty.png",
+      "state": "The panel open, before anything has been asked.",
+      "sha256": "7014aa7120384fa50414c21cf9d14338c126604f1a5e713d65341a19e8bd31c0"
+    },
+    {
+      "file": "C-create-client.png",
+      "state": "A structured answer: title, purpose, condition, numbered procedure.",
+      "sha256": "5dbd23221b78aca38a1cd48c4494a61ad3d9b7a9e1dff65e4d438370cb201e7b"
+    },
+    {
+      "file": "D-show-me-highlight.png",
+      "state": "Show me: the unnamed filter input highlighted and focused in the running application.",
+      "sha256": "b068026748dfe197b7f44c38c89aed9fa0b2023febe7cce7e092eee85ad9e6c3"
+    },
+    {
+      "file": "E-step-through.png",
+      "state": "Step-through mode, on step 2 of 3.",
+      "sha256": "43ffd0833a25f10f737b5dd351a6e5e37367791d927e0a2e34ef77b1a22fe556"
+    },
+    {
+      "file": "F-ambiguity.png",
+      "state": "An ambiguous question answered with a choice, using supported names only.",
+      "sha256": "560327dc530e1bae36ca513a9f22f7763cd30d64c7247473caac20ad58ef1de4"
+    },
+    {
+      "file": "G-dark-mode.png",
+      "state": "The same answer in dark mode, from theme tokens rather than inversion.",
+      "sha256": "ec5c63676c67c93fecb57d0b3b99143afc1461d86f19cafee1ec9736c9b91c6e"
+    },
+    {
+      "file": "H-custom-brand.png",
+      "state": "A host-branded theme: Acme CRM, #006BFF, 12px radius. No recompilation.",
+      "sha256": "fd3221931b2af4d3a0225faf5bd6f60dc2c800d1fd9aa10e2038732e27b4f6b8"
+    },
+    {
+      "file": "I-theme-customizer.png",
+      "state": "The development-only theme playground, with live preview.",
+      "sha256": "9bfdd104cc27a7f240963ae3cc89bbc492e427905317f824adee782fb6a41046"
+    },
+    {
+      "file": "J-mobile-sheet.png",
+      "state": "A narrow viewport: the panel becomes a bottom sheet.",
+      "sha256": "62de1a5ac42acf4fe97a1f4684c769992bf94a49b6e89a97ba2f69f3f1ce5d11"
+    }
+  ]
+}

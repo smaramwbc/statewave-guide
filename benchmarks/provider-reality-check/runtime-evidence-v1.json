@@ -1,0 +1,325 @@
+{
+  "version": 1,
+  "records": [
+    {
+      "action": "navigate",
+      "featureId": "nav.clients",
+      "subjectRef": "element:nav.clients",
+      "targets": [
+        "element:nav.clients"
+      ],
+      "actionKind": "click",
+      "actionTarget": "element:nav.clients",
+      "effects": [
+        "ELEMENT_APPEARED|role=region,semanticId=clients",
+        "ELEMENT_APPEARED|role=generic,semanticId=clients.count",
+        "ELEMENT_APPEARED|name=New client,role=button,semanticId=clients.create",
+        "ELEMENT_APPEARED|name=Export CSV,role=button,semanticId=clients.export",
+        "ELEMENT_APPEARED|name=Refresh,role=button,semanticId=clients.refresh",
+        "ELEMENT_APPEARED|role=searchbox,semanticId=clients.search",
+        "ELEMENT_APPEARED|role=table,semanticId=clients.table",
+        "ELEMENT_APPEARED|name=Delete,role=button,semanticId=clients.table.delete",
+        "ELEMENT_APPEARED|role=row,semanticId=clients.table.row",
+        "ELEMENT_DISAPPEARED|role=region,semanticId=settings",
+        "ELEMENT_DISAPPEARED|role=region,semanticId=settings.danger-zone",
+        "ELEMENT_DISAPPEARED|role=form,semanticId=settings.form",
+        "ELEMENT_DISAPPEARED|role=textbox,semanticId=settings.name",
+        "ELEMENT_DISAPPEARED|role=checkbox,semanticId=settings.notifications",
+        "ELEMENT_DISAPPEARED|role=button,semanticId=settings.rotate-key",
+        "ELEMENT_DISAPPEARED|role=button,semanticId=settings.save",
+        "NETWORK_REQUEST|method=GET,path=/api/clients,statusCategory=2xx",
+        "REGION_APPEARED|role=banner",
+        "REGION_APPEARED|role=region,semanticId=clients",
+        "REGION_APPEARED|role=table,semanticId=clients.table",
+        "REGION_APPEARED|role=toolbar",
+        "REGION_DISAPPEARED|role=contentinfo",
+        "REGION_DISAPPEARED|role=form,semanticId=settings.form",
+        "REGION_DISAPPEARED|role=region,semanticId=settings",
+        "REGION_DISAPPEARED|role=region,semanticId=settings.danger-zone",
+        "ROUTE_CHANGED|from=/settings,to=/clients"
+      ],
+      "rule": "runtime/navigate",
+      "context": {
+        "route": "/clients",
+        "fixtureState": "seeded",
+        "permissions": [
+          "clients:read",
+          "clients:create",
+          "clients:update",
+          "clients:delete",
+          "invoices:read",
+          "invoices:create",
+          "settings:update"
+        ],
+        "featureFlags": {}
+      },
+      "traceId": "nav-clients",
+      "evidenceHash": "94eee5fadcc6dd93325dde1552f99161ea82b7ffabe45af3f928df34f5605a72",
+      "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+    },
+    {
+      "action": "filter",
+      "featureId": "clients.search",
+      "subjectRef": "element:clients.search",
+      "targets": [
+        "element:clients.search"
+      ],
+      "actionKind": "type",
+      "actionTarget": "element:clients.search",
+      "effects": [
+        "COLLECTION_MEMBERS_CHANGED|after=2,before=5,collectionRole=table,containerSemanticId=clients.table,memberRole=row",
+        "NETWORK_REQUEST|method=GET,path=/api/clients,statusCategory=2xx",
+        "VALUE_CHANGED|semanticId=clients.search"
+      ],
+      "rule": "runtime/filter",
+      "context": {
+        "route": "/clients",
+        "fixtureState": "seeded",
+        "permissions": [
+          "clients:read",
+          "clients:create",
+          "clients:update",
+          "clients:delete",
+          "invoices:read",
+          "invoices:create",
+          "settings:update"
+        ],
+        "featureFlags": {}
+      },
+      "traceId": "filter-clients",
+      "evidenceHash": "f78bc6382a6693ab343272d58e4e329675edf96957ffeb4126f0edf481abb957",
+      "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+    },
+    {
+      "action": "open",
+      "featureId": "clients.create",
+      "subjectRef": "element:clients.create",
+      "targets": [
+        "element:clients.create"
+      ],
+      "actionKind": "click",
+      "actionTarget": "element:clients.create",
+      "effects": [
+        "ELEMENT_APPEARED|role=generic,semanticId=clients.create-dialog",
+        "ELEMENT_APPEARED|name=Cancel,role=button,semanticId=clients.create-dialog.cancel",
+        "ELEMENT_APPEARED|name=Billing email,role=textbox,semanticId=clients.create-dialog.email",
+        "ELEMENT_APPEARED|role=form,semanticId=clients.create-dialog.form",
+        "ELEMENT_APPEARED|name=Name,role=textbox,semanticId=clients.create-dialog.name",
+        "ELEMENT_APPEARED|name=Plan,role=combobox,semanticId=clients.create-dialog.plan",
+        "ELEMENT_APPEARED|name=Create client,role=button,semanticId=clients.create-dialog.submit",
+        "ELEMENT_APPEARED|role=presentation,semanticId=dialog.backdrop",
+        "REGION_APPEARED|role=contentinfo",
+        "REGION_APPEARED|role=dialog",
+        "REGION_APPEARED|role=form,semanticId=clients.create-dialog.form"
+      ],
+      "rule": "runtime/open",
+      "context": {
+        "route": "/clients",
+        "fixtureState": "seeded",
+        "permissions": [
+          "clients:read",
+          "clients:create",
+          "clients:update",
+          "clients:delete",
+          "invoices:read",
+          "invoices:create",
+          "settings:update"
+        ],
+        "featureFlags": {}
+      },
+      "traceId": "open-create",
+      "evidenceHash": "79e5975c46cd6fe384c9cbad159fc96ef01293851e0343ce14d5717bb02988b1",
+      "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+    },
+    {
+      "action": "update",
+      "featureId": "client-detail.rename",
+      "subjectRef": "element:client-detail.rename",
+      "targets": [
+        "element:client-detail.rename"
+      ],
+      "actionKind": "click",
+      "actionTarget": "element:client-detail.rename",
+      "effects": [
+        "NETWORK_REQUEST|method=GET,path=/api/clients/c1,statusCategory=2xx",
+        "NETWORK_REQUEST|method=PUT,path=/api/clients/c1,statusCategory=2xx"
+      ],
+      "rule": "runtime/update",
+      "context": {
+        "route": "/clients/c1",
+        "fixtureState": "seeded",
+        "permissions": [
+          "clients:read",
+          "clients:create",
+          "clients:update",
+          "clients:delete",
+          "invoices:read",
+          "invoices:create",
+          "settings:update"
+        ],
+        "featureFlags": {}
+      },
+      "traceId": "rename",
+      "evidenceHash": "3c38f7a415a2e8073bf672ad0b84b2ab7cd398b1f2d7c73b9e6793ccfa64a0f5",
+      "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+    },
+    {
+      "action": "reveal",
+      "featureId": "settings.rotate-key",
+      "subjectRef": "element:settings.rotate-key",
+      "targets": [
+        "element:settings.rotate-key"
+      ],
+      "actionKind": "click",
+      "actionTarget": "element:settings.rotate-key",
+      "effects": [
+        "ELEMENT_APPEARED|role=code,semanticId=settings.new-key",
+        "NETWORK_REQUEST|method=POST,path=/api/settings/api-key/rotate,statusCategory=2xx"
+      ],
+      "rule": "runtime/reveal",
+      "context": {
+        "route": "/settings",
+        "fixtureState": "seeded",
+        "permissions": [
+          "clients:read",
+          "clients:create",
+          "clients:update",
+          "clients:delete",
+          "invoices:read",
+          "invoices:create",
+          "settings:update"
+        ],
+        "featureFlags": {}
+      },
+      "traceId": "rotate",
+      "evidenceHash": "901b1246fe37fe02137ffbd7f5427d3fd90d6afb90e166cc9c91cc22cb183de8",
+      "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+    },
+    {
+      "action": "update",
+      "featureId": "settings.form",
+      "subjectRef": "element:settings.form",
+      "targets": [
+        "element:settings.form"
+      ],
+      "actionKind": "submit",
+      "actionTarget": "element:settings.form",
+      "effects": [
+        "NETWORK_REQUEST|method=PUT,path=/api/settings,statusCategory=2xx"
+      ],
+      "rule": "runtime/update",
+      "context": {
+        "route": "/settings",
+        "fixtureState": "seeded",
+        "permissions": [
+          "clients:read",
+          "clients:create",
+          "clients:update",
+          "clients:delete",
+          "invoices:read",
+          "invoices:create",
+          "settings:update"
+        ],
+        "featureFlags": {}
+      },
+      "traceId": "save-settings",
+      "evidenceHash": "e22d70d05fbf33f163564d4906ea5a7ae44683b314d16c1f346a1eac6713f6e4",
+      "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+    },
+    {
+      "action": "navigate",
+      "featureId": "dashboard.new-client",
+      "subjectRef": "element:dashboard.new-client",
+      "targets": [
+        "element:dashboard.new-client"
+      ],
+      "actionKind": "click",
+      "actionTarget": "element:dashboard.new-client",
+      "effects": [
+        "ELEMENT_APPEARED|role=region,semanticId=clients",
+        "ELEMENT_APPEARED|role=generic,semanticId=clients.count",
+        "ELEMENT_APPEARED|name=New client,role=button,semanticId=clients.create",
+        "ELEMENT_APPEARED|name=Export CSV,role=button,semanticId=clients.export",
+        "ELEMENT_APPEARED|name=Refresh,role=button,semanticId=clients.refresh",
+        "ELEMENT_APPEARED|role=searchbox,semanticId=clients.search",
+        "ELEMENT_APPEARED|role=table,semanticId=clients.table",
+        "ELEMENT_APPEARED|name=Delete,role=button,semanticId=clients.table.delete",
+        "ELEMENT_APPEARED|role=row,semanticId=clients.table.row",
+        "ELEMENT_DISAPPEARED|role=paragraph,semanticId=Dashboard.Docs",
+        "ELEMENT_DISAPPEARED|role=region,semanticId=dashboard",
+        "ELEMENT_DISAPPEARED|role=paragraph,semanticId=dashboard.client-count",
+        "ELEMENT_DISAPPEARED|role=paragraph,semanticId=dashboard.hint",
+        "ELEMENT_DISAPPEARED|role=button,semanticId=dashboard.new-client",
+        "ELEMENT_DISAPPEARED|role=button,semanticId=dashboard.view-clients",
+        "ELEMENT_DISAPPEARED|role=button,semanticId=dashboard.view-invoices",
+        "NETWORK_REQUEST|method=GET,path=/api/clients,statusCategory=2xx",
+        "REGION_APPEARED|role=banner",
+        "REGION_APPEARED|role=region,semanticId=clients",
+        "REGION_APPEARED|role=table,semanticId=clients.table",
+        "REGION_DISAPPEARED|role=region,semanticId=dashboard",
+        "ROUTE_CHANGED|from=/,to=/clients"
+      ],
+      "rule": "runtime/navigate",
+      "context": {
+        "route": "/clients",
+        "fixtureState": "seeded",
+        "permissions": [
+          "clients:read",
+          "clients:create",
+          "clients:update",
+          "clients:delete",
+          "invoices:read",
+          "invoices:create",
+          "settings:update"
+        ],
+        "featureFlags": {}
+      },
+      "traceId": "dashboard-new",
+      "evidenceHash": "1947ea7705615e8e906988875d373c083dad498c2975dd63c59a0db2cec627ab",
+      "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+    }
+  ],
+  "refusals": [
+    {
+      "traceId": "export",
+      "featureId": "clients.export",
+      "proposed": "create",
+      "status": "rejected",
+      "reason": "NO_WRITE_OBSERVED",
+      "detail": "A create capability requires a POST request that succeeded inside the interaction window. No NETWORK_REQUEST was observed."
+    },
+    {
+      "traceId": "delete",
+      "featureId": "client-detail.delete",
+      "proposed": "delete",
+      "status": "rejected",
+      "reason": "NO_WRITE_OBSERVED",
+      "detail": "A delete capability requires a DELETE request that succeeded inside the interaction window. No NETWORK_REQUEST was observed."
+    },
+    {
+      "traceId": "audit",
+      "featureId": "client-detail.audit",
+      "proposed": "reveal",
+      "status": "rejected",
+      "reason": "NOTHING_APPEARED",
+      "detail": "A reveal capability requires an element absent before the interaction and present after, with no navigation. No ELEMENT_APPEARED was observed."
+    },
+    {
+      "traceId": "open-invoice",
+      "featureId": "invoices.list.open",
+      "proposed": "select",
+      "status": "rejected",
+      "reason": "NAVIGATION_OCCURRED",
+      "detail": "a member of a recognised collection declared itself selected when it had not before, with the user still on the same screen. ROUTE_CHANGED was observed, which is not that."
+    },
+    {
+      "traceId": "clear-invoice",
+      "featureId": "invoices.list.clear",
+      "proposed": "clear_selection",
+      "status": "rejected",
+      "reason": "NO_SELECTION_CHANGE",
+      "detail": "A clear_selection capability requires a member that declared itself selected before the interaction declares itself unselected after, with nothing selected in its place. No SELECTION_CHANGED was observed."
+    }
+  ],
+  "graphHash": "e265f12b59a25067f5e9f2159fadb5e4dfb1b8c5f70cc569364c2d107b6bf0e2"
+}

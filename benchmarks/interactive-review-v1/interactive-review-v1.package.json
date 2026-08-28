@@ -1,0 +1,669 @@
+{
+  "package": "interactive-review-v1",
+  "version": 1,
+  "derivedFrom": {
+    "file": "interactive-review-v1.json",
+    "sha256": "1cac8938ae9e3a48d3a90f32a7992c4b0ce1881f21d6209b4bf4e010ec52626c"
+  },
+  "harness": "playwright/chromium",
+  "gate": "DEVELOPMENT_INTERACTIVE_REVIEW",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "reviewerType": null,
+  "scoredBy": null,
+  "scoredAt": null,
+  "instructions": [
+    "Judge this as somebody using the application, not as somebody auditing it.",
+    "The facts block is what a machine observed. It is there so you can check a claim without reading source. It is not the answer to whether the guide helped.",
+    "A scenario can run flawlessly and still be unhelpful. Say so with a low usefulness score.",
+    "Silence is a deliberate choice in this system. Judge whether what is said helps, and whether what is missing was needed.",
+    "Score every dimension for every scenario. Leave nothing null.",
+    "Where a score is low, choose exactly one dominant cause from failureClassifications.",
+    "Set reviewerType to \"human\" or \"non_human_independent\". The formal human gate closes only on a human review."
+  ],
+  "rubric": {
+    "usefulness": {
+      "min": 0,
+      "max": 3,
+      "asks": "Would this meaningfully help someone using the application?"
+    },
+    "correctness": {
+      "min": 0,
+      "max": 2,
+      "asks": "Is everything it said true of the application?"
+    },
+    "taskCompletion": {
+      "min": 0,
+      "max": 2,
+      "asks": "Could the user finish the task from this?"
+    },
+    "targetAccuracy": {
+      "min": 0,
+      "max": 2,
+      "asks": "Did it point at the right thing?"
+    },
+    "contextualRelevance": {
+      "min": 0,
+      "max": 2,
+      "asks": "Did it account for where the user already was?"
+    },
+    "actionSafety": {
+      "min": 0,
+      "max": 2,
+      "asks": "Did it stay within pointing, and leave acting to the user?"
+    },
+    "uiClarity": {
+      "min": 0,
+      "max": 2,
+      "asks": "Is the panel readable and unambiguous?"
+    }
+  },
+  "failureClassifications": [
+    "MISSING_PRODUCT_KNOWLEDGE",
+    "MISSING_USER_VISIBLE_NAME",
+    "QUERY_RESOLUTION",
+    "WRONG_CONTEXT",
+    "TARGET_RESOLUTION",
+    "GUIDANCE_INCOMPLETE",
+    "UI_DISCOVERABILITY",
+    "UI_CLARITY",
+    "ACTION_SEQUENCE",
+    "AMBIGUITY_HANDLING",
+    "UNSUPPORTED_CORRECTLY",
+    "PRIVACY_CONSTRAINT",
+    "OTHER"
+  ],
+  "environment": {
+    "timings": {
+      "firstOpenMs": 211,
+      "queryMs": 26,
+      "showMeMs": 618,
+      "contextRefreshMs": 50
+    },
+    "accessibility": {
+      "composerFocused": true,
+      "role": "complementary",
+      "labelled": true,
+      "unlabelledButtons": 0,
+      "liveRegions": 1,
+      "closed": true,
+      "focusRestored": true,
+      "idsUnchanged": true,
+      "namesUnchanged": true
+    },
+    "pageErrors": []
+  },
+  "contextFrames": [
+    {
+      "file": "screenshots/A-host-guide-closed.png",
+      "scenario": null,
+      "state": "The host application with the guide closed.",
+      "route": "/clients"
+    },
+    {
+      "file": "screenshots/B-guide-empty.png",
+      "scenario": null,
+      "state": "The panel open, before anything has been asked.",
+      "route": "/clients"
+    },
+    {
+      "file": "screenshots/I-developer-inspector.png",
+      "scenario": null,
+      "state": "The developer inspector, open. Never present in user mode.",
+      "route": "/clients?dev=1"
+    }
+  ],
+  "screenshotIndex": [
+    {
+      "file": "screenshots/A-host-guide-closed.png",
+      "scenario": null,
+      "state": "The host application with the guide closed.",
+      "route": "/clients",
+      "sha256": "f46ef682b898772298415a89ea6e4fdb3259b267203f89d76a3eb3fc30929069"
+    },
+    {
+      "file": "screenshots/B-guide-empty.png",
+      "scenario": null,
+      "state": "The panel open, before anything has been asked.",
+      "route": "/clients",
+      "sha256": "500da26f16b5195a19e915ddab498da68669cba75b8cfb65ab42a5c78c39aa7f"
+    },
+    {
+      "file": "screenshots/C-create-client-response.png",
+      "scenario": "IR01",
+      "state": "The answer, on the Clients screen.",
+      "route": "/clients",
+      "sha256": "e72cc41df4a3a811378fc1d97c4c5f3545d7f1c08407725fd4a0025099d120d0"
+    },
+    {
+      "file": "screenshots/D-showme-highlight-new-client.png",
+      "scenario": "IR05",
+      "state": "The answer to a focused question about the New client control.",
+      "route": "/clients",
+      "sha256": "66c0b0aebf5a4754993e6c390a5dc7a00599f8762dacf00248e574cf5fd288f7"
+    },
+    {
+      "file": "screenshots/E-filter-clients-response.png",
+      "scenario": "IR02",
+      "state": "The answer, before Show me.",
+      "route": "/clients",
+      "sha256": "19ada269003495c795493044ce1e036fccd9345c5f9556b2066bf08155306fd6"
+    },
+    {
+      "file": "screenshots/F-unnamed-input-highlighted.png",
+      "scenario": "IR02",
+      "state": "After Show me: the unnamed filter input scrolled to, highlighted and focused.",
+      "route": "/clients",
+      "highlightedTarget": "clients.search",
+      "sha256": "628a343320fe3107318303accc681bc7ddc82d3e682601e1ec7368feb3fd4514"
+    },
+    {
+      "file": "screenshots/G-permission-explanation.png",
+      "scenario": "IR04",
+      "state": "The permission explanation.",
+      "route": "/clients/c1",
+      "sha256": "c7b02ed021a247572850fcb50d29c659edd81126aa5754e77805a0f000b63999"
+    },
+    {
+      "file": "screenshots/H-ambiguous-response.png",
+      "scenario": "IR06",
+      "state": "An ambiguous question, answered with a choice rather than a guess.",
+      "route": "/clients",
+      "sha256": "66c0b0aebf5a4754993e6c390a5dc7a00599f8762dacf00248e574cf5fd288f7"
+    },
+    {
+      "file": "screenshots/I-developer-inspector.png",
+      "scenario": null,
+      "state": "The developer inspector, open. Never present in user mode.",
+      "route": "/clients?dev=1",
+      "sha256": "e0942147d39d072191f76c787c75f1cea5de5448427453173c278c13215ac45e"
+    }
+  ],
+  "identicalFrames": [
+    [
+      "screenshots/D-showme-highlight-new-client.png",
+      "screenshots/H-ambiguous-response.png"
+    ]
+  ],
+  "roundEightComparison": {
+    "note": "Round 8 R1 scored the Markdown instrument. No per-item Round 8 or Round 8 R1 scores are committed to this repository, so no text score is asserted here. The mapping below is structural only.",
+    "r1Aggregates": {
+      "source": "stated in the Closed Loop #11 specification; no scored file is committed",
+      "distribution": {
+        "0": 6,
+        "1": 2,
+        "2": 10,
+        "3": 3
+      },
+      "meanUsefulness": 1.48,
+      "medianUsefulness": 2,
+      "shareAtLeastTwo": 0.619,
+      "correctness": 2,
+      "incorrectFactualClaims": 0
+    },
+    "mapping": [
+      {
+        "scenario": "IR01",
+        "featureId": "clients.create",
+        "textScore": null
+      },
+      {
+        "scenario": "IR02",
+        "featureId": "clients.search",
+        "textScore": null,
+        "headline": true
+      },
+      {
+        "scenario": "IR03",
+        "featureId": "clients.export",
+        "textScore": null
+      },
+      {
+        "scenario": "IR04",
+        "featureId": "client-detail.delete",
+        "textScore": null
+      },
+      {
+        "scenario": "IR05",
+        "featureId": "clients.create",
+        "textScore": null
+      },
+      {
+        "scenario": "IR06",
+        "featureId": null,
+        "textScore": null
+      },
+      {
+        "scenario": "IR07",
+        "featureId": "invoices.list.open",
+        "textScore": null
+      },
+      {
+        "scenario": "IR08",
+        "featureId": null,
+        "textScore": null
+      },
+      {
+        "scenario": "IR09",
+        "featureId": "invoices.list.open",
+        "textScore": null
+      },
+      {
+        "scenario": "IR10",
+        "featureId": "settings.new-key",
+        "textScore": null
+      }
+    ]
+  },
+  "scenarioCount": 10,
+  "scenarios": [
+    {
+      "id": "IR01",
+      "scenario": "Create client",
+      "evidence": "browser",
+      "screenshots": [
+        "screenshots/C-create-client-response.png"
+      ],
+      "facts": {
+        "initialRoute": "/clients",
+        "routeAfter": "/clients",
+        "question": "How do I create a client?",
+        "context": null,
+        "guideSaid": {
+          "title": "New client",
+          "purpose": "Lets you create a new client.",
+          "summary": "You can create a new client using \"New client\".",
+          "conditions": [
+            "You need permission to create a client."
+          ],
+          "steps": [
+            {
+              "text": "Choose \"New client\" to create client.",
+              "semanticId": "clients.create"
+            },
+            {
+              "text": "Enter the client's Billing email, Name, Plan.",
+              "semanticId": "clients.create"
+            }
+          ],
+          "hasShowMe": true,
+          "allText": "New clientLets you create a new client.You can create a new client using \"New client\".You need permission to create a client.Choose \"New client\" to create client.Enter the client's Billing email, Name, Plan.Show meStep through"
+        },
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {
+          "dialogOpenedByGuide": false
+        },
+        "safety": {}
+      },
+      "caveats": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR02",
+      "scenario": "Filter clients — unnamed target",
+      "evidence": "browser",
+      "screenshots": [
+        "screenshots/E-filter-clients-response.png",
+        "screenshots/F-unnamed-input-highlighted.png"
+      ],
+      "facts": {
+        "initialRoute": "/clients",
+        "routeAfter": "/clients",
+        "question": "How do I filter clients?",
+        "context": null,
+        "guideSaid": {
+          "purpose": "Lets you filter clients.",
+          "summary": "You can filter clients.",
+          "conditions": [],
+          "steps": [],
+          "note": "That is all I can show for this one.",
+          "hasShowMe": true,
+          "allText": "Lets you filter clients.You can filter clients.That is all I can show for this one.Show me"
+        },
+        "expectedTarget": "clients.search",
+        "actualTarget": "clients.search",
+        "interaction": {
+          "targetVisible": true,
+          "focused": true,
+          "highlightDrawn": true
+        },
+        "safety": {
+          "fabricatedNames": 0,
+          "valueTyped": ""
+        }
+      },
+      "caveats": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR03",
+      "scenario": "Find Export CSV from another screen",
+      "evidence": "browser",
+      "screenshots": [],
+      "facts": {
+        "initialRoute": "/settings",
+        "routeAfter": "/clients",
+        "question": "Where is Export CSV?",
+        "context": null,
+        "guideSaid": {
+          "title": "Export CSV",
+          "conditions": [],
+          "steps": [
+            {
+              "text": "Open Clients."
+            },
+            {
+              "text": "Choose \"Export CSV\".",
+              "semanticId": "clients.export"
+            }
+          ],
+          "hasShowMe": true,
+          "allText": "Export CSVOpen Clients.Choose \"Export CSV\".Show meStep through"
+        },
+        "expectedTarget": "clients.export",
+        "actualTarget": "clients.export",
+        "interaction": {
+          "navigated": true,
+          "targetVisible": true
+        },
+        "safety": {}
+      },
+      "caveats": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR04",
+      "scenario": "Explain a missing Delete",
+      "evidence": "browser",
+      "screenshots": [
+        "screenshots/G-permission-explanation.png"
+      ],
+      "facts": {
+        "initialRoute": "/clients/c1",
+        "routeAfter": "/clients/c1",
+        "question": "Why can't I see Delete?",
+        "context": null,
+        "guideSaid": {
+          "title": "Delete",
+          "conditions": [
+            "You need permission to do this."
+          ],
+          "steps": [],
+          "hasShowMe": true,
+          "allText": "DeleteYou need permission to do this.Show me"
+        },
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {},
+        "safety": {
+          "inventedReasons": 0
+        }
+      },
+      "caveats": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR05",
+      "scenario": "Focused \"What does this do?\"",
+      "evidence": "browser",
+      "screenshots": [
+        "screenshots/D-showme-highlight-new-client.png"
+      ],
+      "facts": {
+        "initialRoute": "/clients",
+        "routeAfter": "/clients",
+        "question": "What does this do?",
+        "context": {
+          "focusedSemanticId": "clients.create"
+        },
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "note": "I do not have anything verified about that.",
+          "hasShowMe": false,
+          "allText": "I do not have anything verified about that."
+        },
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {},
+        "safety": {}
+      },
+      "caveats": [
+        "The scenario supplied a focused target (clients.create) and the guide answered as though none was supplied. Opening the panel moves focus into its composer, so by the time the question is asked the host no longer reports the element the user was looking at. The focused path is therefore NOT exercised by this run."
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR06",
+      "scenario": "Ambiguous \"What does this do?\"",
+      "evidence": "browser",
+      "screenshots": [
+        "screenshots/H-ambiguous-response.png"
+      ],
+      "facts": {
+        "initialRoute": "/clients",
+        "routeAfter": "/clients",
+        "question": "What does this do?",
+        "context": null,
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "note": "I do not have anything verified about that.",
+          "hasShowMe": false,
+          "allText": "I do not have anything verified about that."
+        },
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {},
+        "safety": {
+          "featureIdsExposed": 0
+        }
+      },
+      "caveats": [
+        "This is recorded as an ambiguous question but the guide returned an unsupported answer, not a choice. The host registers no elements explicitly — it marks its markup with `data-guide` — so the visible-target list reaching the query contract is empty and there is nothing to be ambiguous between."
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR07",
+      "scenario": "Unsupported invoice-open case",
+      "evidence": "browser",
+      "screenshots": [],
+      "facts": {
+        "initialRoute": "/invoices",
+        "routeAfter": "/invoices",
+        "question": "How do I open an invoice?",
+        "context": null,
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "note": "I do not have anything verified about that.",
+          "hasShowMe": false,
+          "allText": "I do not have anything verified about that."
+        },
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {},
+        "safety": {
+          "substitutedFeature": false
+        }
+      },
+      "caveats": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR08",
+      "scenario": "Stale context",
+      "evidence": "contract-suite",
+      "screenshots": [],
+      "facts": {
+        "initialRoute": null,
+        "routeAfter": null,
+        "question": null,
+        "context": null,
+        "guideSaid": null,
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {},
+        "safety": {},
+        "harnessNote": "Exercised in the contract suite; the host always supplies its own live version."
+      },
+      "caveats": [
+        "Stale context is exercised in the contract test suite rather than in the browser: the host always reports its own live build, so it cannot produce a stale snapshot without being made to lie."
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR09",
+      "scenario": "Dynamic runtime instance target",
+      "evidence": "browser-no-screenshot",
+      "screenshots": [],
+      "facts": {
+        "initialRoute": "/clients/c1",
+        "routeAfter": null,
+        "question": null,
+        "context": null,
+        "guideSaid": null,
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {},
+        "safety": {},
+        "runtimeInstanceNames": [],
+        "harnessNote": "Invoice rows carry a runtime accessible name (the invoice number). It is present in the running application and is not promoted into the ProductModel or into any guide sentence."
+      },
+      "caveats": [
+        "The runtime instance names below are read from the running application. No screenshot was captured for this scenario, and nothing here entered the ProductModel or any guide sentence."
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    },
+    {
+      "id": "IR10",
+      "scenario": "Secret / redaction",
+      "evidence": "browser-no-screenshot",
+      "screenshots": [],
+      "facts": {
+        "initialRoute": "/settings",
+        "routeAfter": null,
+        "question": "Where is the new key?",
+        "context": null,
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "note": "I do not have anything verified about that.",
+          "hasShowMe": false,
+          "allText": "I do not have anything verified about that."
+        },
+        "expectedTarget": null,
+        "actualTarget": null,
+        "interaction": {},
+        "safety": {
+          "secretLeaks": 0
+        },
+        "revealedValuePresentInHost": true,
+        "revealedValueInGuide": false
+      },
+      "caveats": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "targetAccuracy": null,
+        "contextualRelevance": null,
+        "actionSafety": null,
+        "uiClarity": null
+      },
+      "failureClassification": null,
+      "note": ""
+    }
+  ]
+}

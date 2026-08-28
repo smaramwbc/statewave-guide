@@ -64,6 +64,7 @@
  */
 
 import type { ApplicationGraph, ApplicationNode } from '@statewavedev/guide-indexer';
+import { isVerifiedClaim } from '@statewavedev/guide-shared';
 import type { CapabilityAction, ProductClaim } from '@statewavedev/guide-shared';
 import { compareStrings } from '../compare.js';
 import type { FeatureScope, ScopeClass } from '../scope.js';
@@ -326,7 +327,7 @@ export function buildGroundedTerms(input: GroundedTermsInput): GroundedTerms {
   }
 
   for (const claim of input.claims) {
-    if (claim.status !== 'structurally_verified') continue;
+    if (!isVerifiedClaim(claim)) continue;
     const action = claim.assertion?.action;
     if (action === undefined) continue;
     put(
@@ -505,6 +506,45 @@ export function artifactNoun(
 }
 
 /**
+ * Actions that describe a mechanism rather than a reason a feature exists.
+ *
+ * `submit` and `navigate` have been here since Closed Loop #7: Round 4 shipped
+ * *"You can submit a setting using Save changes"* from the first and *"You can
+ * open a nav"* from the second.
+ *
+ * `reveal` joined them in Closed Loop #10, and it is worth writing down why,
+ * because the capability itself is sound. Runtime observed that pressing
+ * **Rotate API key** made a target appear, and that is true. Turning it into a
+ * purpose needs a name for *what appeared* — and what appeared is a `<code>`
+ * block holding a rotated key, which Closed Loop #9 deliberately refuses to name
+ * because its text is a value rather than a label. Without that noun the object
+ * falls back to the feature's namespace and the sentence becomes **"Lets you
+ * show a setting."**, which misdescribes the one thing it was meant to describe.
+ *
+ * The capability stays in the ProductModel; what is withheld is the sentence.
+ * That is the same trade made everywhere else here — unknown beats wrong.
+ */
+export const MECHANISM_ACTIONS: ReadonlySet<CapabilityAction> = new Set([
+  'submit',
+  'navigate',
+  'reveal',
+]);
+
+/**
+ * Actions that operate on a collection rather than on one member.
+ *
+ * Filtering narrows a list. *"Filter a client"* would be a different and
+ * unproven claim about picking one out, and what was observed was a membership
+ * count changing from five to two.
+ */
+const COLLECTION_ACTIONS: ReadonlySet<CapabilityAction> = new Set([
+  'search',
+  'export',
+  'import',
+  'filter',
+]);
+
+/**
  * Compiles what may be said about why a feature exists.
  *
  * An action is taken only from a verified `capability` assertion — never from the
@@ -517,7 +557,7 @@ export function compilePurpose(input: CompilePurposeInput): PurposeIR {
   const propositions: LanguageProposition[] = [];
   const withheld: WithheldProposition[] = [];
 
-  const verified = input.claims.filter((claim) => claim.status === 'structurally_verified');
+  const verified = input.claims.filter((claim) => isVerifiedClaim(claim));
 
   // `submit` and `navigate` are mechanisms rather than reasons a feature exists.
   // Round 4 shipped "You can submit a setting using Save changes" from the first
@@ -526,8 +566,7 @@ export function compilePurpose(input: CompilePurposeInput): PurposeIR {
     (claim) =>
       claim.type === 'capability' &&
       claim.assertion?.action !== undefined &&
-      claim.assertion.action !== 'submit' &&
-      claim.assertion.action !== 'navigate',
+      !MECHANISM_ACTIONS.has(claim.assertion.action),
   );
 
   if (capability === undefined) {
@@ -591,6 +630,13 @@ const PURPOSE_VERBS: Record<CapabilityAction, string> = {
   export: 'export',
   import: 'import',
   send: 'send',
+  // Closed Loop #10. Each verb is the plainest word for what its rule actually
+  // established, and none of them says more. `reveal` becomes *show* rather than
+  // *generate*: the observation is that a target was absent and then present.
+  filter: 'filter',
+  reveal: 'show',
+  open: 'open',
+  select: 'select',
 };
 
 /**
@@ -615,7 +661,7 @@ export function realisePurpose(ir: PurposeIR): string | undefined {
     return `Lets you ${verb} the ${artifact.value} for ${article(object.value)}.`;
   }
   if (action.value === 'create') return `Lets you create ${article(`new ${object.value}`)}.`;
-  if (action.value === 'search' || action.value === 'export' || action.value === 'import') {
+  if (COLLECTION_ACTIONS.has(action.value as CapabilityAction)) {
     return `Lets you ${verb} ${object.value}s.`;
   }
   return `Lets you ${verb} ${article(object.value)}.`;
@@ -646,15 +692,14 @@ export interface CompiledQuestion {
  */
 export function compileQuestions(input: CompilePurposeInput): CompiledQuestion[] {
   const questions: CompiledQuestion[] = [];
-  const verified = input.claims.filter((claim) => claim.status === 'structurally_verified');
+  const verified = input.claims.filter((claim) => isVerifiedClaim(claim));
   const object = objectNoun(input);
 
   const capability = verified.find(
     (claim) =>
       claim.type === 'capability' &&
       claim.assertion?.action !== undefined &&
-      claim.assertion.action !== 'submit' &&
-      claim.assertion.action !== 'navigate',
+      !MECHANISM_ACTIONS.has(claim.assertion.action),
   );
 
   if (capability !== undefined && object !== undefined) {
@@ -670,7 +715,7 @@ export function compileQuestions(input: CompilePurposeInput): CompiledQuestion[]
         ? `${verb} the ${artifact.text} for ${article(object.noun)}`
         : action === 'create'
           ? `create ${article(`new ${object.noun}`)}`
-          : action === 'search' || action === 'export' || action === 'import'
+          : COLLECTION_ACTIONS.has(action)
             ? `${verb} ${object.noun}s`
             : `${verb} ${article(object.noun)}`;
     questions.push({

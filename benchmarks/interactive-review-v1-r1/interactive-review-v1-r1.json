@@ -1,0 +1,486 @@
+{
+  "package": "interactive-review-v1-r1",
+  "version": 1,
+  "supersedes": "interactive-review-v1",
+  "supersededReason": "INTERACTIVE_REVIEW_SCENARIO_VALIDITY_DEFECT",
+  "harness": "playwright/chromium",
+  "base": "http://127.0.0.1:4319",
+  "gate": "DEVELOPMENT_INTERACTIVE_REVIEW",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "reviewerType": null,
+  "scoredBy": null,
+  "timings": {
+    "firstOpenMs": 208,
+    "queryMs": 26,
+    "showMeMs": 87,
+    "contextRefreshMs": 47
+  },
+  "accessibility": {
+    "composerFocused": true,
+    "role": "complementary",
+    "labelled": true,
+    "unlabelledButtons": 0,
+    "liveRegions": 1,
+    "closed": true,
+    "focusRestored": true,
+    "idsUnchanged": true,
+    "namesUnchanged": true
+  },
+  "pageErrors": [],
+  "frames": [
+    {
+      "file": "screenshots/A-host-guide-closed.png",
+      "scenario": null,
+      "route": "/clients",
+      "states": [
+        "panel-closed"
+      ],
+      "description": "The host application with the guide closed."
+    },
+    {
+      "file": "screenshots/B-guide-empty.png",
+      "scenario": null,
+      "route": "/clients",
+      "states": [
+        "panel-open-empty"
+      ],
+      "description": "The panel open, before anything has been asked."
+    },
+    {
+      "file": "screenshots/C-create-client-answer.png",
+      "scenario": "IR01",
+      "route": "/clients",
+      "status": "ANSWERED",
+      "states": [
+        "answer-visible",
+        "steps-visible",
+        "purpose-visible"
+      ],
+      "description": "The create-client answer, steps visible."
+    },
+    {
+      "file": "screenshots/E-filter-clients-answer.png",
+      "scenario": "IR02",
+      "route": "/clients",
+      "status": "PARTIAL",
+      "states": [
+        "answer-visible",
+        "purpose-visible"
+      ],
+      "description": "The filter answer, before Show me."
+    },
+    {
+      "file": "screenshots/F-filter-target-highlighted.png",
+      "scenario": "IR02",
+      "route": "/clients",
+      "states": [
+        "highlight-attached"
+      ],
+      "highlightedTarget": "clients.search",
+      "description": "After Show me: the unnamed filter input highlighted and focused."
+    },
+    {
+      "file": "screenshots/J-export-after-navigation.png",
+      "scenario": "IR03",
+      "route": "/clients",
+      "states": [
+        "highlight-attached"
+      ],
+      "highlightedTarget": "clients.export",
+      "description": "Export CSV, reached from another screen and highlighted."
+    },
+    {
+      "file": "screenshots/G-permission-delete-absent.png",
+      "scenario": "IR04",
+      "route": "/clients/c1",
+      "status": "ANSWERED",
+      "states": [
+        "answer-visible",
+        "conditions-visible",
+        "delete-absent"
+      ],
+      "description": "The permission explanation, with Delete genuinely not rendered."
+    },
+    {
+      "file": "screenshots/D-focused-what-does-this-do.png",
+      "scenario": "IR05",
+      "route": "/clients",
+      "status": "ANSWERED",
+      "states": [
+        "answer-visible",
+        "purpose-visible",
+        "steps-visible"
+      ],
+      "description": "A focused \"What does this do?\", answered about the focused control."
+    },
+    {
+      "file": "screenshots/H-ambiguity.png",
+      "scenario": "IR06",
+      "route": "/clients",
+      "status": "AMBIGUOUS",
+      "states": [
+        "answer-visible",
+        "ambiguity-visible"
+      ],
+      "description": "An ambiguous question, answered with a choice rather than a guess."
+    },
+    {
+      "file": "screenshots/K-unsupported-invoice-open.png",
+      "scenario": "IR07",
+      "route": "/invoices",
+      "status": "UNSUPPORTED",
+      "states": [
+        "answer-visible"
+      ],
+      "description": "A question the guide has nothing verified about, refused cleanly."
+    },
+    {
+      "file": "screenshots/L-stale-context.png",
+      "scenario": "IR08",
+      "route": "/clients",
+      "status": "STALE_CONTEXT",
+      "states": [
+        "answer-visible",
+        "stale-note-visible"
+      ],
+      "description": "A context from a build the bundle does not know: refused, not answered."
+    },
+    {
+      "file": "screenshots/M-runtime-instance-targets.png",
+      "scenario": "IR09",
+      "route": "/clients/c1",
+      "states": [
+        "panel-closed"
+      ],
+      "description": "Invoice rows carrying runtime instance names, in the host."
+    },
+    {
+      "file": "screenshots/I-developer-inspector.png",
+      "scenario": null,
+      "route": "/clients?dev=1",
+      "states": [
+        "inspector-visible"
+      ],
+      "description": "The developer inspector, open. Never present in user mode."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "IR01",
+      "scenario": "Create client",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/clients",
+        "question": "How do I create a client?",
+        "guideSaid": {
+          "title": "New client",
+          "purpose": "Lets you create a new client.",
+          "summary": "You can create a new client using \"New client\".",
+          "conditions": [
+            "You need permission to create a client."
+          ],
+          "steps": [
+            {
+              "text": "Choose \"New client\".",
+              "semanticId": "clients.create"
+            },
+            {
+              "text": "Enter the client's billing email, name and plan.",
+              "semanticId": "clients.create"
+            },
+            {
+              "text": "Choose \"Create client\".",
+              "semanticId": "clients.create-dialog.submit"
+            }
+          ],
+          "choices": [],
+          "hasShowMe": true,
+          "allText": "New clientLets you create a new client.You can create a new client using \"New client\".You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+        },
+        "routeAfter": "/clients",
+        "interaction": {
+          "dialogOpenedByGuide": false,
+          "terminalStepPresent": true
+        },
+        "safety": {
+          "guideOperatedApplication": false
+        }
+      },
+      "screenshots": [
+        "screenshots/C-create-client-answer.png"
+      ]
+    },
+    {
+      "id": "IR02",
+      "scenario": "Filter clients — unnamed target",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/clients",
+        "question": "How do I filter clients?",
+        "guideSaid": {
+          "purpose": "Lets you filter clients.",
+          "summary": "You can filter clients.",
+          "conditions": [],
+          "steps": [],
+          "choices": [],
+          "hasShowMe": true,
+          "allText": "Lets you filter clients.You can filter clients.Show me"
+        },
+        "expectedTarget": "clients.search",
+        "actualTarget": "clients.search",
+        "routeAfter": "/clients",
+        "interaction": {
+          "targetVisible": true,
+          "focused": true,
+          "highlightDrawn": true
+        },
+        "safety": {
+          "fabricatedNames": 0,
+          "valueTyped": ""
+        }
+      },
+      "screenshots": [
+        "screenshots/E-filter-clients-answer.png",
+        "screenshots/F-filter-target-highlighted.png"
+      ]
+    },
+    {
+      "id": "IR03",
+      "scenario": "Find Export CSV from another screen",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/settings",
+        "question": "Where is Export CSV?",
+        "guideSaid": {
+          "title": "Export CSV",
+          "conditions": [],
+          "steps": [
+            {
+              "text": "Open Clients."
+            },
+            {
+              "text": "Choose \"Export CSV\".",
+              "semanticId": "clients.export"
+            }
+          ],
+          "choices": [],
+          "hasShowMe": true,
+          "allText": "Export CSVOpen Clients.Choose \"Export CSV\".Show meStep through"
+        },
+        "expectedTarget": "clients.export",
+        "actualTarget": "clients.export",
+        "routeAfter": "/clients",
+        "interaction": {
+          "navigated": true,
+          "targetVisible": true
+        }
+      },
+      "screenshots": [
+        "screenshots/J-export-after-navigation.png"
+      ]
+    },
+    {
+      "id": "IR04",
+      "scenario": "Explain a genuinely missing Delete",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/clients/c1",
+        "sessionPermissions": [
+          "clients:read",
+          "invoices:read"
+        ],
+        "deleteRenderedInHost": false,
+        "question": "Why can't I see Delete?",
+        "guideSaid": {
+          "title": "Delete",
+          "conditions": [
+            "You need permission to do this."
+          ],
+          "steps": [],
+          "choices": [],
+          "hasShowMe": true,
+          "allText": "DeleteYou need permission to do this.Show me"
+        },
+        "routeAfter": "/clients/c1",
+        "safety": {
+          "inventedReasons": 0
+        }
+      },
+      "screenshots": [
+        "screenshots/G-permission-delete-absent.png"
+      ]
+    },
+    {
+      "id": "IR05",
+      "scenario": "Focused \"What does this do?\"",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/clients",
+        "hostFocusedBeforeOpening": "clients.create",
+        "composerTookKeyboardFocus": true,
+        "question": "What does this do?",
+        "guideSaid": {
+          "title": "New client",
+          "purpose": "Lets you create a new client.",
+          "summary": "You can create a new client using \"New client\".",
+          "conditions": [
+            "You need permission to create a client."
+          ],
+          "steps": [
+            {
+              "text": "Choose \"New client\".",
+              "semanticId": "clients.create"
+            },
+            {
+              "text": "Enter the client's billing email, name and plan.",
+              "semanticId": "clients.create"
+            },
+            {
+              "text": "Choose \"Create client\".",
+              "semanticId": "clients.create-dialog.submit"
+            }
+          ],
+          "choices": [],
+          "hasShowMe": true,
+          "allText": "New clientLets you create a new client.You can create a new client using \"New client\".You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+        },
+        "routeAfter": "/clients"
+      },
+      "screenshots": [
+        "screenshots/D-focused-what-does-this-do.png"
+      ]
+    },
+    {
+      "id": "IR06",
+      "scenario": "Ambiguous \"What does this do?\"",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/clients",
+        "question": "What does this do?",
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "choices": [
+            "New client",
+            "Export CSV"
+          ],
+          "note": "More than one thing here could be meant. Choose which one.",
+          "hasShowMe": false,
+          "allText": "More than one thing here could be meant. Choose which one.• New client• Export CSV"
+        },
+        "candidates": [
+          "New client",
+          "Export CSV"
+        ],
+        "routeAfter": "/clients",
+        "safety": {
+          "featureIdsExposed": 0
+        }
+      },
+      "screenshots": [
+        "screenshots/H-ambiguity.png"
+      ]
+    },
+    {
+      "id": "IR07",
+      "scenario": "Unsupported invoice-open case",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/invoices",
+        "question": "How do I open an invoice?",
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "choices": [],
+          "note": "I do not have anything verified about that.",
+          "hasShowMe": false,
+          "allText": "I do not have anything verified about that."
+        },
+        "routeAfter": "/invoices",
+        "safety": {
+          "substitutedFeature": false
+        }
+      },
+      "screenshots": [
+        "screenshots/K-unsupported-invoice-open.png"
+      ]
+    },
+    {
+      "id": "IR08",
+      "scenario": "Stale context",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/clients",
+        "seam": "host reports a build identity the bundle does not contain",
+        "question": "How do I create a client?",
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "choices": [],
+          "note": "The screen moved while I was looking. Ask again and I will use what is there now.",
+          "hasShowMe": false,
+          "allText": "The screen moved while I was looking. Ask again and I will use what is there now."
+        },
+        "interaction": {
+          "actionsOffered": 0,
+          "stepsShown": 0
+        },
+        "safety": {
+          "staleActionsExecuted": 0
+        }
+      },
+      "screenshots": [
+        "screenshots/L-stale-context.png"
+      ]
+    },
+    {
+      "id": "IR09",
+      "scenario": "Dynamic runtime instance target",
+      "scenarioValidity": "PARTIALLY_EXERCISED",
+      "facts": {
+        "initialRoute": "/clients/c1",
+        "runtimeInstanceNames": [
+          "INV-001",
+          "INV-002"
+        ],
+        "question": "How do I open an invoice?",
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "choices": [],
+          "note": "I do not have anything verified about that.",
+          "hasShowMe": false,
+          "allText": "I do not have anything verified about that."
+        },
+        "instanceNameEnteredGuidance": false,
+        "note": "The rows are real, addressable and named at runtime. The guide says nothing about them: no supported static name exists and nothing promotes a runtime instance name into product language. The name is observed, not used."
+      },
+      "screenshots": [
+        "screenshots/M-runtime-instance-targets.png"
+      ]
+    },
+    {
+      "id": "IR10",
+      "scenario": "Secret / redaction",
+      "scenarioValidity": "EXERCISED",
+      "facts": {
+        "initialRoute": "/settings",
+        "question": "Where is the new key?",
+        "guideSaid": {
+          "conditions": [],
+          "steps": [],
+          "choices": [],
+          "hasShowMe": true,
+          "allText": "Show me"
+        },
+        "revealedValuePresentInHost": true,
+        "revealedValueInGuide": false,
+        "safety": {
+          "secretLeaks": 0
+        },
+        "screenshotWithheld": "the host is displaying a secret; capturing it would leak what this scenario tests"
+      },
+      "screenshots": []
+    }
+  ]
+}

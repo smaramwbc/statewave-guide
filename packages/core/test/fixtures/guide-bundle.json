@@ -1,0 +1,3952 @@
+{
+  "version": 1,
+  "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49",
+  "features": [
+    {
+      "featureId": "api.get.partial-clients",
+      "steps": [],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "api.get.partial-clients",
+        "steps": [],
+        "questions": [],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "clients:read",
+              "provenance": {
+                "claims": [
+                  "api.get.partial-clients#permission:1"
+                ],
+                "facts": [
+                  "api:GET:?/clients|requires_permission|permission:clients:read",
+                  "permission:clients:read",
+                  "api:GET:?/clients|requires_permission|permission:clients:read",
+                  "permission:clients:read"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "api.get.partial-clients#permission:1"
+              ],
+              "facts": [
+                "api:GET:?/clients|requires_permission|permission:clients:read",
+                "permission:clients:read",
+                "api:GET:?/clients|requires_permission|permission:clients:read",
+                "permission:clients:read"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "api.get.partial-clients"
+          },
+          {
+            "code": "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+            "detail": "A verified constraint was not rendered: it does not change which values or actions are allowed, and does not explain a likely failure.",
+            "subject": "api.get.partial-clients#constraint:1"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "api.get.partial-clients"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "api.get.partial-clients#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "api.get.partial-clients#user_question:1"
+          }
+        ],
+        "completeness": "EMPTY",
+        "taskCompletion": "NO_TASK",
+        "actionAccounting": [],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "routes": [],
+      "controls": [],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "client-detail.audit",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Client Detail.",
+          "screenRoute": "/clients/:clientId",
+          "screenName": "Client Detail"
+        },
+        {
+          "index": 2,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-capability",
+          "text": "Choose \"Audit trail\".",
+          "semanticId": "client-detail.audit"
+        }
+      ],
+      "conceptNouns": [
+        "client"
+      ],
+      "guidance": {
+        "featureId": "client-detail.audit",
+        "title": {
+          "text": "Audit trail",
+          "origin": "ui-label",
+          "nodeId": "element:client-detail.audit"
+        },
+        "titleEvidence": {
+          "text": "Audit trail",
+          "origin": "ui-label",
+          "evidence": "element:client-detail.audit",
+          "ownership": "OWNED"
+        },
+        "summary": {
+          "text": "You can view a client using \"Audit trail\".",
+          "provenance": {
+            "claims": [
+              "client-detail.audit#capability:1"
+            ],
+            "facts": [
+              "api:GET:/api/clients/:param/audit",
+              "element:client-detail.audit",
+              "api:GET:/api/clients/:param/audit",
+              "element:client-detail.audit"
+            ]
+          }
+        },
+        "purpose": {
+          "text": "Lets you view the audit trail for a client.",
+          "provenance": {
+            "claims": [
+              "client-detail.audit#capability:1"
+            ],
+            "facts": [
+              "api:GET:/api/clients/:param/audit",
+              "element:client-detail.audit"
+            ]
+          }
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Client Detail",
+                "origin": "route-title",
+                "nodeId": "route:/clients/:clientId"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients/:clientId"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients/:clientId"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-capability",
+            "proposition": {
+              "kind": "perform_action",
+              "action": "view",
+              "object": "client",
+              "control": {
+                "text": "Audit trail",
+                "origin": "ui-label",
+                "nodeId": "element:client-detail.audit"
+              },
+              "provenance": {
+                "claims": [
+                  "client-detail.audit#capability:1"
+                ],
+                "facts": [
+                  "api:GET:/api/clients/:param/audit",
+                  "element:client-detail.audit"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.audit#capability:1"
+              ],
+              "facts": [
+                "api:GET:/api/clients/:param/audit",
+                "element:client-detail.audit"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "How do I view the audit trail for a client?",
+            "provenance": {
+              "claims": [
+                "client-detail.audit#capability:1"
+              ],
+              "facts": [
+                "api:GET:/api/clients/:param/audit",
+                "element:client-detail.audit"
+              ]
+            }
+          },
+          {
+            "text": "Why can't I see \"Audit trail\"?",
+            "provenance": {
+              "claims": [
+                "client-detail.audit#permission:1"
+              ],
+              "facts": [
+                "element:client-detail.audit"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "clients:read",
+              "capability": "view a client",
+              "provenance": {
+                "claims": [
+                  "client-detail.audit#permission:1"
+                ],
+                "facts": [
+                  "api:GET:/api/clients/:param/audit|requires_permission|permission:clients:read",
+                  "permission:clients:read",
+                  "api:GET:/api/clients/:param/audit|requires_permission|permission:clients:read",
+                  "permission:clients:read"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.audit#permission:1"
+              ],
+              "facts": [
+                "api:GET:/api/clients/:param/audit|requires_permission|permission:clients:read",
+                "permission:clients:read",
+                "api:GET:/api/clients/:param/audit|requires_permission|permission:clients:read",
+                "permission:clients:read"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.audit#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.audit#user_question:1"
+          }
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "client-detail.audit#workflow_step:1",
+            "subjectRef": "element:client-detail.audit",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:client-detail.audit in this guide as the same kind of step.",
+            "targetNodeId": "element:client-detail.audit"
+          },
+          {
+            "claimId": "client-detail.audit#capability:1",
+            "subjectRef": "element:client-detail.audit",
+            "outcome": "emitted",
+            "targetNodeId": "element:client-detail.audit"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "action",
+            "value": "view",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.audit#capability:1",
+              "detail": "verified capability action \"view\""
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:GET:/api/clients/:param/audit",
+              "attribute": "path",
+              "text": "/api/clients/:clientId/audit"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "audit trail",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:client-detail.audit",
+              "attribute": "label",
+              "text": "Audit trail"
+            }
+          },
+          {
+            "type": "action",
+            "value": "view",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.audit#capability:1",
+              "detail": "verified capability"
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:GET:/api/clients/:param/audit",
+              "attribute": "path",
+              "text": "/api/clients/:clientId/audit"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "audit trail",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:client-detail.audit",
+              "attribute": "label",
+              "text": "Audit trail"
+            }
+          },
+          {
+            "type": "condition",
+            "value": "requires permission",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.audit#permission:1",
+              "detail": "verified permission"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "Audit trail",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:client-detail.audit",
+              "attribute": "label",
+              "text": "Audit trail"
+            }
+          }
+        ],
+        "withheldLanguage": []
+      },
+      "entryRoute": "/clients/:clientId",
+      "routes": [
+        "/clients/:clientId"
+      ],
+      "controls": [
+        {
+          "semanticId": "client-detail.audit",
+          "label": "Audit trail",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "client-detail.change-plan",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Client Detail.",
+          "screenRoute": "/clients/:clientId",
+          "screenName": "Client Detail"
+        },
+        {
+          "index": 2,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-workflow",
+          "text": "Choose \"Upgrade\".",
+          "semanticId": "client-detail.change-plan"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "client-detail.change-plan",
+        "title": {
+          "text": "Upgrade",
+          "origin": "ui-label",
+          "nodeId": "element:client-detail.change-plan"
+        },
+        "titleEvidence": {
+          "text": "Upgrade",
+          "origin": "ui-label",
+          "evidence": "element:client-detail.change-plan",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Client Detail",
+                "origin": "route-title",
+                "nodeId": "route:/clients/:clientId"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients/:clientId"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients/:clientId"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-workflow",
+            "proposition": {
+              "kind": "perform_action",
+              "object": "client",
+              "control": {
+                "text": "Upgrade",
+                "origin": "ui-label",
+                "nodeId": "element:client-detail.change-plan"
+              },
+              "provenance": {
+                "claims": [
+                  "client-detail.change-plan#workflow_step:1"
+                ],
+                "facts": [
+                  "element:client-detail.change-plan"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.change-plan#workflow_step:1"
+              ],
+              "facts": [
+                "element:client-detail.change-plan"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "Why can't I see \"Upgrade\"?",
+            "provenance": {
+              "claims": [
+                "client-detail.change-plan#constraint:1"
+              ],
+              "facts": [
+                "element:client-detail.change-plan"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "clients:update",
+              "provenance": {
+                "claims": [
+                  "client-detail.change-plan#permission:1"
+                ],
+                "facts": [
+                  "element:client-detail.change-plan|requires_permission|permission:clients:update",
+                  "permission:clients:update",
+                  "element:client-detail.change-plan|requires_permission|permission:clients:update",
+                  "permission:clients:update"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.change-plan#permission:1"
+              ],
+              "facts": [
+                "element:client-detail.change-plan|requires_permission|permission:clients:update",
+                "permission:clients:update",
+                "element:client-detail.change-plan|requires_permission|permission:clients:update",
+                "permission:clients:update"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+            "detail": "A verified constraint was not rendered: it does not change which values or actions are allowed, and does not explain a likely failure.",
+            "subject": "client-detail.change-plan#constraint:1"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "client-detail.change-plan"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.change-plan#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.change-plan#purpose:2"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.change-plan#user_question:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "client-detail.change-plan#workflow_step:1",
+            "subjectRef": "feature:client-detail.change-plan",
+            "outcome": "emitted",
+            "targetNodeId": "element:client-detail.change-plan"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "condition",
+            "value": "requires permission",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.change-plan#constraint:1",
+              "detail": "verified permission"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "Upgrade",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:client-detail.change-plan",
+              "attribute": "label",
+              "text": "Upgrade"
+            }
+          }
+        ],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/clients/:clientId",
+      "routes": [
+        "/clients/:clientId"
+      ],
+      "controls": [
+        {
+          "semanticId": "client-detail.change-plan",
+          "label": "Upgrade",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "client-detail.delete",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Client Detail.",
+          "screenRoute": "/clients/:clientId",
+          "screenName": "Client Detail"
+        },
+        {
+          "index": 2,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-workflow",
+          "text": "Choose \"Delete\".",
+          "semanticId": "client-detail.delete"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "client-detail.delete",
+        "title": {
+          "text": "Delete",
+          "origin": "ui-label",
+          "nodeId": "element:client-detail.delete"
+        },
+        "titleEvidence": {
+          "text": "Delete",
+          "origin": "ui-label",
+          "evidence": "element:client-detail.delete",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Client Detail",
+                "origin": "route-title",
+                "nodeId": "route:/clients/:clientId"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients/:clientId"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients/:clientId"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-workflow",
+            "proposition": {
+              "kind": "perform_action",
+              "object": "client",
+              "control": {
+                "text": "Delete",
+                "origin": "ui-label",
+                "nodeId": "element:client-detail.delete"
+              },
+              "provenance": {
+                "claims": [
+                  "client-detail.delete#workflow_step:1"
+                ],
+                "facts": [
+                  "element:client-detail.delete"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.delete#workflow_step:1"
+              ],
+              "facts": [
+                "element:client-detail.delete"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "Why can't I see \"Delete\"?",
+            "provenance": {
+              "claims": [
+                "client-detail.delete#permission:1"
+              ],
+              "facts": [
+                "element:client-detail.delete"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "clients:delete",
+              "provenance": {
+                "claims": [
+                  "client-detail.delete#permission:1"
+                ],
+                "facts": [
+                  "element:client-detail.delete|requires_permission|permission:clients:delete",
+                  "permission:clients:delete",
+                  "element:client-detail.delete|requires_permission|permission:clients:delete",
+                  "permission:clients:delete"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.delete#permission:1"
+              ],
+              "facts": [
+                "element:client-detail.delete|requires_permission|permission:clients:delete",
+                "permission:clients:delete",
+                "element:client-detail.delete|requires_permission|permission:clients:delete",
+                "permission:clients:delete"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "client-detail.delete"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.delete#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.delete#user_question:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "client-detail.delete#workflow_step:1",
+            "subjectRef": "feature:client-detail.delete",
+            "outcome": "emitted",
+            "targetNodeId": "element:client-detail.delete"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "condition",
+            "value": "requires permission",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.delete#permission:1",
+              "detail": "verified permission"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "Delete",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:client-detail.delete",
+              "attribute": "label",
+              "text": "Delete"
+            }
+          }
+        ],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/clients/:clientId",
+      "routes": [
+        "/clients/:clientId"
+      ],
+      "controls": [
+        {
+          "semanticId": "client-detail.delete",
+          "label": "Delete",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "client-detail.rename",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Client Detail.",
+          "screenRoute": "/clients/:clientId",
+          "screenName": "Client Detail"
+        },
+        {
+          "index": 2,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-capability",
+          "text": "Choose \"Rename\".",
+          "semanticId": "client-detail.rename"
+        }
+      ],
+      "conceptNouns": [
+        "client"
+      ],
+      "guidance": {
+        "featureId": "client-detail.rename",
+        "title": {
+          "text": "Rename",
+          "origin": "ui-label",
+          "nodeId": "element:client-detail.rename"
+        },
+        "titleEvidence": {
+          "text": "Rename",
+          "origin": "ui-label",
+          "evidence": "element:client-detail.rename",
+          "ownership": "OWNED"
+        },
+        "summary": {
+          "text": "You can change a client using \"Rename\".",
+          "provenance": {
+            "claims": [
+              "client-detail.rename#capability:1"
+            ],
+            "facts": [
+              "api:PUT:/api/clients/:param",
+              "element:client-detail.rename",
+              "function:frontend/src/services/clientService.ts#clientService.update|calls_api|api:PUT:/api/clients/:param",
+              "api:PUT:/api/clients/:param",
+              "element:client-detail.rename",
+              "function:frontend/src/services/clientService.ts#clientService.update|calls_api|api:PUT:/api/clients/:param"
+            ]
+          }
+        },
+        "purpose": {
+          "text": "Lets you change a client.",
+          "provenance": {
+            "claims": [
+              "client-detail.rename#capability:1"
+            ],
+            "facts": [
+              "api:PUT:/api/clients/:param"
+            ]
+          }
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Client Detail",
+                "origin": "route-title",
+                "nodeId": "route:/clients/:clientId"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients/:clientId"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients/:clientId"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-capability",
+            "proposition": {
+              "kind": "perform_action",
+              "action": "update",
+              "object": "client",
+              "control": {
+                "text": "Rename",
+                "origin": "ui-label",
+                "nodeId": "element:client-detail.rename"
+              },
+              "provenance": {
+                "claims": [
+                  "client-detail.rename#capability:1"
+                ],
+                "facts": [
+                  "api:PUT:/api/clients/:param",
+                  "element:client-detail.rename",
+                  "function:frontend/src/services/clientService.ts#clientService.update|calls_api|api:PUT:/api/clients/:param"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.rename#capability:1"
+              ],
+              "facts": [
+                "api:PUT:/api/clients/:param",
+                "element:client-detail.rename",
+                "function:frontend/src/services/clientService.ts#clientService.update|calls_api|api:PUT:/api/clients/:param"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "How do I change a client?",
+            "provenance": {
+              "claims": [
+                "client-detail.rename#capability:1"
+              ],
+              "facts": [
+                "api:PUT:/api/clients/:param"
+              ]
+            }
+          },
+          {
+            "text": "Why can't I see \"Rename\"?",
+            "provenance": {
+              "claims": [
+                "client-detail.rename#constraint:1"
+              ],
+              "facts": [
+                "element:client-detail.rename"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "clients:update",
+              "capability": "change a client",
+              "provenance": {
+                "claims": [
+                  "client-detail.rename#permission:1"
+                ],
+                "facts": [
+                  "api:PUT:/api/clients/:param|requires_permission|permission:clients:update",
+                  "element:client-detail.rename|requires_permission|permission:clients:update",
+                  "permission:clients:update",
+                  "api:PUT:/api/clients/:param|requires_permission|permission:clients:update",
+                  "element:client-detail.rename|requires_permission|permission:clients:update",
+                  "permission:clients:update"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "client-detail.rename#permission:1"
+              ],
+              "facts": [
+                "api:PUT:/api/clients/:param|requires_permission|permission:clients:update",
+                "element:client-detail.rename|requires_permission|permission:clients:update",
+                "permission:clients:update",
+                "api:PUT:/api/clients/:param|requires_permission|permission:clients:update",
+                "element:client-detail.rename|requires_permission|permission:clients:update",
+                "permission:clients:update"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+            "detail": "A verified constraint was not rendered: it does not change which values or actions are allowed, and does not explain a likely failure.",
+            "subject": "client-detail.rename#constraint:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.rename#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "client-detail.rename#user_question:1"
+          }
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "client-detail.rename#workflow_step:1",
+            "subjectRef": "element:client-detail.rename",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:client-detail.rename in this guide as the same kind of step.",
+            "targetNodeId": "element:client-detail.rename"
+          },
+          {
+            "claimId": "client-detail.rename#capability:runtime:1",
+            "subjectRef": "element:client-detail.rename",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:client-detail.rename in this guide as the same kind of step.",
+            "targetNodeId": "element:client-detail.rename"
+          },
+          {
+            "claimId": "client-detail.rename#capability:1",
+            "subjectRef": "element:client-detail.rename",
+            "outcome": "emitted",
+            "targetNodeId": "element:client-detail.rename"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "action",
+            "value": "update",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.rename#capability:1",
+              "detail": "verified capability action \"update\""
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:PUT:/api/clients/:param",
+              "attribute": "path",
+              "text": "/api/clients/:clientId"
+            }
+          },
+          {
+            "type": "action",
+            "value": "update",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.rename#capability:1",
+              "detail": "verified capability"
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:PUT:/api/clients/:param",
+              "attribute": "path",
+              "text": "/api/clients/:clientId"
+            }
+          },
+          {
+            "type": "condition",
+            "value": "requires permission",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "client-detail.rename#constraint:1",
+              "detail": "verified permission"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "Rename",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:client-detail.rename",
+              "attribute": "label",
+              "text": "Rename"
+            }
+          }
+        ],
+        "withheldLanguage": []
+      },
+      "entryRoute": "/clients/:clientId",
+      "routes": [
+        "/clients/:clientId"
+      ],
+      "controls": [
+        {
+          "semanticId": "client-detail.rename",
+          "label": "Rename",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "clients.create",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Clients.",
+          "screenRoute": "/clients",
+          "screenName": "Clients"
+        },
+        {
+          "index": 2,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-capability",
+          "text": "Choose \"New client\".",
+          "semanticId": "clients.create"
+        },
+        {
+          "index": 3,
+          "kind": "enter_fields",
+          "role": "input",
+          "origin": "verified-workflow",
+          "text": "Enter the client's billing email, name and plan.",
+          "semanticId": "clients.create"
+        },
+        {
+          "index": 4,
+          "kind": "confirm_action",
+          "role": "confirmation",
+          "origin": "verified-workflow",
+          "text": "Choose \"Create client\".",
+          "semanticId": "clients.create-dialog.submit"
+        }
+      ],
+      "conceptNouns": [
+        "client"
+      ],
+      "guidance": {
+        "featureId": "clients.create",
+        "title": {
+          "text": "New client",
+          "origin": "ui-label",
+          "nodeId": "element:clients.create"
+        },
+        "titleEvidence": {
+          "text": "New client",
+          "origin": "ui-label",
+          "evidence": "element:clients.create",
+          "ownership": "OWNED"
+        },
+        "summary": {
+          "text": "You can create a new client using \"New client\".",
+          "provenance": {
+            "claims": [
+              "clients.create#capability:1"
+            ],
+            "facts": [
+              "api:POST:/api/clients",
+              "component:frontend/src/components/ClientForm.tsx#ClientForm",
+              "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+              "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+              "element:clients.create",
+              "element:clients.create-dialog",
+              "element:clients.create-dialog.cancel",
+              "element:clients.create-dialog.email",
+              "api:POST:/api/clients",
+              "component:frontend/src/components/ClientForm.tsx#ClientForm",
+              "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+              "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+              "element:clients.create",
+              "element:clients.create-dialog",
+              "element:clients.create-dialog.cancel",
+              "element:clients.create-dialog.email"
+            ]
+          }
+        },
+        "purpose": {
+          "text": "Lets you create a new client.",
+          "provenance": {
+            "claims": [
+              "clients.create#capability:1"
+            ],
+            "facts": [
+              "api:POST:/api/clients"
+            ]
+          }
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Clients",
+                "origin": "route-title",
+                "nodeId": "route:/clients"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-capability",
+            "proposition": {
+              "kind": "perform_action",
+              "action": "create",
+              "object": "client",
+              "control": {
+                "text": "New client",
+                "origin": "ui-label",
+                "nodeId": "element:clients.create"
+              },
+              "provenance": {
+                "claims": [
+                  "clients.create#capability:1"
+                ],
+                "facts": [
+                  "api:POST:/api/clients",
+                  "component:frontend/src/components/ClientForm.tsx#ClientForm",
+                  "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+                  "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+                  "element:clients.create",
+                  "element:clients.create-dialog",
+                  "element:clients.create-dialog.cancel",
+                  "element:clients.create-dialog.email"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "clients.create#capability:1"
+              ],
+              "facts": [
+                "api:POST:/api/clients",
+                "component:frontend/src/components/ClientForm.tsx#ClientForm",
+                "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+                "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+                "element:clients.create",
+                "element:clients.create-dialog",
+                "element:clients.create-dialog.cancel",
+                "element:clients.create-dialog.email"
+              ]
+            }
+          },
+          {
+            "index": 3,
+            "role": "input",
+            "kind": "action",
+            "origin": "verified-workflow",
+            "proposition": {
+              "kind": "enter_fields",
+              "fields": [
+                {
+                  "text": "Billing email",
+                  "origin": "ui-label",
+                  "nodeId": "element:clients.create-dialog.email"
+                },
+                {
+                  "text": "Name",
+                  "origin": "ui-label",
+                  "nodeId": "element:clients.create-dialog.name"
+                },
+                {
+                  "text": "Plan",
+                  "origin": "ui-label",
+                  "nodeId": "element:clients.create-dialog.plan"
+                }
+              ],
+              "object": "client",
+              "provenance": {
+                "claims": [
+                  "clients.create#capability:1",
+                  "clients.create#capability:2",
+                  "clients.create#workflow_step:1",
+                  "clients.create#workflow_step:2",
+                  "clients.create#workflow_step:3"
+                ],
+                "facts": [
+                  "api:POST:/api/clients",
+                  "component:frontend/src/components/ClientForm.tsx#ClientForm",
+                  "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+                  "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+                  "element:clients.create",
+                  "element:clients.create-dialog",
+                  "element:clients.create-dialog.cancel",
+                  "element:clients.create-dialog.email",
+                  "element:clients.create-dialog.form",
+                  "element:clients.create-dialog.name",
+                  "element:clients.create-dialog.plan",
+                  "element:clients.create-dialog.submit"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "clients.create#capability:1",
+                "clients.create#capability:2",
+                "clients.create#workflow_step:1",
+                "clients.create#workflow_step:2",
+                "clients.create#workflow_step:3"
+              ],
+              "facts": [
+                "api:POST:/api/clients",
+                "component:frontend/src/components/ClientForm.tsx#ClientForm",
+                "component:frontend/src/components/ClientForm.tsx#ClientForm|submits_to|function:frontend/src/components/ClientForm.tsx#submitClient",
+                "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+                "element:clients.create",
+                "element:clients.create-dialog",
+                "element:clients.create-dialog.cancel",
+                "element:clients.create-dialog.email",
+                "element:clients.create-dialog.form",
+                "element:clients.create-dialog.name",
+                "element:clients.create-dialog.plan",
+                "element:clients.create-dialog.submit"
+              ]
+            }
+          },
+          {
+            "index": 4,
+            "role": "confirmation",
+            "kind": "action",
+            "origin": "verified-workflow",
+            "proposition": {
+              "kind": "confirm_action",
+              "control": {
+                "text": "Create client",
+                "origin": "ui-label",
+                "nodeId": "element:clients.create-dialog.submit"
+              },
+              "object": "client",
+              "provenance": {
+                "claims": [
+                  "clients.create#workflow_step:4"
+                ],
+                "facts": [
+                  "api:POST:/api/clients",
+                  "element:clients.create-dialog.submit"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "clients.create#workflow_step:4"
+              ],
+              "facts": [
+                "api:POST:/api/clients",
+                "element:clients.create-dialog.submit"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "How do I create a new client?",
+            "provenance": {
+              "claims": [
+                "clients.create#capability:1"
+              ],
+              "facts": [
+                "api:POST:/api/clients"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "clients:create",
+              "capability": "create a client",
+              "provenance": {
+                "claims": [
+                  "clients.create#permission:1"
+                ],
+                "facts": [
+                  "element:clients.create|requires_permission|permission:clients:create",
+                  "permission:clients:create",
+                  "element:clients.create|requires_permission|permission:clients:create",
+                  "permission:clients:create"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "clients.create#permission:1"
+              ],
+              "facts": [
+                "element:clients.create|requires_permission|permission:clients:create",
+                "permission:clients:create",
+                "element:clients.create|requires_permission|permission:clients:create",
+                "permission:clients:create"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "PASSIVE_TARGET",
+            "detail": "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog is something the interface shows, not something a user acts on. component:frontend/src/components/NewClientDialog.tsx#NewClientDialog offers no passive element this feature owns to recover from.",
+            "subject": "clients.create#workflow_step:2"
+          },
+          {
+            "code": "PASSIVE_TARGET",
+            "detail": "component:frontend/src/components/ClientForm.tsx#ClientForm is something the interface shows, not something a user acts on. component:frontend/src/components/ClientForm.tsx#ClientForm offers no passive element this feature owns to recover from.",
+            "subject": "clients.create#workflow_step:3"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.create#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.create#user_question:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.create#user_question:2"
+          }
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "COMPLETE_PATH",
+        "actionAccounting": [
+          {
+            "claimId": "clients.create#capability:2",
+            "subjectRef": "element:clients.create",
+            "outcome": "dropped",
+            "reason": "UNSUPPORTED_PRESENTATION",
+            "detail": "A submit capability is the mechanism, not the outcome. Saying so names internal vocabulary; saying anything else asserts a result nothing verifies."
+          },
+          {
+            "claimId": "clients.create#workflow_step:2",
+            "subjectRef": "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog",
+            "outcome": "dropped",
+            "reason": "PASSIVE_TARGET",
+            "detail": "component:frontend/src/components/NewClientDialog.tsx#NewClientDialog is something the interface shows, not something a user acts on. component:frontend/src/components/NewClientDialog.tsx#NewClientDialog offers no passive element this feature owns to recover from.",
+            "recovery": "none"
+          },
+          {
+            "claimId": "clients.create#workflow_step:3",
+            "subjectRef": "component:frontend/src/components/ClientForm.tsx#ClientForm",
+            "outcome": "dropped",
+            "reason": "PASSIVE_TARGET",
+            "detail": "component:frontend/src/components/ClientForm.tsx#ClientForm is something the interface shows, not something a user acts on. component:frontend/src/components/ClientForm.tsx#ClientForm offers no passive element this feature owns to recover from.",
+            "recovery": "none"
+          },
+          {
+            "claimId": "clients.create#capability:2",
+            "subjectRef": "element:clients.create",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:clients.create in this guide as the same kind of step.",
+            "targetNodeId": "element:clients.create"
+          },
+          {
+            "claimId": "clients.create#workflow_step:1",
+            "subjectRef": "element:clients.create",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:clients.create in this guide as the same kind of step.",
+            "targetNodeId": "element:clients.create"
+          },
+          {
+            "claimId": "clients.create#capability:runtime:1",
+            "subjectRef": "element:clients.create",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:clients.create in this guide as the same kind of step.",
+            "targetNodeId": "element:clients.create"
+          },
+          {
+            "claimId": "clients.create#capability:1",
+            "subjectRef": "element:clients.create",
+            "outcome": "emitted",
+            "targetNodeId": "element:clients.create"
+          },
+          {
+            "claimId": "clients.create#workflow_step:4",
+            "subjectRef": "element:clients.create-dialog.submit",
+            "outcome": "emitted",
+            "targetNodeId": "element:clients.create-dialog.submit"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "action",
+            "value": "create",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "clients.create#capability:1",
+              "detail": "verified capability action \"create\""
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:POST:/api/clients",
+              "attribute": "path",
+              "text": "/api/clients"
+            }
+          },
+          {
+            "type": "action",
+            "value": "create",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "clients.create#capability:1",
+              "detail": "verified capability"
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:POST:/api/clients",
+              "attribute": "path",
+              "text": "/api/clients"
+            }
+          }
+        ],
+        "withheldLanguage": []
+      },
+      "entryRoute": "/clients",
+      "routes": [
+        "/clients"
+      ],
+      "controls": [
+        {
+          "semanticId": "clients.create",
+          "label": "New client",
+          "nameable": true
+        },
+        {
+          "semanticId": "clients.create-dialog",
+          "label": "Clients appear in the list as soon as they are created.",
+          "nameable": true
+        },
+        {
+          "semanticId": "clients.create-dialog.cancel",
+          "label": "Cancel",
+          "nameable": true
+        },
+        {
+          "semanticId": "clients.create-dialog.email",
+          "label": "Billing email",
+          "nameable": true
+        },
+        {
+          "semanticId": "clients.create-dialog.form",
+          "nameable": false
+        },
+        {
+          "semanticId": "clients.create-dialog.name",
+          "label": "Name",
+          "nameable": true
+        },
+        {
+          "semanticId": "clients.create-dialog.plan",
+          "label": "Plan",
+          "nameable": true
+        },
+        {
+          "semanticId": "clients.create-dialog.submit",
+          "label": "Create client",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "clients.error",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Clients.",
+          "screenRoute": "/clients",
+          "screenName": "Clients"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "clients.error",
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Clients",
+                "origin": "route-title",
+                "nodeId": "route:/clients"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "clients.error"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "clients.error"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.error#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites component:frontend/src/pages/ClientsPage.tsx#ClientsPage (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "clients.error#user_question:1"
+          }
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "actionAccounting": [],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/clients",
+      "routes": [
+        "/clients"
+      ],
+      "controls": [
+        {
+          "semanticId": "clients.error",
+          "nameable": false
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "clients.export",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Clients.",
+          "screenRoute": "/clients",
+          "screenName": "Clients"
+        },
+        {
+          "index": 2,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-workflow",
+          "text": "Choose \"Export CSV\".",
+          "semanticId": "clients.export"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "clients.export",
+        "title": {
+          "text": "Export CSV",
+          "origin": "ui-label",
+          "nodeId": "element:clients.export"
+        },
+        "titleEvidence": {
+          "text": "Export CSV",
+          "origin": "ui-label",
+          "evidence": "element:clients.export",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Clients",
+                "origin": "route-title",
+                "nodeId": "route:/clients"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-workflow",
+            "proposition": {
+              "kind": "perform_action",
+              "object": "client",
+              "control": {
+                "text": "Export CSV",
+                "origin": "ui-label",
+                "nodeId": "element:clients.export"
+              },
+              "provenance": {
+                "claims": [
+                  "clients.export#workflow_step:1"
+                ],
+                "facts": [
+                  "element:clients.export"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "clients.export#workflow_step:1"
+              ],
+              "facts": [
+                "element:clients.export"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "clients.export"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.export#purpose:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "clients.export#workflow_step:1",
+            "subjectRef": "feature:clients.export",
+            "outcome": "emitted",
+            "targetNodeId": "element:clients.export"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/clients",
+      "routes": [
+        "/clients"
+      ],
+      "controls": [
+        {
+          "semanticId": "clients.export",
+          "label": "Export CSV",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "clients.search",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Clients.",
+          "screenRoute": "/clients",
+          "screenName": "Clients"
+        }
+      ],
+      "conceptNouns": [
+        "client"
+      ],
+      "guidance": {
+        "featureId": "clients.search",
+        "summary": {
+          "text": "You can filter clients.",
+          "provenance": {
+            "claims": [
+              "clients.search#capability:runtime:1"
+            ],
+            "facts": [
+              "element:clients.search",
+              "COLLECTION_MEMBERS_CHANGED|after=2,before=5,collectionRole=table,containerSemanticId=clients.table,memberRole=row",
+              "NETWORK_REQUEST|method=GET,path=/api/clients,statusCategory=2xx",
+              "VALUE_CHANGED|semanticId=clients.search"
+            ]
+          }
+        },
+        "purpose": {
+          "text": "Lets you filter clients.",
+          "provenance": {
+            "claims": [
+              "clients.search#capability:runtime:1",
+              "clients.search"
+            ],
+            "facts": []
+          }
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Clients",
+                "origin": "route-title",
+                "nodeId": "route:/clients"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "How do I filter clients?",
+            "provenance": {
+              "claims": [
+                "clients.search#capability:runtime:1",
+                "clients.search"
+              ],
+              "facts": []
+            }
+          }
+        ],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "clients.search"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.search#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.search#user_question:1"
+          }
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "actionAccounting": [
+          {
+            "claimId": "clients.search#workflow_step:1",
+            "subjectRef": "feature:clients.search",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:clients.search in this guide as the same kind of step.",
+            "targetNodeId": "element:clients.search"
+          },
+          {
+            "claimId": "clients.search#capability:runtime:1",
+            "subjectRef": "element:clients.search",
+            "outcome": "dropped",
+            "reason": "UNSUPPORTED_PRESENTATION",
+            "detail": "The control resolved to an input, and nothing on screen names what goes in it. A lone unlabelled box can only be named from its identifier, which says what the box is for rather than what to type — \"Enter the client’s search\".",
+            "targetNodeId": "element:clients.search"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "action",
+            "value": "filter",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "clients.search#capability:runtime:1",
+              "detail": "verified capability action \"filter\""
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "clients.search",
+              "detail": "the feature namespace, which names what the feature is about"
+            }
+          },
+          {
+            "type": "action",
+            "value": "filter",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "clients.search#capability:runtime:1",
+              "detail": "verified capability"
+            }
+          },
+          {
+            "type": "object",
+            "value": "client",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "clients.search",
+              "detail": "the feature namespace, which names what the feature is about"
+            }
+          }
+        ],
+        "withheldLanguage": []
+      },
+      "entryRoute": "/clients",
+      "routes": [
+        "/clients"
+      ],
+      "controls": [
+        {
+          "semanticId": "clients.search",
+          "nameable": false
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "clients.table",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Clients.",
+          "screenRoute": "/clients",
+          "screenName": "Clients"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "clients.table",
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Clients",
+                "origin": "route-title",
+                "nodeId": "route:/clients"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "clients.table"
+          },
+          {
+            "code": "NO_ACTIONABLE_TARGET",
+            "detail": "clients.table owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:clients.table carries only contains, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "subject": "clients.table#workflow_step:1"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "clients.table"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.table#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites component:frontend/src/components/ClientTable.tsx#ClientTable (CONTEXTUAL), element:clients.table.forbidden (OUTSIDE), permission:clients:read (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "clients.table#user_question:1"
+          }
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "actionAccounting": [
+          {
+            "claimId": "clients.table#workflow_step:1",
+            "subjectRef": "feature:clients.table",
+            "outcome": "dropped",
+            "reason": "NO_ACTIONABLE_TARGET",
+            "detail": "clients.table owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:clients.table carries only contains, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "recovery": "unsupported-relationship"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/clients",
+      "routes": [
+        "/clients"
+      ],
+      "controls": [
+        {
+          "semanticId": "clients.table",
+          "nameable": false
+        },
+        {
+          "semanticId": "clients.table.delete",
+          "label": "Delete",
+          "nameable": true
+        },
+        {
+          "semanticId": "clients.table.row",
+          "nameable": false
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "clients.table.forbidden",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Clients.",
+          "screenRoute": "/clients",
+          "screenName": "Clients"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "clients.table.forbidden",
+        "title": {
+          "text": "You do not have access to the client list.",
+          "origin": "ui-label",
+          "nodeId": "element:clients.table.forbidden"
+        },
+        "titleEvidence": {
+          "text": "You do not have access to the client list.",
+          "origin": "ui-label",
+          "evidence": "element:clients.table.forbidden",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Clients",
+                "origin": "route-title",
+                "nodeId": "route:/clients"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/clients"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/clients"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_ACTIONABLE_TARGET",
+            "detail": "clients.table.forbidden owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:clients.table.forbidden has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts.",
+            "subject": "clients.table.forbidden#workflow_step:1"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "clients.table.forbidden"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites component:frontend/src/components/ClientTable.tsx#ClientTable (CONTEXTUAL), permission:clients:read (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "clients.table.forbidden#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "clients.table.forbidden#user_question:1"
+          }
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "actionAccounting": [
+          {
+            "claimId": "clients.table.forbidden#workflow_step:1",
+            "subjectRef": "feature:clients.table.forbidden",
+            "outcome": "dropped",
+            "reason": "NO_ACTIONABLE_TARGET",
+            "detail": "clients.table.forbidden owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:clients.table.forbidden has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts.",
+            "recovery": "passive"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/clients",
+      "routes": [
+        "/clients"
+      ],
+      "controls": [
+        {
+          "semanticId": "clients.table.forbidden",
+          "label": "You do not have access to the client list.",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "dashboard.new-client",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Dashboard.",
+          "screenRoute": "/",
+          "screenName": "Dashboard"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "dashboard.new-client",
+        "title": {
+          "text": "New client",
+          "origin": "ui-label",
+          "nodeId": "element:dashboard.new-client"
+        },
+        "titleEvidence": {
+          "text": "New client",
+          "origin": "ui-label",
+          "evidence": "element:dashboard.new-client",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Dashboard",
+                "origin": "route-title",
+                "nodeId": "route:/"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "Why can't I see \"New client\"?",
+            "provenance": {
+              "claims": [
+                "dashboard.new-client#constraint:1"
+              ],
+              "facts": [
+                "element:dashboard.new-client"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "clients:create",
+              "provenance": {
+                "claims": [
+                  "dashboard.new-client#permission:1"
+                ],
+                "facts": [
+                  "element:dashboard.new-client|requires_permission|permission:clients:create",
+                  "permission:clients:create",
+                  "element:dashboard.new-client|requires_permission|permission:clients:create",
+                  "permission:clients:create"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "dashboard.new-client#permission:1"
+              ],
+              "facts": [
+                "element:dashboard.new-client|requires_permission|permission:clients:create",
+                "permission:clients:create",
+                "element:dashboard.new-client|requires_permission|permission:clients:create",
+                "permission:clients:create"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "CONSTRAINT_WITHHELD_AS_IRRELEVANT",
+            "detail": "A verified constraint was not rendered: it does not change which values or actions are allowed, and does not explain a likely failure.",
+            "subject": "dashboard.new-client#constraint:1"
+          },
+          {
+            "code": "NO_ACTIONABLE_TARGET",
+            "detail": "dashboard.new-client owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:dashboard.new-client carries only requires_permission, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "subject": "dashboard.new-client#workflow_step:1"
+          },
+          {
+            "code": "PASSIVE_TARGET",
+            "detail": "element:dashboard.new-client is something the interface shows, not something a user acts on. element:dashboard.new-client carries only requires_permission, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "subject": "dashboard.new-client#capability:runtime:1"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "dashboard.new-client"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites component:frontend/src/pages/DashboardPage.tsx#DashboardPage (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "dashboard.new-client#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "dashboard.new-client#user_question:1"
+          }
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "actionAccounting": [
+          {
+            "claimId": "dashboard.new-client#workflow_step:1",
+            "subjectRef": "feature:dashboard.new-client",
+            "outcome": "dropped",
+            "reason": "NO_ACTIONABLE_TARGET",
+            "detail": "dashboard.new-client owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:dashboard.new-client carries only requires_permission, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "recovery": "unsupported-relationship"
+          },
+          {
+            "claimId": "dashboard.new-client#capability:runtime:1",
+            "subjectRef": "element:dashboard.new-client",
+            "outcome": "dropped",
+            "reason": "PASSIVE_TARGET",
+            "detail": "element:dashboard.new-client is something the interface shows, not something a user acts on. element:dashboard.new-client carries only requires_permission, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "recovery": "unsupported-relationship"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "condition",
+            "value": "requires permission",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "dashboard.new-client#constraint:1",
+              "detail": "verified permission"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "New client",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:dashboard.new-client",
+              "attribute": "label",
+              "text": "New client"
+            }
+          }
+        ],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/",
+      "routes": [
+        "/"
+      ],
+      "controls": [
+        {
+          "semanticId": "dashboard.new-client",
+          "label": "New client",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "invoices.create-form.submit",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Invoices.",
+          "screenRoute": "/invoices",
+          "screenName": "Invoices"
+        },
+        {
+          "index": 2,
+          "kind": "confirm_action",
+          "role": "confirmation",
+          "origin": "verified-capability",
+          "text": "Choose \"Raise invoice\" to create a new invoice.",
+          "semanticId": "invoices.create-form.submit"
+        }
+      ],
+      "conceptNouns": [
+        "invoice"
+      ],
+      "guidance": {
+        "featureId": "invoices.create-form.submit",
+        "title": {
+          "text": "Raise invoice",
+          "origin": "ui-label",
+          "nodeId": "element:invoices.create-form.submit"
+        },
+        "titleEvidence": {
+          "text": "Raise invoice",
+          "origin": "ui-label",
+          "evidence": "element:invoices.create-form.submit",
+          "ownership": "OWNED"
+        },
+        "summary": {
+          "text": "You can create a new invoice using \"Raise invoice\".",
+          "provenance": {
+            "claims": [
+              "invoices.create-form.submit#capability:1"
+            ],
+            "facts": [
+              "api:POST:/api/invoices",
+              "element:invoices.create-form.submit",
+              "element:invoices.create-form.submit|submits_to|function:frontend/src/pages/InvoicesPage.tsx#createInvoice",
+              "function:frontend/src/services/invoiceService.ts#create|calls_api|api:POST:/api/invoices",
+              "api:POST:/api/invoices",
+              "element:invoices.create-form.submit",
+              "element:invoices.create-form.submit|submits_to|function:frontend/src/pages/InvoicesPage.tsx#createInvoice",
+              "function:frontend/src/services/invoiceService.ts#create|calls_api|api:POST:/api/invoices"
+            ]
+          }
+        },
+        "purpose": {
+          "text": "Lets you create a new invoice.",
+          "provenance": {
+            "claims": [
+              "invoices.create-form.submit#capability:1"
+            ],
+            "facts": [
+              "api:POST:/api/invoices"
+            ]
+          }
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Invoices",
+                "origin": "route-title",
+                "nodeId": "route:/invoices"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/invoices"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/invoices"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "confirmation",
+            "kind": "action",
+            "origin": "verified-capability",
+            "proposition": {
+              "kind": "confirm_action",
+              "control": {
+                "text": "Raise invoice",
+                "origin": "ui-label",
+                "nodeId": "element:invoices.create-form.submit"
+              },
+              "action": "create",
+              "object": "invoice",
+              "provenance": {
+                "claims": [
+                  "invoices.create-form.submit#capability:1"
+                ],
+                "facts": [
+                  "api:POST:/api/invoices",
+                  "element:invoices.create-form.submit",
+                  "element:invoices.create-form.submit|submits_to|function:frontend/src/pages/InvoicesPage.tsx#createInvoice",
+                  "function:frontend/src/services/invoiceService.ts#create|calls_api|api:POST:/api/invoices"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "invoices.create-form.submit#capability:1"
+              ],
+              "facts": [
+                "api:POST:/api/invoices",
+                "element:invoices.create-form.submit",
+                "element:invoices.create-form.submit|submits_to|function:frontend/src/pages/InvoicesPage.tsx#createInvoice",
+                "function:frontend/src/services/invoiceService.ts#create|calls_api|api:POST:/api/invoices"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "How do I create a new invoice?",
+            "provenance": {
+              "claims": [
+                "invoices.create-form.submit#capability:1"
+              ],
+              "facts": [
+                "api:POST:/api/invoices"
+              ]
+            }
+          },
+          {
+            "text": "Why can't I see \"Raise invoice\"?",
+            "provenance": {
+              "claims": [
+                "invoices.create-form.submit#permission:1"
+              ],
+              "facts": [
+                "element:invoices.create-form.submit"
+              ]
+            }
+          }
+        ],
+        "conditions": [
+          {
+            "proposition": {
+              "kind": "requires_permission",
+              "permission": "invoices:create",
+              "capability": "create an invoice",
+              "provenance": {
+                "claims": [
+                  "invoices.create-form.submit#permission:1"
+                ],
+                "facts": [
+                  "api:POST:/api/invoices|requires_permission|permission:invoices:create",
+                  "element:invoices.create-form.submit|requires_permission|permission:invoices:create",
+                  "permission:invoices:create",
+                  "api:POST:/api/invoices|requires_permission|permission:invoices:create",
+                  "element:invoices.create-form.submit|requires_permission|permission:invoices:create",
+                  "permission:invoices:create"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "invoices.create-form.submit#permission:1"
+              ],
+              "facts": [
+                "api:POST:/api/invoices|requires_permission|permission:invoices:create",
+                "element:invoices.create-form.submit|requires_permission|permission:invoices:create",
+                "permission:invoices:create",
+                "api:POST:/api/invoices|requires_permission|permission:invoices:create",
+                "element:invoices.create-form.submit|requires_permission|permission:invoices:create",
+                "permission:invoices:create"
+              ]
+            }
+          }
+        ],
+        "diagnostics": [
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites element:invoices.create-form (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "invoices.create-form.submit#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "invoices.create-form.submit#user_question:1"
+          }
+        ],
+        "completeness": "COMPLETE",
+        "taskCompletion": "TERMINAL_ACTION_REACHED",
+        "actionAccounting": [
+          {
+            "claimId": "invoices.create-form.submit#capability:2",
+            "subjectRef": "element:invoices.create-form.submit",
+            "outcome": "dropped",
+            "reason": "UNSUPPORTED_PRESENTATION",
+            "detail": "A submit capability is the mechanism, not the outcome. Saying so names internal vocabulary; saying anything else asserts a result nothing verifies."
+          },
+          {
+            "claimId": "invoices.create-form.submit#capability:2",
+            "subjectRef": "element:invoices.create-form.submit",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:invoices.create-form.submit in this guide as the same kind of step.",
+            "targetNodeId": "element:invoices.create-form.submit"
+          },
+          {
+            "claimId": "invoices.create-form.submit#capability:1",
+            "subjectRef": "element:invoices.create-form.submit",
+            "outcome": "emitted",
+            "targetNodeId": "element:invoices.create-form.submit"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [
+          {
+            "type": "action",
+            "value": "create",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "invoices.create-form.submit#capability:1",
+              "detail": "verified capability action \"create\""
+            }
+          },
+          {
+            "type": "object",
+            "value": "invoice",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:POST:/api/invoices",
+              "attribute": "path",
+              "text": "/api/invoices"
+            }
+          },
+          {
+            "type": "action",
+            "value": "create",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "invoices.create-form.submit#capability:1",
+              "detail": "verified capability"
+            }
+          },
+          {
+            "type": "object",
+            "value": "invoice",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "api:POST:/api/invoices",
+              "attribute": "path",
+              "text": "/api/invoices"
+            }
+          },
+          {
+            "type": "condition",
+            "value": "requires permission",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "invoices.create-form.submit#permission:1",
+              "detail": "verified permission"
+            }
+          },
+          {
+            "type": "artifact",
+            "value": "Raise invoice",
+            "support": {
+              "kind": "owned-node",
+              "nodeId": "element:invoices.create-form.submit",
+              "attribute": "label",
+              "text": "Raise invoice"
+            }
+          }
+        ],
+        "withheldLanguage": []
+      },
+      "entryRoute": "/invoices",
+      "routes": [
+        "/invoices"
+      ],
+      "controls": [
+        {
+          "semanticId": "invoices.create-form.submit",
+          "label": "Raise invoice",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "invoices.list.clear",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-workflow",
+          "text": "Choose \"Clear selection\".",
+          "semanticId": "invoices.list.clear"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "invoices.list.clear",
+        "title": {
+          "text": "Clear selection",
+          "origin": "ui-label",
+          "nodeId": "element:invoices.list.clear"
+        },
+        "titleEvidence": {
+          "text": "Clear selection",
+          "origin": "ui-label",
+          "evidence": "element:invoices.list.clear",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-workflow",
+            "proposition": {
+              "kind": "perform_action",
+              "object": "invoice",
+              "control": {
+                "text": "Clear selection",
+                "origin": "ui-label",
+                "nodeId": "element:invoices.list.clear"
+              },
+              "provenance": {
+                "claims": [
+                  "invoices.list.clear#workflow_step:1"
+                ],
+                "facts": [
+                  "element:invoices.list.clear"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "invoices.list.clear#workflow_step:1"
+              ],
+              "facts": [
+                "element:invoices.list.clear"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "ENTRY_ROUTE_AMBIGUOUS",
+            "detail": "This feature appears on 2 screens (/clients/:clientId, /invoices), so none is named as the place to start.",
+            "subject": "invoices.list.clear"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "invoices.list.clear"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "invoices.list.clear#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites element:invoices.list (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "invoices.list.clear#user_question:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "invoices.list.clear#workflow_step:1",
+            "subjectRef": "feature:invoices.list.clear",
+            "outcome": "emitted",
+            "targetNodeId": "element:invoices.list.clear"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "routes": [
+        "/clients/:clientId",
+        "/invoices"
+      ],
+      "controls": [
+        {
+          "semanticId": "invoices.list.clear",
+          "label": "Clear selection",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "invoices.list.open",
+      "steps": [],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "invoices.list.open",
+        "steps": [],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "invoices.list.open"
+          },
+          {
+            "code": "ENTRY_ROUTE_AMBIGUOUS",
+            "detail": "This feature appears on 2 screens (/clients/:clientId, /invoices), so none is named as the place to start.",
+            "subject": "invoices.list.open"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "invoices.list.open"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "invoices.list.open#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites element:invoices.list.row (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "invoices.list.open#user_question:1"
+          }
+        ],
+        "completeness": "EMPTY",
+        "taskCompletion": "NO_TASK",
+        "actionAccounting": [
+          {
+            "claimId": "invoices.list.open#workflow_step:1",
+            "subjectRef": "feature:invoices.list.open",
+            "outcome": "dropped",
+            "reason": "UNSUPPORTED_PRESENTATION",
+            "detail": "The control resolved, but nothing about it could be phrased as an instruction.",
+            "targetNodeId": "element:invoices.list.open"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "routes": [
+        "/clients/:clientId",
+        "/invoices"
+      ],
+      "controls": [
+        {
+          "semanticId": "invoices.list.open",
+          "nameable": false
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "nav.clients",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-capability",
+          "text": "Choose \"Clients\".",
+          "semanticId": "nav.clients"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "nav.clients",
+        "title": {
+          "text": "Clients",
+          "origin": "ui-label",
+          "nodeId": "element:nav.clients"
+        },
+        "titleEvidence": {
+          "text": "Clients",
+          "origin": "ui-label",
+          "evidence": "element:nav.clients",
+          "ownership": "OWNED"
+        },
+        "summary": {
+          "text": "Open Clients.",
+          "provenance": {
+            "claims": [
+              "nav.clients#capability:1"
+            ],
+            "facts": [
+              "element:nav.clients",
+              "element:nav.clients|navigates_to|route:/clients",
+              "route:/clients",
+              "element:nav.clients",
+              "element:nav.clients|navigates_to|route:/clients",
+              "route:/clients"
+            ]
+          }
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-capability",
+            "proposition": {
+              "kind": "perform_action",
+              "action": "navigate",
+              "control": {
+                "text": "Clients",
+                "origin": "ui-label",
+                "nodeId": "element:nav.clients"
+              },
+              "provenance": {
+                "claims": [
+                  "nav.clients#capability:1"
+                ],
+                "facts": [
+                  "element:nav.clients",
+                  "element:nav.clients|navigates_to|route:/clients",
+                  "route:/clients"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "nav.clients#capability:1"
+              ],
+              "facts": [
+                "element:nav.clients",
+                "element:nav.clients|navigates_to|route:/clients",
+                "route:/clients"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "REDUNDANT_ENTRY_STEP",
+            "detail": "A verified action already navigates to route:/clients, so the synthesised \"go here\" step would say the same thing twice. The verified action is kept because it names the control.",
+            "subject": "route:/clients"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "nav.clients#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "nav.clients#user_question:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "nav.clients#capability:runtime:1",
+            "subjectRef": "element:nav.clients",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:nav.clients in this guide as the same kind of step.",
+            "targetNodeId": "element:nav.clients"
+          },
+          {
+            "claimId": "nav.clients#capability:1",
+            "subjectRef": "feature:nav.clients",
+            "outcome": "emitted",
+            "targetNodeId": "element:nav.clients"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "routes": [
+        "/clients"
+      ],
+      "controls": [
+        {
+          "semanticId": "nav.clients",
+          "label": "Clients",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "settings.danger-zone",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Settings.",
+          "screenRoute": "/settings",
+          "screenName": "Settings"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "settings.danger-zone",
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Settings",
+                "origin": "route-title",
+                "nodeId": "route:/settings"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/settings"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/settings"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "settings.danger-zone"
+          },
+          {
+            "code": "NO_ACTIONABLE_TARGET",
+            "detail": "settings.danger-zone owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:settings.danger-zone carries only contains, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "subject": "settings.danger-zone#workflow_step:1"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "settings.danger-zone"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "settings.danger-zone#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "settings.danger-zone#user_question:1"
+          }
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "actionAccounting": [
+          {
+            "claimId": "settings.danger-zone#workflow_step:1",
+            "subjectRef": "feature:settings.danger-zone",
+            "outcome": "dropped",
+            "reason": "NO_ACTIONABLE_TARGET",
+            "detail": "settings.danger-zone owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:settings.danger-zone carries only contains, which name what is required or where something leads rather than work this feature owns. A shared destination is not a shared action.",
+            "recovery": "unsupported-relationship"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/settings",
+      "routes": [
+        "/settings"
+      ],
+      "controls": [
+        {
+          "semanticId": "settings.danger-zone",
+          "nameable": false
+        },
+        {
+          "semanticId": "settings.new-key",
+          "nameable": false
+        },
+        {
+          "semanticId": "settings.rotate-key",
+          "label": "Rotate API key",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "settings.form",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Settings.",
+          "screenRoute": "/settings",
+          "screenName": "Settings"
+        },
+        {
+          "index": 2,
+          "kind": "confirm_action",
+          "role": "confirmation",
+          "origin": "verified-submit",
+          "text": "Choose \"Save changes\".",
+          "semanticId": "settings.form"
+        }
+      ],
+      "conceptNouns": [
+        "setting"
+      ],
+      "guidance": {
+        "featureId": "settings.form",
+        "summary": {
+          "text": "You can change a setting.",
+          "provenance": {
+            "claims": [
+              "settings.form#capability:runtime:1"
+            ],
+            "facts": [
+              "element:settings.form",
+              "NETWORK_REQUEST|method=PUT,path=/api/settings,statusCategory=2xx"
+            ]
+          }
+        },
+        "purpose": {
+          "text": "Lets you change a setting.",
+          "provenance": {
+            "claims": [
+              "settings.form#capability:runtime:1",
+              "settings.form"
+            ],
+            "facts": []
+          }
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Settings",
+                "origin": "route-title",
+                "nodeId": "route:/settings"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/settings"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/settings"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "confirmation",
+            "kind": "action",
+            "origin": "verified-submit",
+            "proposition": {
+              "kind": "confirm_action",
+              "control": {
+                "text": "Save changes",
+                "origin": "ui-label",
+                "nodeId": "element:settings.save"
+              },
+              "action": "submit",
+              "object": "setting",
+              "provenance": {
+                "claims": [
+                  "settings.form#capability:1"
+                ],
+                "facts": [
+                  "element:settings.form",
+                  "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+                  "element:settings.save"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "settings.form#capability:1"
+              ],
+              "facts": [
+                "element:settings.form",
+                "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+                "element:settings.save"
+              ]
+            }
+          }
+        ],
+        "questions": [
+          {
+            "text": "How do I change a setting?",
+            "provenance": {
+              "claims": [
+                "settings.form#capability:runtime:1",
+                "settings.form"
+              ],
+              "facts": []
+            }
+          }
+        ],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "settings.form"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "settings.form#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "settings.form#user_question:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "TERMINAL_ACTION_REACHED",
+        "actionAccounting": [
+          {
+            "claimId": "settings.form#capability:1",
+            "subjectRef": "element:settings.form",
+            "outcome": "dropped",
+            "reason": "UNSUPPORTED_PRESENTATION",
+            "detail": "A submit capability is the mechanism, not the outcome. Saying so names internal vocabulary; saying anything else asserts a result nothing verifies."
+          },
+          {
+            "claimId": "settings.form#workflow_step:1",
+            "subjectRef": "feature:settings.form",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:settings.save in this guide as the same kind of step.",
+            "targetNodeId": "element:settings.save"
+          },
+          {
+            "claimId": "settings.form#capability:runtime:1",
+            "subjectRef": "element:settings.form",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:settings.save in this guide as the same kind of step.",
+            "targetNodeId": "element:settings.save"
+          },
+          {
+            "claimId": "settings.form#capability:1",
+            "subjectRef": "element:settings.form",
+            "outcome": "emitted",
+            "targetNodeId": "element:settings.save"
+          }
+        ],
+        "actionRecoveries": [
+          {
+            "subject": "element:settings.form",
+            "from": "element:settings.form",
+            "rule": "passive-subject-shared-action-surface",
+            "relationship": "submits_to",
+            "actionSurface": "function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "control": "element:settings.save",
+            "actionSurfaceScope": "OWNED",
+            "controlScope": "OWNED",
+            "traversed": [
+              "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+              "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+            ],
+            "actionabilityEvidence": "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "why": "element:settings.save is the only control the graph proves acts on function:frontend/src/pages/SettingsPage.tsx#saveSettings, which settings.form owns."
+          },
+          {
+            "subject": "feature:settings.form",
+            "from": "element:settings.form",
+            "rule": "passive-subject-shared-action-surface",
+            "relationship": "submits_to",
+            "actionSurface": "function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "control": "element:settings.save",
+            "actionSurfaceScope": "OWNED",
+            "controlScope": "OWNED",
+            "traversed": [
+              "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+              "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+            ],
+            "actionabilityEvidence": "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "why": "element:settings.save is the only control the graph proves acts on function:frontend/src/pages/SettingsPage.tsx#saveSettings, which settings.form owns."
+          },
+          {
+            "subject": "element:settings.form",
+            "from": "element:settings.form",
+            "rule": "passive-subject-shared-action-surface",
+            "relationship": "submits_to",
+            "actionSurface": "function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "control": "element:settings.save",
+            "actionSurfaceScope": "OWNED",
+            "controlScope": "OWNED",
+            "traversed": [
+              "element:settings.form|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+              "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+            ],
+            "actionabilityEvidence": "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings",
+            "why": "element:settings.save is the only control the graph proves acts on function:frontend/src/pages/SettingsPage.tsx#saveSettings, which settings.form owns."
+          }
+        ],
+        "languagePropositions": [
+          {
+            "type": "action",
+            "value": "update",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "settings.form#capability:runtime:1",
+              "detail": "verified capability action \"update\""
+            }
+          },
+          {
+            "type": "object",
+            "value": "setting",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "settings.form",
+              "detail": "the feature namespace, which names what the feature is about"
+            }
+          },
+          {
+            "type": "action",
+            "value": "update",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "settings.form#capability:runtime:1",
+              "detail": "verified capability"
+            }
+          },
+          {
+            "type": "object",
+            "value": "setting",
+            "support": {
+              "kind": "claim-assertion",
+              "claimId": "settings.form",
+              "detail": "the feature namespace, which names what the feature is about"
+            }
+          }
+        ],
+        "withheldLanguage": []
+      },
+      "entryRoute": "/settings",
+      "routes": [
+        "/settings"
+      ],
+      "controls": [
+        {
+          "semanticId": "settings.form",
+          "nameable": false
+        },
+        {
+          "semanticId": "settings.name",
+          "label": "Organisation",
+          "nameable": true
+        },
+        {
+          "semanticId": "settings.notifications",
+          "label": "Email me when an invoice is paid",
+          "nameable": true
+        },
+        {
+          "semanticId": "settings.save",
+          "label": "Save changes",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "settings.new-key",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Settings.",
+          "screenRoute": "/settings",
+          "screenName": "Settings"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "settings.new-key",
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Settings",
+                "origin": "route-title",
+                "nodeId": "route:/settings"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/settings"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/settings"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_USER_VISIBLE_LABEL",
+            "detail": "Nothing this feature owns carries text a user can read, so it has no name the interface supplies. A title built from the identifier would be an address wearing the costume of a name.",
+            "subject": "settings.new-key"
+          },
+          {
+            "code": "NO_ACTIONABLE_TARGET",
+            "detail": "settings.new-key owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:settings.new-key has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts.",
+            "subject": "settings.new-key#workflow_step:1"
+          },
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "settings.new-key"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "settings.new-key#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites element:settings.rotate-key (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "settings.new-key#user_question:1"
+          }
+        ],
+        "completeness": "ENTRY_ONLY",
+        "taskCompletion": "ENTRY_ONLY",
+        "actionAccounting": [
+          {
+            "claimId": "settings.new-key#workflow_step:1",
+            "subjectRef": "feature:settings.new-key",
+            "outcome": "dropped",
+            "reason": "NO_ACTIONABLE_TARGET",
+            "detail": "settings.new-key owns nothing a user can act on: its roots are containers, displays, or controls the graph proves nothing about. feature:settings.new-key has no outgoing relationship at all: the graph proves it is something the interface shows, not something that acts.",
+            "recovery": "passive"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/settings",
+      "routes": [
+        "/settings"
+      ],
+      "controls": [
+        {
+          "semanticId": "settings.new-key",
+          "nameable": false
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "settings.rotate-key",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Settings.",
+          "screenRoute": "/settings",
+          "screenName": "Settings"
+        },
+        {
+          "index": 2,
+          "kind": "perform_action",
+          "role": "trigger",
+          "origin": "verified-capability",
+          "text": "Choose \"Rotate API key\".",
+          "semanticId": "settings.rotate-key"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "settings.rotate-key",
+        "title": {
+          "text": "Rotate API key",
+          "origin": "ui-label",
+          "nodeId": "element:settings.rotate-key"
+        },
+        "titleEvidence": {
+          "text": "Rotate API key",
+          "origin": "ui-label",
+          "evidence": "element:settings.rotate-key",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Settings",
+                "origin": "route-title",
+                "nodeId": "route:/settings"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/settings"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/settings"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "trigger",
+            "kind": "action",
+            "origin": "verified-capability",
+            "proposition": {
+              "kind": "perform_action",
+              "action": "reveal",
+              "object": "setting",
+              "control": {
+                "text": "Rotate API key",
+                "origin": "ui-label",
+                "nodeId": "element:settings.rotate-key"
+              },
+              "provenance": {
+                "claims": [
+                  "settings.rotate-key#capability:runtime:1"
+                ],
+                "facts": [
+                  "element:settings.rotate-key",
+                  "ELEMENT_APPEARED|role=code,semanticId=settings.new-key",
+                  "NETWORK_REQUEST|method=POST,path=/api/settings/api-key/rotate,statusCategory=2xx"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "settings.rotate-key#capability:runtime:1"
+              ],
+              "facts": [
+                "element:settings.rotate-key",
+                "ELEMENT_APPEARED|role=code,semanticId=settings.new-key",
+                "NETWORK_REQUEST|method=POST,path=/api/settings/api-key/rotate,statusCategory=2xx"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "settings.rotate-key"
+          },
+          {
+            "code": "LANGUAGE_CLAIM_NOT_RENDERED",
+            "detail": "The sentence was not passed through. Free-form prose cannot be checked proposition by proposition, so what a reader sees is rebuilt from supported propositions instead.",
+            "subject": "settings.rotate-key#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites element:settings.new-key (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "settings.rotate-key#user_question:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "PARTIAL",
+        "actionAccounting": [
+          {
+            "claimId": "settings.rotate-key#capability:runtime:1",
+            "subjectRef": "element:settings.rotate-key",
+            "outcome": "dropped",
+            "reason": "UNSUPPORTED_PRESENTATION",
+            "detail": "A reveal capability is the mechanism, not the outcome. What appeared is established; what it means is not, and the object noun would come from the feature's own namespace rather than from anything on screen."
+          },
+          {
+            "claimId": "settings.rotate-key#workflow_step:1",
+            "subjectRef": "feature:settings.rotate-key",
+            "outcome": "dropped",
+            "reason": "DUPLICATE_ACTION",
+            "detail": "Another claim already puts element:settings.rotate-key in this guide as the same kind of step.",
+            "targetNodeId": "element:settings.rotate-key"
+          },
+          {
+            "claimId": "settings.rotate-key#capability:runtime:1",
+            "subjectRef": "element:settings.rotate-key",
+            "outcome": "emitted",
+            "targetNodeId": "element:settings.rotate-key"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/settings",
+      "routes": [
+        "/settings"
+      ],
+      "controls": [
+        {
+          "semanticId": "settings.rotate-key",
+          "label": "Rotate API key",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    },
+    {
+      "featureId": "settings.save",
+      "steps": [
+        {
+          "index": 1,
+          "kind": "navigate",
+          "role": "entry",
+          "origin": "synthetic-entry",
+          "text": "Open Settings.",
+          "screenRoute": "/settings",
+          "screenName": "Settings"
+        },
+        {
+          "index": 2,
+          "kind": "confirm_action",
+          "role": "confirmation",
+          "origin": "verified-submit",
+          "text": "Choose \"Save changes\".",
+          "semanticId": "settings.save"
+        }
+      ],
+      "conceptNouns": [],
+      "guidance": {
+        "featureId": "settings.save",
+        "title": {
+          "text": "Save changes",
+          "origin": "ui-label",
+          "nodeId": "element:settings.save"
+        },
+        "titleEvidence": {
+          "text": "Save changes",
+          "origin": "ui-label",
+          "evidence": "element:settings.save",
+          "ownership": "OWNED"
+        },
+        "steps": [
+          {
+            "index": 1,
+            "role": "entry",
+            "kind": "action",
+            "origin": "synthetic-entry",
+            "proposition": {
+              "kind": "navigate",
+              "destination": {
+                "text": "Settings",
+                "origin": "route-title",
+                "nodeId": "route:/settings"
+              },
+              "provenance": {
+                "claims": [],
+                "facts": [
+                  "route:/settings"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [],
+              "facts": [
+                "route:/settings"
+              ]
+            }
+          },
+          {
+            "index": 2,
+            "role": "confirmation",
+            "kind": "action",
+            "origin": "verified-submit",
+            "proposition": {
+              "kind": "confirm_action",
+              "control": {
+                "text": "Save changes",
+                "origin": "ui-label",
+                "nodeId": "element:settings.save"
+              },
+              "action": "submit",
+              "object": "setting",
+              "provenance": {
+                "claims": [
+                  "settings.save#capability:1"
+                ],
+                "facts": [
+                  "element:settings.save",
+                  "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+                ]
+              }
+            },
+            "provenance": {
+              "claims": [
+                "settings.save#capability:1"
+              ],
+              "facts": [
+                "element:settings.save",
+                "element:settings.save|submits_to|function:frontend/src/pages/SettingsPage.tsx#saveSettings"
+              ]
+            }
+          }
+        ],
+        "questions": [],
+        "conditions": [],
+        "diagnostics": [
+          {
+            "code": "NO_VERIFIED_CAPABILITY",
+            "detail": "Nothing this feature does could be established, so no description was written. Silence is the output; the technical reason lives here.",
+            "subject": "settings.save"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites element:settings.form (CONTEXTUAL), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "settings.save#purpose:1"
+          },
+          {
+            "code": "LANGUAGE_EVIDENCE_NOT_OWNED",
+            "detail": "Cites permission:settings:update (OUTSIDE), which this feature does not own. A feature may not describe its neighbours — 24% of language-claim evidence in the frozen capture does exactly that.",
+            "subject": "settings.save#user_question:1"
+          }
+        ],
+        "completeness": "ACTIONABLE",
+        "taskCompletion": "TERMINAL_ACTION_REACHED",
+        "actionAccounting": [
+          {
+            "claimId": "settings.save#capability:1",
+            "subjectRef": "element:settings.save",
+            "outcome": "dropped",
+            "reason": "UNSUPPORTED_PRESENTATION",
+            "detail": "A submit capability is the mechanism, not the outcome. Saying so names internal vocabulary; saying anything else asserts a result nothing verifies."
+          },
+          {
+            "claimId": "settings.save#capability:1",
+            "subjectRef": "element:settings.save",
+            "outcome": "emitted",
+            "targetNodeId": "element:settings.save"
+          }
+        ],
+        "actionRecoveries": [],
+        "languagePropositions": [],
+        "withheldLanguage": [
+          {
+            "type": "action",
+            "value": "(unknown)",
+            "refusal": "PRODUCT_OVERREACH",
+            "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+          }
+        ]
+      },
+      "entryRoute": "/settings",
+      "routes": [
+        "/settings"
+      ],
+      "controls": [
+        {
+          "semanticId": "settings.save",
+          "label": "Save changes",
+          "nameable": true
+        }
+      ],
+      "requiredPermissions": []
+    }
+  ],
+  "screens": [
+    {
+      "route": "*"
+    },
+    {
+      "route": "/",
+      "name": "Dashboard",
+      "nameOrigin": "navigation-label"
+    },
+    {
+      "route": "/clients",
+      "name": "Clients",
+      "nameOrigin": "navigation-label"
+    },
+    {
+      "route": "/clients/:clientId"
+    },
+    {
+      "route": "/invoices"
+    },
+    {
+      "route": "/settings",
+      "name": "Settings",
+      "nameOrigin": "navigation-label"
+    }
+  ]
+}

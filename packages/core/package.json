@@ -38,7 +38,8 @@
   },
   "dependencies": {
     "@statewavedev/guide-actions": "workspace:*",
-    "@statewavedev/guide-shared": "workspace:*"
+    "@statewavedev/guide-shared": "workspace:*",
+    "@statewavedev/guide-semantic": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.5.1",

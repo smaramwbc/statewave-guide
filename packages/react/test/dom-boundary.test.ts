@@ -140,11 +140,25 @@ describe('the DOM boundary', () => {
     const keys = reachableKeys(registry);
     for (const name of FORBIDDEN) expect(keys.has(name)).toBe(false);
 
+    // `presentIds` was added by Closed Loop #13.1 and returns arrays of strings;
+    // `presentGeometry` by #17 and returns numbers and ids; `presentVisibleLanguage`
+    // by #18 and returns strings the interface is currently showing, each tagged
+    // with the attribute it came from. All are listed here deliberately: the
+    // point of pinning this surface is that growing it has to be a decision
+    // somebody made, not something that happened.
+    //
+    // What leaves is still only data. A rectangle is four numbers, an ancestry
+    // is a list of ids, and a placeholder is a string — nothing downstream can
+    // call a method on any of them or reach the node they came from.
     expect([...keys].sort()).toEqual([
       'get',
       'getSnapshot',
       'has',
       'list',
+      'presentGeometry',
+      'presentIds',
+      'presentInstances',
+      'presentVisibleLanguage',
       'subscribe',
       'visibleIds',
     ]);
@@ -204,9 +218,16 @@ describe('the DOM boundary', () => {
       );
     }
 
-    expect(source).not.toContain('resolveNode');
-    expect(source).not.toContain('ElementRegistryInternals');
-    expect(source).not.toContain('internalsOf');
+    // Comments are stripped first. What is being asserted is that no node-access
+    // capability is *published*, and prose explaining why one is private is not a
+    // published capability — a doc comment naming `resolveNode` to say the
+    // selector stays behind it should not read as the surface leaking.
+    const published = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+
+    expect(published).not.toContain('resolveNode');
+    expect(published).not.toContain('resolveInstanceNode');
+    expect(published).not.toContain('ElementRegistryInternals');
+    expect(published).not.toContain('internalsOf');
     // The rename is part of the same promise: the published vocabulary is
     // `GuideElementState`, and the old name is gone.
     expect(source).not.toContain('RegisteredElement');
@@ -332,6 +353,10 @@ describe('the DOM boundary', () => {
       get: () => undefined,
       list: () => [],
       visibleIds: () => [],
+      presentIds: () => ({ visible: [], disabled: [] }),
+      presentInstances: () => [],
+      presentGeometry: () => ({}),
+      presentVisibleLanguage: () => [],
       subscribe: () => () => undefined,
       getSnapshot: () => [],
     };

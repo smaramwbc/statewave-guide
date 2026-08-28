@@ -1,0 +1,239 @@
+/** The development playground's own chrome, laid out as the reference shows it.
+    Every rule carries a .pg ancestor for the same reason the guide's carry
+    .sw-guide: the demo's `body.demo button` would otherwise repaint them. */
+.pg,
+.pg * {
+  box-sizing: border-box;
+}
+.pg {
+  position: fixed;
+  top: 24px;
+  right: calc(var(--demo-panel-width, 420px) + 48px);
+  width: 300px;
+  z-index: 2147483002;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(17, 24, 39, 0.04),
+    0 24px 60px -24px rgba(17, 24, 39, 0.28);
+  font:
+    14px/1.5 Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+  color: #111827;
+  overflow: hidden;
+}
+.pg .pg__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 20px 2px;
+}
+.pg .pg__head-icon {
+  color: #6b7280;
+  display: inline-flex;
+}
+.pg .pg__head strong {
+  flex: 1;
+  font-weight: 600;
+  font-size: 15px;
+}
+.pg .pg__close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  display: inline-flex;
+}
+.pg .pg__close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+.pg .pg__sub {
+  margin: 0;
+  padding: 0 20px 14px;
+  color: #6b7280;
+  font-size: 13.5px;
+}
+.pg .pg__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.pg .pg__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pg .pg__label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+  display: flex;
+  justify-content: space-between;
+}
+.pg .pg__value {
+  color: #6b7280;
+  font-weight: 500;
+}
+.pg .pg__input,
+.pg .pg__select select {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  color: #111827;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  appearance: none;
+}
+.pg .pg__select {
+  position: relative;
+  display: block;
+}
+.pg .pg__select::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #6b7280;
+  border-bottom: 2px solid #6b7280;
+  transform: translateY(-70%) rotate(45deg);
+}
+.pg .pg__input:focus-visible,
+.pg .pg__select select:focus-visible {
+  outline: 2px solid #635bff;
+  outline-offset: -1px;
+}
+.pg .pg__swatches {
+  display: flex;
+  gap: 12px;
+}
+.pg .pg__swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  background: var(--swatch);
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 3px transparent;
+  transition: box-shadow 100ms;
+}
+.pg .pg__swatch[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 5px var(--swatch);
+}
+.pg .pg__swatch:focus-visible {
+  outline: 2px solid #635bff;
+  outline-offset: 5px;
+}
+.pg .pg__row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pg .pg__chip {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 10px 8px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pg .pg__chip:hover {
+  background: #f9fafb;
+}
+.pg .pg__chip[aria-pressed='true'] {
+  border-color: #635bff;
+  color: #635bff;
+  background: #f5f4ff;
+}
+.pg .pg__chip:focus-visible {
+  outline: 2px solid #635bff;
+  outline-offset: 2px;
+}
+.pg .pg__chip--icon {
+  padding: 11px 8px;
+}
+.pg input[type='range'] {
+  width: 100%;
+  accent-color: #635bff;
+}
+.pg .pg__warn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12.5px;
+  background: #fff8ed;
+  border: 1px solid #f3ddb8;
+  color: #7a4d00;
+  border-radius: 10px;
+  padding: 9px 12px;
+}
+.pg .pg__export summary {
+  cursor: pointer;
+  font-size: 13.5px;
+  color: #6b7280;
+  font-weight: 500;
+}
+.pg .pg__export pre {
+  margin: 8px 0 0;
+  font-size: 11px;
+  overflow-x: auto;
+  background: #f3f4f6;
+  padding: 10px;
+  border-radius: 10px;
+}
+.pg .pg__foot {
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 14px 20px;
+}
+.pg .pg__reset {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.pg .pg__reset:hover {
+  color: #111827;
+}
+.pg .pg__reset:focus-visible {
+  outline: 2px solid #635bff;
+  outline-offset: 3px;
+  border-radius: 4px;
+}

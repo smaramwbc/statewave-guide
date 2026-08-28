@@ -27,6 +27,7 @@ import {
   type ProductFeature,
   type ProductModel,
   type ProvenanceReference,
+  isVerifiedClaim,
 } from '../src/index.js';
 
 describe('guideElementIdSchema', () => {
@@ -264,15 +265,29 @@ describe('structured claims — the shape that makes verification possible', () 
     for (const type of LANGUAGE_CLAIM_TYPES) expect(isFactualClaimType(type)).toBe(false);
   });
 
-  it('distinguishes the three verification states', () => {
+  it('distinguishes the four verification states', () => {
     // "checked against the graph" and "a sentence we allowed through" are
     // different guarantees; collapsing them would be the most misleading thing
     // this model could do.
+    //
+    // Closed Loop #10 added a fourth for the same reason it kept the first three
+    // apart. A structural proof holds for every run because the code cannot do
+    // otherwise; a behavioural one is a report about a single observed run under
+    // a recorded context. Both are verified and they are not interchangeable,
+    // which is why they are two values and not one.
     expect(productClaimStatusSchema.options).toEqual([
       'structurally_verified',
+      'behaviorally_verified',
       'semantically_grounded',
       'rejected',
     ]);
+  });
+
+  it('treats both verified states as verified, and neither of the others', () => {
+    expect(isVerifiedClaim({ status: 'structurally_verified' })).toBe(true);
+    expect(isVerifiedClaim({ status: 'behaviorally_verified' })).toBe(true);
+    expect(isVerifiedClaim({ status: 'semantically_grounded' })).toBe(false);
+    expect(isVerifiedClaim({ status: 'rejected' })).toBe(false);
   });
 });
 describe('appContextSchema', () => {

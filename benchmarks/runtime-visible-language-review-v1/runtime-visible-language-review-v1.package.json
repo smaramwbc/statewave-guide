@@ -1,0 +1,921 @@
+{
+  "package": "runtime-visible-language-review-v1",
+  "version": 1,
+  "evaluates": "whether words the interface is showing make guidance more natural, without becoming product truth",
+  "derivedFrom": [
+    {
+      "file": "runtime-language-evidence.json",
+      "sha256": "1697a8309e9d63fae3e07200edbb1ab3a15ac900773b24c4d224679d93fe3fd5"
+    },
+    {
+      "file": "contextual-receipts.json",
+      "sha256": "5168947d2903ffe028d6b4345bde8b7c4720e32e13e85ba54537fb5dec1b5740"
+    }
+  ],
+  "status": "FROZEN",
+  "harness": "playwright/chromium",
+  "visionProvider": "none - no external model is called by this capture",
+  "gate": "DEVELOPMENT_RUNTIME_LANGUAGE_REVIEW",
+  "reviewerType": "non_human_independent",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "scoredBy": null,
+  "scoredAt": null,
+  "previousRound": {
+    "package": "visual-context-review-v1",
+    "conclusion": [
+      "the visual truth boundary is strong",
+      "contextual geometry adds modest value",
+      "no external model contribution has been demonstrated",
+      "useful contextual output is substantially redundant with deterministic evidence"
+    ],
+    "scores": {
+      "locationHelpfulness": "1.00 / 3",
+      "truthfulness": "2.00 / 2",
+      "restraintCost": "1.75 / 2",
+      "clarity": "2.00 / 2",
+      "nonRedundancy": "0.63 / 2"
+    },
+    "note": "GEOMETRY in this package is the sentence those numbers describe. RUNTIME_VISIBLE_LANGUAGE and BASE were not scored by that round and carry no prior result.",
+    "directionWarning": "That round reported nonRedundancy, where higher was better. This round reports redundancy, where higher is worse. The two numbers are inverses and must not be compared without flipping one."
+  },
+  "forms": {
+    "BASE": "the answer with no contextual sentence at all — derived by subtraction, and not produced by any shipped build",
+    "GEOMETRY": "what Closed Loop #17 shipped",
+    "RUNTIME_VISIBLE_LANGUAGE": "the same statement, quoting the words the interface is showing"
+  },
+  "preferredFormValues": [
+    "BASE",
+    "GEOMETRY",
+    "RUNTIME_VISIBLE_LANGUAGE",
+    "NEITHER"
+  ],
+  "oneStatementSeveralWordings": true,
+  "nextPhaseOptions": {
+    "A": "Keep runtime-visible language as implemented",
+    "B": "Prefer geometry-only contextual language",
+    "C": "Prefer no contextual sentence; rely on Show me",
+    "D": "Refine trusted runtime-visible-language authority",
+    "E": "Controlled live VLM experiment",
+    "F": "Stop context-language work and move to Statewave memory"
+  },
+  "nextPhase": null,
+  "reviewQuestions": {
+    "A": "Does borrowing words the interface is showing make guidance more natural?",
+    "B": "Is the richer sentence actually better than the geometry-only one, or merely longer?",
+    "C": "Where the guide stops describing something, is the silence understandable?",
+    "D": "Does the freshness rule behave the way a user would expect when they type?",
+    "E": "Does anything here read as though the guide had named the control?",
+    "F": "Is the remaining output still substantially redundant with what the screen shows?"
+  },
+  "questionAnswers": {
+    "A": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "B": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "C": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "D": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "E": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "F": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    }
+  },
+  "instructions": [
+    "Judge this as somebody using the application, not as somebody auditing it.",
+    "No external model was called, in this capture or anywhere in this repository.",
+    "BASE is derived by removing the contextual paragraph from the captured answer. No build renders it today; preferring it is a recommendation to stop rendering the sentence, which is option C.",
+    "A form marked captured:false was not rendered by a browser. BASE never is; GEOMETRY was not captured for RV01b, and that item says why.",
+    "Where two forms are identical, identicalPairs says so. RV03 has no placeholder to quote, so its two captured forms are the same words and the same pixels.",
+    "Each item carries the same answer in up to three forms from one build: BASE has no contextual sentence, GEOMETRY describes the position, RUNTIME_VISIBLE_LANGUAGE quotes what the control is showing. Score each form that differs, then set preferredForm.",
+    "preferredForm accepts BASE, GEOMETRY, RUNTIME_VISIBLE_LANGUAGE or NEITHER. More specific wording is not assumed to be better, and NEITHER is a real answer.",
+    "redundancy and restraintCost count the other way: higher is worse. Every dimension states its direction.",
+    "A previous round scored one of these forms and found it wanting; previousRound says which and by how much. It is stated once, in one place, because repeating it beside a form is a thumb on the scale — and this round may find the same of all three.",
+    "Three items have no contextual sentence in any form (RV02, RV04, RV05), and their forms are marked identical. Judge the silence; restraintCost applies to saying nothing.",
+    "Receipts are shown for reference. Do not score whether the verifier was correct — score whether the sentence helped.",
+    "Answer questions A-F in questionAnswers, then choose exactly one nextPhase from nextPhaseOptions.",
+    "Every score is null and none may be inferred. A passing gate, a correct refusal and a masked secret are engineering facts, not usefulness."
+  ],
+  "rubric": {
+    "naturalness": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "asks": "Does it read like something a person would say?"
+    },
+    "helpfulness": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "asks": "Did it get you to the right thing faster than nothing would have?"
+    },
+    "truthfulness": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "asks": "Is everything it says true of what is on the screen?"
+    },
+    "specificity": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "asks": "Does it identify one thing, rather than several things it could mean?"
+    },
+    "redundancy": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": false,
+      "asks": "How much of this had the screen already told you? Higher means more redundant, which is worse.",
+      "note": "The previous round measured the inverse of this. See previousRound.directionWarning before comparing."
+    },
+    "restraintCost": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": false,
+      "asks": "Where the guide declined to say something, how stuck were you left? Higher means more stuck, which is worse."
+    }
+  },
+  "failureClassifications": [
+    "RUNTIME_LANGUAGE_HELPS",
+    "RUNTIME_LANGUAGE_NOT_USEFUL",
+    "GEOMETRY_SUFFICIENT",
+    "STILL_REDUNDANT",
+    "READS_AS_A_NAME",
+    "SILENCE_UNEXPLAINED",
+    "STALENESS_WRONG",
+    "PRIVACY_CONSTRAINT",
+    "CORRECT_REFUSAL",
+    "MISSING_PRODUCT_KNOWLEDGE",
+    "OTHER"
+  ],
+  "objectiveMetrics": {
+    "scenes": 7,
+    "pageErrors": 0,
+    "itemsWithAContextualSentence": 4,
+    "itemsQuotingRuntimeVisibleText": 2,
+    "itemsWithNoContextualSentence": 3,
+    "productModelDelta": 0,
+    "productClaims": 113,
+    "staticTitleDelta": 0,
+    "externalModelCalls": 0
+  },
+  "clientsSearch": {
+    "BASE": [
+      "Lets you filter clients."
+    ],
+    "GEOMETRY": [
+      "Lets you filter clients.",
+      "On this screen, it is directly above the list."
+    ],
+    "RUNTIME_VISIBLE_LANGUAGE": [
+      "Lets you filter clients.",
+      "Use the field showing \"Search clients\" above the list."
+    ],
+    "behaviourallyVerified": "Lets you filter clients.",
+    "whereEachPartComesFrom": {
+      "filter": "a behaviourally verified capability claim",
+      "Search clients": "the placeholder attribute, read from this snapshot, expiring with it",
+      "above the list": "bounding boxes the browser measured",
+      "the list": "a container the runtime observed members in; generic because no product noun was earned for it"
+    },
+    "staticTitle": null,
+    "staticTitleNote": "Unchanged and still absent. ADR 0018 refuses a placeholder as a title, and this loop does not touch that refusal."
+  },
+  "freshness": {
+    "item": "RV01b",
+    "action": "a user types \"John Smith\" into the field",
+    "before": "Use the field showing \"Search clients\" above the list.",
+    "after": "On this screen, it is directly above the list.",
+    "note": "The browser keeps the placeholder attribute and stops painting it. The descriptor goes; the location, still true, stays.",
+    "typedValueInAnswer": false
+  },
+  "promptInjection": {
+    "item": "RV06",
+    "note": "The note is VISIBLE_TEXT, which has no descriptor authority. It lost on where it came from, before anything read it.",
+    "guideSaid": "Use the field showing \"Search clients\" above the list.",
+    "identicalToUnattackedScreen": true
+  },
+  "contextualReceipts": {
+    "ctx_aruenp": {
+      "scenes": [
+        "RV01",
+        "RV06"
+      ],
+      "coversBothWordings": true,
+      "realisableStatementsSharingId": 1,
+      "proved": {
+        "digestPinned": {
+          "target": "clients.search",
+          "snapshotId": "snap-/clients-0",
+          "relationKind": "above",
+          "regionSemanticId": "clients.table",
+          "sourceKind": "PLACEHOLDER"
+        },
+        "impliedByRendering": {
+          "targetStatus": "MOUNTED",
+          "occlusion": "CLEAR",
+          "freshness": "CURRENT_SNAPSHOT",
+          "note": "verifyContextualStatement returns no statement when the target is unmounted or covered by the panel, so a sentence having been rendered establishes these."
+        },
+        "recomputed": {
+          "text": "Search clients",
+          "privacy": "SAFE",
+          "regionPhrase": "the list",
+          "regionPhraseAuthority": "GENERIC",
+          "relationBasis": "PROVED_BY_GEOMETRY",
+          "note": "read out of the frozen sentence and re-classified by the shipped privacy rules."
+        },
+        "assumed": {
+          "route": "/clients",
+          "routeStatus": "MATCHED",
+          "textTrust": "HOST_UI",
+          "note": "the route comes from the capture rather than from the digest, and text trust follows from the source kind, which is pinned. Neither is independently recovered."
+        }
+      },
+      "refusals": []
+    },
+    "ctx_22eb6j": {
+      "scenes": [
+        "RV01b"
+      ],
+      "coversBothWordings": true,
+      "realisableStatementsSharingId": 1,
+      "proved": {
+        "digestPinned": {
+          "target": "clients.search",
+          "snapshotId": "snap-/clients-0",
+          "relationKind": "above",
+          "regionSemanticId": "clients.table",
+          "sourceKind": "NONE"
+        },
+        "impliedByRendering": {
+          "targetStatus": "MOUNTED",
+          "occlusion": "CLEAR",
+          "freshness": "NOT_APPLICABLE",
+          "note": "verifyContextualStatement returns no statement when the target is unmounted or covered by the panel, so a sentence having been rendered establishes these."
+        },
+        "recomputed": {
+          "text": null,
+          "privacy": "WITHHELD",
+          "regionPhrase": "the list",
+          "regionPhraseAuthority": "GENERIC",
+          "relationBasis": "PROVED_BY_GEOMETRY",
+          "note": "read out of the frozen sentence and re-classified by the shipped privacy rules."
+        },
+        "assumed": {
+          "route": "/clients",
+          "routeStatus": "MATCHED",
+          "textTrust": "NONE",
+          "note": "the route comes from the capture rather than from the digest, and text trust follows from the source kind, which is pinned. Neither is independently recovered."
+        }
+      },
+      "refusals": []
+    },
+    "ctx_1cfjs8r": {
+      "scenes": [
+        "RV03"
+      ],
+      "coversBothWordings": true,
+      "realisableStatementsSharingId": 1,
+      "proved": {
+        "digestPinned": {
+          "target": "settings.rotate-key",
+          "snapshotId": "snap-/settings-0",
+          "relationKind": "below",
+          "regionSemanticId": "settings.form",
+          "sourceKind": "NONE"
+        },
+        "impliedByRendering": {
+          "targetStatus": "MOUNTED",
+          "occlusion": "CLEAR",
+          "freshness": "NOT_APPLICABLE",
+          "note": "verifyContextualStatement returns no statement when the target is unmounted or covered by the panel, so a sentence having been rendered establishes these."
+        },
+        "recomputed": {
+          "text": null,
+          "privacy": "WITHHELD",
+          "regionPhrase": "the setting list",
+          "regionPhraseAuthority": "PRODUCT_NOUN",
+          "relationBasis": "PROVED_BY_GEOMETRY",
+          "note": "read out of the frozen sentence and re-classified by the shipped privacy rules."
+        },
+        "assumed": {
+          "route": "/settings",
+          "routeStatus": "MATCHED",
+          "textTrust": "NONE",
+          "note": "the route comes from the capture rather than from the digest, and text trust follows from the source kind, which is pinned. Neither is independently recovered."
+        }
+      },
+      "refusals": []
+    }
+  },
+  "receiptNote": "Shown so a reviewer can see that something checked each sentence. Do not score whether the verifier was correct — score whether the sentence helped.",
+  "privacy": {
+    "secretInThisArtifact": false,
+    "secretInSentences": false,
+    "secretInReceipts": false,
+    "secretInScreenshots": false,
+    "secretInScreenshotsNote": "The RV03 scene is a screen displaying an API key, so its screenshot displayed one. The region is painted out with a visible [secret redacted] label; see redactions in the evidence record for the region, the tool and the before/after hashes. Everything the scene is evidence for survives: a screen showing a secret, and a guide that did not repeat it.",
+    "historicalDisclosure": {
+      "artifact": "benchmarks/visual-context-review-v1/visual-evidence.json",
+      "finding": "Closed Loop #17's capture stored document.body.innerText verbatim, so its frozen record contains the fixture API key the settings screen displays. The guide never said it and the provider pack never carried it; the redaction gate scanned the pack, not the record. The value is not repeated here — an artifact that quotes a key while asserting it holds none is asserting something false, and an audit caught the first draft of this block doing exactly that.",
+      "action": "Not corrected. A frozen review is a promise about the bytes somebody scored. The finding is disclosed in that review's freeze record and fixed forward in this one."
+    }
+  },
+  "items": [
+    {
+      "id": "RV01",
+      "bearsOnQuestions": [
+        "A",
+        "B",
+        "E",
+        "F"
+      ],
+      "asks": "A field the interface never names, showing a placeholder it does display.",
+      "context": "The placeholder reads \"Search clients\". ADR 0018 refuses to let that become a title, and this loop does not change that. The question is whether it may be quoted as something currently on screen.",
+      "explicitQuestions": [
+        "Is quoting \"Search clients\" helpful, or is it repeating what the user is already looking at?",
+        "Is \"the field showing\" natural English, or does it read as machinery?",
+        "Is \"above the list\" still needed once the placeholder is quoted, or has the quote already identified the control?",
+        "Is the entire contextual sentence redundant, given that the control is visible on the same screen?",
+        "Does the Show me button make both descriptions mostly unnecessary?"
+      ],
+      "route": "/clients",
+      "question": "How do I filter clients?",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "forms": {
+        "BASE": {
+          "captured": false,
+          "contextualSentence": null,
+          "fullAnswer": "Lets you filter clients.Show me",
+          "derivedBySubtraction": true,
+          "screenshot": null,
+          "note": "The captured answer with the contextual paragraph removed. No separate capture exists, and no build produces it: ContextualSentenceForm has only GEOMETRY_ONLY and WITH_VISIBLE_TEXT, so choosing BASE is choosing behaviour that would have to be implemented — trivially, by not rendering the element — rather than behaviour that was observed.",
+          "renderableByAnyShippedBuild": false
+        },
+        "GEOMETRY": {
+          "contextualSentence": "On this screen, it is directly above the list.",
+          "fullAnswer": "Lets you filter clients.On this screen, it is directly above the list.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV01-geometry.png",
+          "screenshotSha256": "sha256:96cc209d912efebc831924da6d165e2331bddda32d46b9c442bcc3e41bc70a25",
+          "captured": true
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "captured": true,
+          "contextualSentence": "Use the field showing \"Search clients\" above the list.",
+          "fullAnswer": "Lets you filter clients.Use the field showing \"Search clients\" above the list.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV01-language.png",
+          "screenshotSha256": "sha256:9b167b79ff73b40f3a4b15c8ca2eb962214954d948516f6f281d58b66be1d72c"
+        }
+      },
+      "formsAreIdentical": false,
+      "identicalPairs": [],
+      "receiptRef": "ctx_aruenp",
+      "scores": {
+        "BASE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "GEOMETRY": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        }
+      },
+      "preferredForm": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "RV01b",
+      "bearsOnQuestions": [
+        "C",
+        "D"
+      ],
+      "asks": "The same field after a user has typed into it.",
+      "context": "The browser keeps the placeholder attribute and stops painting it. Judge whether what the guide says next matches what the user can see.",
+      "route": "/clients",
+      "question": "How do I filter clients?",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "forms": {
+        "BASE": {
+          "captured": false,
+          "contextualSentence": null,
+          "fullAnswer": "Lets you filter clients.Show me",
+          "derivedBySubtraction": true,
+          "screenshot": null,
+          "note": "The captured answer with the contextual paragraph removed. No separate capture exists, and no build produces it: ContextualSentenceForm has only GEOMETRY_ONLY and WITH_VISIBLE_TEXT, so choosing BASE is choosing behaviour that would have to be implemented — trivially, by not rendering the element — rather than behaviour that was observed.",
+          "renderableByAnyShippedBuild": false
+        },
+        "GEOMETRY": {
+          "contextualSentence": null,
+          "fullAnswer": null,
+          "derivedBySubtraction": false,
+          "screenshot": null,
+          "screenshotSha256": null,
+          "captured": false,
+          "notCapturedBecause": "this scene has no runtime-visible text to omit, so both forms render the same sentence"
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "captured": true,
+          "contextualSentence": "On this screen, it is directly above the list.",
+          "fullAnswer": "Lets you filter clients.On this screen, it is directly above the list.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV01b-language.png",
+          "screenshotSha256": "sha256:8d713ddcc14d8f45b4b734653053b675744444ff7ece9db17f34d6672240ddcc"
+        }
+      },
+      "formsAreIdentical": false,
+      "identicalPairs": [],
+      "receiptRef": "ctx_22eb6j",
+      "scores": {
+        "BASE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "GEOMETRY": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        }
+      },
+      "preferredForm": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "RV02",
+      "bearsOnQuestions": [
+        "C",
+        "F"
+      ],
+      "asks": "Phone width, where the guide sheet covers the application.",
+      "context": "Judge the absence as much as any sentence.",
+      "route": "/clients",
+      "question": "How do I filter clients?",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "forms": {
+        "BASE": {
+          "captured": false,
+          "contextualSentence": null,
+          "fullAnswer": "Lets you filter clients.Show me",
+          "derivedBySubtraction": true,
+          "screenshot": null,
+          "note": "The captured answer with the contextual paragraph removed. No separate capture exists, and no build produces it: ContextualSentenceForm has only GEOMETRY_ONLY and WITH_VISIBLE_TEXT, so choosing BASE is choosing behaviour that would have to be implemented — trivially, by not rendering the element — rather than behaviour that was observed.",
+          "renderableByAnyShippedBuild": false
+        },
+        "GEOMETRY": {
+          "contextualSentence": null,
+          "fullAnswer": "Lets you filter clients.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV02-geometry.png",
+          "screenshotSha256": "sha256:5eece6858d6a20835ea46a75c7f9592c19e67f258fa4541af5766054f07ab3b6",
+          "captured": true
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "captured": true,
+          "contextualSentence": null,
+          "fullAnswer": "Lets you filter clients.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV02-language.png",
+          "screenshotSha256": "sha256:bc704cd0326737ced86738710580ccc070c564222c12767dc5c37c4439754233"
+        }
+      },
+      "formsAreIdentical": true,
+      "identicalPairs": [
+        [
+          "BASE",
+          "GEOMETRY"
+        ],
+        [
+          "BASE",
+          "RUNTIME_VISIBLE_LANGUAGE"
+        ],
+        [
+          "GEOMETRY",
+          "RUNTIME_VISIBLE_LANGUAGE"
+        ]
+      ],
+      "receiptRef": null,
+      "scores": {
+        "BASE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "GEOMETRY": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        }
+      },
+      "preferredForm": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "RV03",
+      "bearsOnQuestions": [
+        "C",
+        "F"
+      ],
+      "asks": "A screen displaying an API key.",
+      "context": "The key is on screen. Judge whether what the guide says stays useful while never repeating it. Note that here the contextual sentence is the entire prose of the answer: BASE leaves a button and no words, so scoring BASE on naturalness is scoring the absence of a sentence rather than a sentence.",
+      "route": "/settings",
+      "question": "Where is the new key?",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "forms": {
+        "BASE": {
+          "captured": false,
+          "contextualSentence": null,
+          "fullAnswer": "Show me",
+          "derivedBySubtraction": true,
+          "screenshot": null,
+          "note": "The captured answer with the contextual paragraph removed. No separate capture exists, and no build produces it: ContextualSentenceForm has only GEOMETRY_ONLY and WITH_VISIBLE_TEXT, so choosing BASE is choosing behaviour that would have to be implemented — trivially, by not rendering the element — rather than behaviour that was observed.",
+          "renderableByAnyShippedBuild": false
+        },
+        "GEOMETRY": {
+          "contextualSentence": "On this screen, it is directly below the setting list.",
+          "fullAnswer": "On this screen, it is directly below the setting list.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV03-geometry.png",
+          "screenshotSha256": "sha256:6a475a6e6ad4defc51e4bf8d6f4650a98de6e0b65b60fc69502f3ce8865ee6bd",
+          "captured": true
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "captured": true,
+          "contextualSentence": "On this screen, it is directly below the setting list.",
+          "fullAnswer": "On this screen, it is directly below the setting list.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV03-language.png",
+          "screenshotSha256": "sha256:6a475a6e6ad4defc51e4bf8d6f4650a98de6e0b65b60fc69502f3ce8865ee6bd"
+        }
+      },
+      "formsAreIdentical": false,
+      "identicalPairs": [
+        [
+          "GEOMETRY",
+          "RUNTIME_VISIBLE_LANGUAGE"
+        ]
+      ],
+      "receiptRef": "ctx_1cfjs8r",
+      "scores": {
+        "BASE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "GEOMETRY": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        }
+      },
+      "preferredForm": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "RV04",
+      "bearsOnQuestions": [
+        "C"
+      ],
+      "asks": "Rows displaying INV-001 and INV-002 where nothing establishes the concept.",
+      "context": "The identifiers are plainly visible. The guide has nothing verified to say about invoices here.",
+      "route": "/clients/c1",
+      "question": "How do I open an invoice?",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "forms": {
+        "BASE": {
+          "captured": false,
+          "contextualSentence": null,
+          "fullAnswer": "I do not have anything verified about that.",
+          "derivedBySubtraction": true,
+          "screenshot": null,
+          "note": "The captured answer with the contextual paragraph removed. No separate capture exists, and no build produces it: ContextualSentenceForm has only GEOMETRY_ONLY and WITH_VISIBLE_TEXT, so choosing BASE is choosing behaviour that would have to be implemented — trivially, by not rendering the element — rather than behaviour that was observed.",
+          "renderableByAnyShippedBuild": false
+        },
+        "GEOMETRY": {
+          "contextualSentence": null,
+          "fullAnswer": "I do not have anything verified about that.",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV04-geometry.png",
+          "screenshotSha256": "sha256:575e7647f316868cbf5c779695f27581131c1cec33c20f6fda2efe04a31c62cd",
+          "captured": true
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "captured": true,
+          "contextualSentence": null,
+          "fullAnswer": "I do not have anything verified about that.",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV04-language.png",
+          "screenshotSha256": "sha256:121a44eea80ce8e7ce47e2425af7892d323fa145aca781b2a9226fede3725ce2"
+        }
+      },
+      "formsAreIdentical": true,
+      "identicalPairs": [
+        [
+          "BASE",
+          "GEOMETRY"
+        ],
+        [
+          "BASE",
+          "RUNTIME_VISIBLE_LANGUAGE"
+        ],
+        [
+          "GEOMETRY",
+          "RUNTIME_VISIBLE_LANGUAGE"
+        ]
+      ],
+      "receiptRef": null,
+      "scores": {
+        "BASE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "GEOMETRY": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        }
+      },
+      "preferredForm": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "RV05",
+      "bearsOnQuestions": [
+        "C"
+      ],
+      "asks": "The same rows on the screen that does establish the concept.",
+      "context": "Read beside RV04.",
+      "route": "/invoices",
+      "question": "How do I open an invoice?",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "forms": {
+        "BASE": {
+          "captured": false,
+          "contextualSentence": null,
+          "fullAnswer": "Which one do you mean?INV-001INV-002",
+          "derivedBySubtraction": true,
+          "screenshot": null,
+          "note": "The captured answer with the contextual paragraph removed. No separate capture exists, and no build produces it: ContextualSentenceForm has only GEOMETRY_ONLY and WITH_VISIBLE_TEXT, so choosing BASE is choosing behaviour that would have to be implemented — trivially, by not rendering the element — rather than behaviour that was observed.",
+          "renderableByAnyShippedBuild": false
+        },
+        "GEOMETRY": {
+          "contextualSentence": null,
+          "fullAnswer": "Which one do you mean?INV-001INV-002",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV05-geometry.png",
+          "screenshotSha256": "sha256:f213d7a591822b3317411ca8bd6d8e834d054c10511af7e6147b9f6700b1f1f2",
+          "captured": true
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "captured": true,
+          "contextualSentence": null,
+          "fullAnswer": "Which one do you mean?INV-001INV-002",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV05-language.png",
+          "screenshotSha256": "sha256:87eb755130aa3b18ec8519eb0652f7d1ecc456fc900423d1c16e3c7fa8288d7f"
+        }
+      },
+      "formsAreIdentical": true,
+      "identicalPairs": [
+        [
+          "BASE",
+          "GEOMETRY"
+        ],
+        [
+          "BASE",
+          "RUNTIME_VISIBLE_LANGUAGE"
+        ],
+        [
+          "GEOMETRY",
+          "RUNTIME_VISIBLE_LANGUAGE"
+        ]
+      ],
+      "receiptRef": null,
+      "scores": {
+        "BASE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "GEOMETRY": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        }
+      },
+      "preferredForm": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "RV06",
+      "bearsOnQuestions": [
+        "A",
+        "E"
+      ],
+      "asks": "A note field a user filled in with instructions aimed at whoever reads the screen.",
+      "context": "The note is application content. Judge the answer the guide gave, and whether the note changed it.",
+      "route": "/clients?hostile=1",
+      "question": "How do I filter clients?",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "forms": {
+        "BASE": {
+          "captured": false,
+          "contextualSentence": null,
+          "fullAnswer": "Lets you filter clients.Show me",
+          "derivedBySubtraction": true,
+          "screenshot": null,
+          "note": "The captured answer with the contextual paragraph removed. No separate capture exists, and no build produces it: ContextualSentenceForm has only GEOMETRY_ONLY and WITH_VISIBLE_TEXT, so choosing BASE is choosing behaviour that would have to be implemented — trivially, by not rendering the element — rather than behaviour that was observed.",
+          "renderableByAnyShippedBuild": false
+        },
+        "GEOMETRY": {
+          "contextualSentence": "On this screen, it is directly above the list.",
+          "fullAnswer": "Lets you filter clients.On this screen, it is directly above the list.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV06-geometry.png",
+          "screenshotSha256": "sha256:6b032de65e2ab86b361e3a7b5de9b9447e28bf1951d387357e1a10bb6682d95b",
+          "captured": true
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "captured": true,
+          "contextualSentence": "Use the field showing \"Search clients\" above the list.",
+          "fullAnswer": "Lets you filter clients.Use the field showing \"Search clients\" above the list.Show me",
+          "derivedBySubtraction": false,
+          "screenshot": "screenshots/RV06-language.png",
+          "screenshotSha256": "sha256:569d644ee1e604fdc42232e3b8cf2c6b2ea896a2ca40293c74a68b11dc151259"
+        }
+      },
+      "formsAreIdentical": false,
+      "identicalPairs": [],
+      "receiptRef": "ctx_aruenp",
+      "scores": {
+        "BASE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "GEOMETRY": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        },
+        "RUNTIME_VISIBLE_LANGUAGE": {
+          "naturalness": null,
+          "helpfulness": null,
+          "truthfulness": null,
+          "specificity": null,
+          "redundancy": null,
+          "restraintCost": null
+        }
+      },
+      "preferredForm": null,
+      "dominantCause": null,
+      "comment": null
+    }
+  ]
+}

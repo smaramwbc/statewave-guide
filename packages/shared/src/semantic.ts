@@ -30,10 +30,20 @@
  * `source|type|target`.
  */
 export interface SemanticEvidence {
-  /** Canonical graph identifier. */
+  /** Canonical graph identifier, or a serialised observed effect. */
   ref: string;
-  /** Which half of the graph it points at. */
-  kind: 'node' | 'relationship';
+  /**
+   * Where the evidence came from.
+   *
+   * `node` and `relationship` point into the ApplicationGraph and are true of
+   * the source. `runtime`, added by Closed Loop #10, is an effect a browser was
+   * watched producing — true of one run of one build against one seeded data
+   * set. They share an array and must never share a label: the moment a reader
+   * cannot tell "the graph proves this" from "a browser once did this", the two
+   * have collapsed into one kind of evidence, and only one of them deserves the
+   * weight.
+   */
+  kind: 'node' | 'relationship' | 'runtime';
   /** Provenance carried forward so a reader can open the file. */
   file?: string;
   line?: number;
@@ -128,7 +138,18 @@ export type CapabilityAction =
   | 'search'
   | 'export'
   | 'import'
-  | 'send';
+  | 'send'
+  // Behaviour a running application demonstrated, added by Closed Loop #10.
+  // Each is here because an interaction with the fixture produced the effect its
+  // rule requires — none in anticipation. `filter` is what a text box provably
+  // does when a visible collection narrows and the route does not change, and it
+  // is deliberately not `search`: nothing observed says where the narrowing
+  // happened. `reveal` is a target absent before and present after, and asserts
+  // nothing about how its contents came to be.
+  | 'filter'
+  | 'reveal'
+  | 'open'
+  | 'select';
 
 /**
  * The machine-checkable payload of a factual claim.
@@ -270,6 +291,24 @@ export type ProductClaimStatus =
    */
   | 'structurally_verified'
   /**
+   * A factual claim whose assertion was checked against an *observed* run and
+   * holds.
+   *
+   * Deliberately not folded into `structurally_verified`, because the two are
+   * different guarantees and saying so is the whole point. Structural
+   * verification is a proof about the program: it holds for every run, and it
+   * holds because the code cannot do otherwise. Behavioural verification is a
+   * report about one run under a known `RuntimeContext` — this route, these
+   * permissions, this fixture state — and generalising it is exactly the error
+   * that would make it worthless.
+   *
+   * Both are *verified*, and consumers that mean "verified" should say so
+   * through {@link isVerifiedClaim} rather than by naming one of them. What a
+   * consumer may not do is print "structurally verified" over something a
+   * browser was watching.
+   */
+  | 'behaviorally_verified'
+  /**
    * A language claim that references only real evidence and contradicts nothing.
    * It is *grounded*, not proven — no claim is made that the sentence is true,
    * only that it is attached to facts that exist.
@@ -277,6 +316,18 @@ export type ProductClaimStatus =
   | 'semantically_grounded'
   /** Refused. Persisted anyway, so the refusal stays visible. */
   | 'rejected';
+
+/**
+ * Whether a claim's assertion was checked and held, by either route.
+ *
+ * The predicate exists so that "was this verified?" has one answer in one place.
+ * Before Closed Loop #10 the question was spelled `status === 'structurally_verified'`
+ * in thirty-five places, and adding a second kind of verification by editing
+ * thirty-five comparisons is how one of them gets missed.
+ */
+export function isVerifiedClaim(claim: Pick<ProductClaim, 'status'>): boolean {
+  return claim.status === 'structurally_verified' || claim.status === 'behaviorally_verified';
+}
 
 /**
  * One atomic piece of generated product knowledge.
@@ -308,6 +359,25 @@ export interface ProductClaim {
   outcome?: ClaimVerificationOutcome;
   /** Present when `status` is `rejected`. */
   rejection?: { reason: SemanticRejectionReason; detail: string };
+  /**
+   * The conditions a behavioural claim was observed under.
+   *
+   * Present exactly when `status` is `behaviorally_verified`. A run establishes
+   * what happened on *one* screen, with *one* set of permissions, against *one*
+   * seeded data set — and a claim that forgets which is a claim that reads as
+   * universal. "You can delete a client", observed as an administrator, is a
+   * fact about administrators.
+   *
+   * Structural rather than imported: the runtime package depends on this one.
+   */
+  runtimeContext?: {
+    route: string;
+    fixtureState: string;
+    permissions: readonly string[];
+    featureFlags: Readonly<Record<string, boolean>>;
+  };
+  /** The interaction trace a behavioural claim came from, so it can be re-run. */
+  runtimeTraceId?: string;
   /**
    * What this claim was true *of*.
    *

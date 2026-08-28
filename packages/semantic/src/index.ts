@@ -256,6 +256,18 @@ export type {
   OwnershipStep,
 } from './scope.js';
 export { planClaimOpportunities, OPPORTUNITY_LIMITS } from './opportunities.js';
+export {
+  RUNTIME_VERIFICATION_RULES,
+  integrateRuntimeCapability,
+  runtimeRuleFor,
+} from './runtime-claims.js';
+export type {
+  IntegrateInput,
+  RuntimeCapabilityRecord,
+  RuntimeClaimContext,
+  RuntimeIntegrationOutcome,
+  RuntimeIntegrationRefusal,
+} from './runtime-claims.js';
 export type {
   ClaimOpportunity,
   ClaimDecision,

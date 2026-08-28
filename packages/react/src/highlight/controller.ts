@@ -30,6 +30,8 @@ import { injectHighlightStyles } from './styles.js';
 
 /** How a highlight should look and behave. */
 export interface HighlightOptions {
+  /** Which instance of a repeated semantic id to point at. */
+  instanceRef?: string;
   /** Heading shown in the popover. */
   title?: string;
   /** Body text shown in the popover. */
@@ -90,6 +92,8 @@ export type TargetResult =
 
 /** Options for {@link HighlightController.scrollTo}. */
 export interface ScrollToOptions {
+  /** Which instance of a repeated semantic id to scroll to. */
+  instanceRef?: string;
   /** Vertical alignment of the target. Defaults to `center`. */
   block?: ScrollLogicalPosition;
   /** Scroll behaviour. Defaults to `smooth`. */
@@ -425,7 +429,14 @@ export function createHighlightController(
   }
 
   /** Resolves the id, or explains — in the shared vocabulary — why it could not. */
-  function locate(id: string): Located {
+  /**
+   * Resolves an id, optionally to one specific instance of it.
+   *
+   * `instanceRef` matters wherever a list repeats a semantic id: without it the
+   * first match wins, which after somebody picked the second row means pointing
+   * confidently at the wrong one.
+   */
+  function locate(id: string, instanceRef?: string): Located {
     if (typeof id !== 'string' || !isValidGuideElementId(id)) {
       return {
         success: false,
@@ -439,7 +450,10 @@ export function createHighlightController(
       };
     }
 
-    const node = registryInternals.resolveNode(id);
+    const node =
+      instanceRef === undefined
+        ? registryInternals.resolveNode(id)
+        : registryInternals.resolveInstanceNode(id, instanceRef);
     if (node) return { success: true, node };
 
     return {
@@ -466,7 +480,7 @@ export function createHighlightController(
     // when it arrived never flashes an overlay on its way to being refused.
     if (isAborted(input.signal)) return cancelled(id);
 
-    const located = locate(id);
+    const located = locate(id, input.instanceRef);
     if (!located.success) return fail(id, located.error);
     const node = located.node;
 
@@ -573,7 +587,7 @@ export function createHighlightController(
   async function scrollTo(id: string, input: ScrollToOptions = {}): Promise<ScrollResult> {
     if (isAborted(input.signal)) return cancelled(id);
 
-    const located = locate(id);
+    const located = locate(id, input.instanceRef);
     if (!located.success) return fail(id, located.error);
     const node = located.node;
 

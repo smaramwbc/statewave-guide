@@ -1,0 +1,214 @@
+{
+  "artifact": "contextual-receipts",
+  "version": 1,
+  "producedBy": "scripts/build-runtime-language-receipts.mjs",
+  "source": "runtime-language-evidence.json",
+  "method": "Re-derived from the frozen sentences and verified by digest. A receipt id is a hash over the statement that produced it, so a reconstruction either reproduces the id the browser recorded or it is wrong. Every entry here reproduces it.",
+  "digestStrength": "The receipt id is a 32-bit non-cryptographic hash and is not collision-resistant in general. Uniqueness is therefore checked rather than assumed: for every receipt, the space of statements this fixture could realistically have produced (17 semantic ids as target and region, 5 relations, 5 source kinds, 60 snapshot counts — about 4.3 million combinations) is searched exhaustively, and exactly one matches. That makes the id a reliable pin on this evidence, and not a general guarantee.",
+  "snapshotIdLimitation": "Snapshot ids are constant per route in the reference host, so the snapshot clause of freshness is inert there. RV01b staleness was demonstrated by the text no longer being reported, not by the id changing.",
+  "oneStatementTwoWordings": "A receipt covers both rendered forms of a scene. The engine verifies one statement; the sentence form is chosen afterwards, so a reviewer comparing wordings is comparing two phrasings of a single verified fact.",
+  "summary": {
+    "statements": 4,
+    "idsReproduced": 4,
+    "coveringBothWordings": 4,
+    "scenesWithNoSentence": 3,
+    "withRuntimeVisibleText": 0
+  },
+  "receipts": [
+    {
+      "scene": "RV01",
+      "rendered": {
+        "WITH_VISIBLE_TEXT": "Use the field showing \"Search clients\" above the list.",
+        "GEOMETRY_ONLY": "On this screen, it is directly above the list."
+      },
+      "receiptId": "ctx_aruenp",
+      "matchesCapturedId": true,
+      "realisableStatementsSharingId": 1,
+      "coversBothForms": true,
+      "proved": {
+        "digestPinned": {
+          "target": "clients.search",
+          "snapshotId": "snap-/clients-0",
+          "relationKind": "above",
+          "regionSemanticId": "clients.table",
+          "sourceKind": "PLACEHOLDER"
+        },
+        "impliedByRendering": {
+          "targetStatus": "MOUNTED",
+          "occlusion": "CLEAR",
+          "freshness": "CURRENT_SNAPSHOT",
+          "note": "verifyContextualStatement returns no statement when the target is unmounted or covered by the panel, so a sentence having been rendered establishes these."
+        },
+        "recomputed": {
+          "text": "Search clients",
+          "privacy": "SAFE",
+          "regionPhrase": "the list",
+          "regionPhraseAuthority": "GENERIC",
+          "relationBasis": "PROVED_BY_GEOMETRY",
+          "note": "read out of the frozen sentence and re-classified by the shipped privacy rules."
+        },
+        "assumed": {
+          "route": "/clients",
+          "routeStatus": "MATCHED",
+          "textTrust": "HOST_UI",
+          "note": "the route comes from the capture rather than from the digest, and text trust follows from the source kind, which is pinned. Neither is independently recovered."
+        }
+      },
+      "refusals": [],
+      "snapshotId": "snap-/clients-0"
+    },
+    {
+      "scene": "RV01b",
+      "rendered": {
+        "WITH_VISIBLE_TEXT": "On this screen, it is directly above the list.",
+        "GEOMETRY_ONLY": null
+      },
+      "receiptId": "ctx_22eb6j",
+      "matchesCapturedId": true,
+      "realisableStatementsSharingId": 1,
+      "coversBothForms": true,
+      "proved": {
+        "digestPinned": {
+          "target": "clients.search",
+          "snapshotId": "snap-/clients-0",
+          "relationKind": "above",
+          "regionSemanticId": "clients.table",
+          "sourceKind": "NONE"
+        },
+        "impliedByRendering": {
+          "targetStatus": "MOUNTED",
+          "occlusion": "CLEAR",
+          "freshness": "NOT_APPLICABLE",
+          "note": "verifyContextualStatement returns no statement when the target is unmounted or covered by the panel, so a sentence having been rendered establishes these."
+        },
+        "recomputed": {
+          "text": null,
+          "privacy": "WITHHELD",
+          "regionPhrase": "the list",
+          "regionPhraseAuthority": "GENERIC",
+          "relationBasis": "PROVED_BY_GEOMETRY",
+          "note": "read out of the frozen sentence and re-classified by the shipped privacy rules."
+        },
+        "assumed": {
+          "route": "/clients",
+          "routeStatus": "MATCHED",
+          "textTrust": "NONE",
+          "note": "the route comes from the capture rather than from the digest, and text trust follows from the source kind, which is pinned. Neither is independently recovered."
+        }
+      },
+      "refusals": [],
+      "snapshotId": "snap-/clients-0"
+    },
+    {
+      "scene": "RV02",
+      "rendered": {
+        "WITH_VISIBLE_TEXT": null,
+        "GEOMETRY_ONLY": null
+      },
+      "receiptId": null,
+      "note": "no contextual sentence was rendered; nothing to receipt"
+    },
+    {
+      "scene": "RV03",
+      "rendered": {
+        "WITH_VISIBLE_TEXT": "On this screen, it is directly below the setting list.",
+        "GEOMETRY_ONLY": "On this screen, it is directly below the setting list."
+      },
+      "receiptId": "ctx_1cfjs8r",
+      "matchesCapturedId": true,
+      "realisableStatementsSharingId": 1,
+      "coversBothForms": true,
+      "proved": {
+        "digestPinned": {
+          "target": "settings.rotate-key",
+          "snapshotId": "snap-/settings-0",
+          "relationKind": "below",
+          "regionSemanticId": "settings.form",
+          "sourceKind": "NONE"
+        },
+        "impliedByRendering": {
+          "targetStatus": "MOUNTED",
+          "occlusion": "CLEAR",
+          "freshness": "NOT_APPLICABLE",
+          "note": "verifyContextualStatement returns no statement when the target is unmounted or covered by the panel, so a sentence having been rendered establishes these."
+        },
+        "recomputed": {
+          "text": null,
+          "privacy": "WITHHELD",
+          "regionPhrase": "the setting list",
+          "regionPhraseAuthority": "PRODUCT_NOUN",
+          "relationBasis": "PROVED_BY_GEOMETRY",
+          "note": "read out of the frozen sentence and re-classified by the shipped privacy rules."
+        },
+        "assumed": {
+          "route": "/settings",
+          "routeStatus": "MATCHED",
+          "textTrust": "NONE",
+          "note": "the route comes from the capture rather than from the digest, and text trust follows from the source kind, which is pinned. Neither is independently recovered."
+        }
+      },
+      "refusals": [],
+      "snapshotId": "snap-/settings-0"
+    },
+    {
+      "scene": "RV04",
+      "rendered": {
+        "WITH_VISIBLE_TEXT": null,
+        "GEOMETRY_ONLY": null
+      },
+      "receiptId": null,
+      "note": "no contextual sentence was rendered; nothing to receipt"
+    },
+    {
+      "scene": "RV05",
+      "rendered": {
+        "WITH_VISIBLE_TEXT": null,
+        "GEOMETRY_ONLY": null
+      },
+      "receiptId": null,
+      "note": "no contextual sentence was rendered; nothing to receipt"
+    },
+    {
+      "scene": "RV06",
+      "rendered": {
+        "WITH_VISIBLE_TEXT": "Use the field showing \"Search clients\" above the list.",
+        "GEOMETRY_ONLY": "On this screen, it is directly above the list."
+      },
+      "receiptId": "ctx_aruenp",
+      "matchesCapturedId": true,
+      "realisableStatementsSharingId": 1,
+      "coversBothForms": true,
+      "proved": {
+        "digestPinned": {
+          "target": "clients.search",
+          "snapshotId": "snap-/clients-0",
+          "relationKind": "above",
+          "regionSemanticId": "clients.table",
+          "sourceKind": "PLACEHOLDER"
+        },
+        "impliedByRendering": {
+          "targetStatus": "MOUNTED",
+          "occlusion": "CLEAR",
+          "freshness": "CURRENT_SNAPSHOT",
+          "note": "verifyContextualStatement returns no statement when the target is unmounted or covered by the panel, so a sentence having been rendered establishes these."
+        },
+        "recomputed": {
+          "text": "Search clients",
+          "privacy": "SAFE",
+          "regionPhrase": "the list",
+          "regionPhraseAuthority": "GENERIC",
+          "relationBasis": "PROVED_BY_GEOMETRY",
+          "note": "read out of the frozen sentence and re-classified by the shipped privacy rules."
+        },
+        "assumed": {
+          "route": "/clients",
+          "routeStatus": "MATCHED",
+          "textTrust": "HOST_UI",
+          "note": "the route comes from the capture rather than from the digest, and text trust follows from the source kind, which is pinned. Neither is independently recovered."
+        }
+      },
+      "refusals": [],
+      "snapshotId": "snap-/clients-0"
+    }
+  ]
+}
