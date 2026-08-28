@@ -62,6 +62,15 @@ export interface ElementRegistryInternals {
   unregister(id: string): boolean;
   /** The DOM boundary. Reachable only through this module. */
   resolveNode(id: string): HTMLElement | undefined;
+  /**
+   * One specific instance, by the within-snapshot handle `presentInstances` gave it.
+   *
+   * Returns nothing when the handle no longer names an element with that semantic
+   * id — the list re-rendered, or the screen changed — rather than falling back to
+   * the first match. Falling back is how a guide points confidently at the row
+   * above the one somebody picked.
+   */
+  resolveInstanceNode(id: string, ref: string): HTMLElement | undefined;
   /** Disconnects observers and drops every registration. The registry stays usable. */
   destroy(): void;
 }

@@ -36,7 +36,7 @@ export const SEMANTIC_LIMITS = {
 /** Validates {@link SemanticEvidence}. */
 export const semanticEvidenceSchema = z.object({
   ref: z.string().min(1),
-  kind: z.enum(['node', 'relationship']),
+  kind: z.enum(['node', 'relationship', 'runtime']),
   file: z.string().optional(),
   line: z.number().int().positive().optional(),
 });
@@ -72,6 +72,20 @@ export const capabilityActionSchema = z.enum([
   'export',
   'import',
   'send',
+  // Added by Closed Loop #10, and each one because a real interaction with the
+  // running fixture demonstrated it — not in anticipation of anything. `filter`
+  // is what a text box provably does when the visible collection narrows and the
+  // route does not change; it is emphatically not `search`, which stays
+  // unsupported. `reveal` is a target that was absent and then present, and says
+  // nothing about how its contents came to be.
+  //
+  // `clear_selection` is deliberately absent: the one candidate for it was
+  // rejected at runtime, and a kind with no evidence behind it is a kind nobody
+  // has to maintain.
+  'filter',
+  'reveal',
+  'open',
+  'select',
 ]);
 
 /**
@@ -188,6 +202,7 @@ export const claimProvenanceSchema = z.object({
 /** Validates {@link ProductClaimStatus}. */
 export const productClaimStatusSchema = z.enum([
   'structurally_verified',
+  'behaviorally_verified',
   'semantically_grounded',
   'rejected',
 ]);
@@ -224,6 +239,16 @@ export const productClaimSchema = z.object({
   outcome: claimVerificationOutcomeSchema.optional(),
   provenance: claimProvenanceSchema,
   rejection: z.object({ reason: semanticRejectionReasonSchema, detail: z.string() }).optional(),
+  // Present on a behavioural claim, and on nothing else. What a run was true of.
+  runtimeContext: z
+    .object({
+      route: z.string().min(1),
+      fixtureState: z.string().min(1),
+      permissions: z.array(z.string().min(1)),
+      featureFlags: z.record(z.string(), z.boolean()),
+    })
+    .optional(),
+  runtimeTraceId: z.string().min(1).optional(),
   generatedBy: generatorAttributionSchema.optional(),
 });
 

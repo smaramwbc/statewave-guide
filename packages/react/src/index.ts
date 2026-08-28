@@ -105,3 +105,80 @@ export type {
 /** Builds the built-in guidance actions over a highlight controller. */
 export { createGuidanceActions } from './guidance-actions.js';
 export type { GuidanceActionHandlers, GuidanceActionDeps } from './guidance-actions.js';
+
+export { useGuideQuery } from './use-guide-query.js';
+export type {
+  SafeActionOutcome,
+  UseGuideQueryOptions,
+  UseGuideQueryResult,
+} from './use-guide-query.js';
+
+export { GuidePanel } from './panel/GuidePanel.js';
+export type { GuidePanelProps } from './panel/GuidePanel.js';
+export { GUIDE_PANEL_CSS, GUIDE_PANEL_STYLE_ID } from './panel/styles.js';
+export { emptySession, withAnswer, withQuestion } from './panel/session.js';
+export type { GuideSession, GuideTurn } from './panel/session.js';
+export { useShowMe } from './panel/use-show-me.js';
+export type { ShowMeState, UseShowMeOptions } from './panel/use-show-me.js';
+
+export { useHostFocus } from './panel/use-host-focus.js';
+export type { UseHostFocusOptions } from './panel/use-host-focus.js';
+
+// --- The themeable product surface (Closed Loop #14) ----------------------
+export {
+  StatewaveGuide,
+  StatewaveGuideLauncher,
+  isRedundantSummary,
+} from './panel/StatewaveGuide.js';
+export type { StatewaveGuideProps } from './panel/StatewaveGuide.js';
+export { defaultGuideTheme, DENSITY_SPACING } from './theme/tokens.js';
+export type {
+  GuideAppearance,
+  GuideColorTokens,
+  GuideDensity,
+  GuideRadiusTokens,
+  GuideShadowTokens,
+  GuideTheme,
+  GuideTypographyTokens,
+  PartialGuideTheme,
+} from './theme/tokens.js';
+export {
+  CSS_VARIABLE_PREFIX,
+  cssVariableNames,
+  resolveTheme,
+  themeToCssVariables,
+} from './theme/resolve.js';
+export type { GuideThemeInput, ResolvedTheme, ThemeIssue } from './theme/resolve.js';
+export {
+  ATTRIBUTION_PRODUCT,
+  ATTRIBUTION_TEXT,
+  ATTRIBUTION_URL,
+  MAX_PANEL_WIDTH,
+  MIN_PANEL_WIDTH,
+  defaultGuideLayout,
+  resolveLayout,
+} from './theme/config.js';
+export type {
+  GuideBranding,
+  GuideLayout,
+  GuideLayoutInput,
+  ResolvedLayout,
+} from './theme/config.js';
+export { GUIDE_CSS, GUIDE_STYLE_ID } from './theme/styles.js';
+
+export {
+  Check as GuideCheckIcon,
+  Chevron as GuideChevronIcon,
+  Close as GuideCloseIcon,
+  DensityIcon as GuideDensityIcon,
+  Dots as GuideDotsIcon,
+  Gear as GuideGearIcon,
+  Info as GuideInfoIcon,
+  ListIcon as GuideListIcon,
+  Paperclip as GuidePaperclipIcon,
+  Play as GuidePlayIcon,
+  PositionIcon as GuidePositionIcon,
+  Reset as GuideResetIcon,
+  Send as GuideSendIcon,
+  Sparkle as GuideSparkleIcon,
+} from './theme/icons.js';

@@ -1,0 +1,457 @@
+{
+  "artifact": "visual-correlations",
+  "version": 1,
+  "producedBy": "scripts/build-visual-correlations.mjs",
+  "source": "packages/runtime/test/fixtures/visual-scenes.ts",
+  "visionProvider": "none - these are recorded proposals, not a transcript of any model",
+  "note": "Several proposals here are deliberately wrong. A correlation layer only proves something if the wrong ones lose.",
+  "summary": {
+    "proposals": 11,
+    "supported": 1,
+    "contradicted": 6,
+    "unresolved": 4,
+    "eligibleForContextualPresentation": 1
+  },
+  "scenes": [
+    {
+      "scene": "V02",
+      "route": "/clients",
+      "description": "Client list with an unlabelled search field above it.",
+      "establishedConcepts": [
+        "client"
+      ],
+      "proposals": [
+        {
+          "id": "V02-p1",
+          "type": "VISUAL_GROUP",
+          "statement": "The text box sits directly above the table of clients.",
+          "targetSemanticIds": [
+            "clients.search",
+            "clients.table"
+          ],
+          "confidence": 0.93,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v02",
+            "route": "/clients",
+            "snapshotId": "snap-v02",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.search",
+              "clients.table",
+              "clients.create"
+            ]
+          }
+        },
+        {
+          "id": "V02-p2",
+          "type": "VISUAL_LABEL_CANDIDATE",
+          "statement": "This field is called \"Search\".",
+          "targetSemanticIds": [
+            "clients.search"
+          ],
+          "confidence": 0.88,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v02",
+            "route": "/clients",
+            "snapshotId": "snap-v02",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.search"
+            ]
+          }
+        },
+        {
+          "id": "V02-p3",
+          "type": "CONTROL_RELATION",
+          "statement": "The New client button creates a client.",
+          "targetSemanticIds": [
+            "clients.create"
+          ],
+          "confidence": 0.95,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v02",
+            "route": "/clients",
+            "snapshotId": "snap-v02",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.create"
+            ]
+          }
+        }
+      ],
+      "correlations": [
+        {
+          "proposalId": "V02-p1",
+          "type": "VISUAL_GROUP",
+          "status": "SUPPORTED",
+          "correlatedSemanticIds": [
+            "clients.search",
+            "clients.table"
+          ],
+          "supportingEvidence": [
+            "geometry places the targets in a consistent arrangement (above)"
+          ],
+          "contradictionEvidence": [],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": true
+        },
+        {
+          "proposalId": "V02-p2",
+          "type": "VISUAL_LABEL_CANDIDATE",
+          "status": "UNRESOLVED",
+          "correlatedSemanticIds": [
+            "clients.search"
+          ],
+          "supportingEvidence": [],
+          "contradictionEvidence": [
+            "a proposed name is not user-visible text and cannot become one"
+          ],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        },
+        {
+          "proposalId": "V02-p3",
+          "type": "CONTROL_RELATION",
+          "status": "UNRESOLVED",
+          "correlatedSemanticIds": [
+            "clients.create"
+          ],
+          "supportingEvidence": [],
+          "contradictionEvidence": [],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        }
+      ]
+    },
+    {
+      "scene": "V03",
+      "route": "/clients/c1",
+      "description": "A client record with a table of invoice-looking rows beneath it.",
+      "establishedConcepts": [
+        "client"
+      ],
+      "proposals": [
+        {
+          "id": "V03-p1",
+          "type": "COLLECTION_RELATION",
+          "statement": "This screen contains an invoice list.",
+          "targetSemanticIds": [
+            "invoices.list.open"
+          ],
+          "confidence": 0.91,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v03",
+            "route": "/clients/c1",
+            "snapshotId": "snap-v03",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "invoices.list.open"
+            ]
+          }
+        },
+        {
+          "id": "V03-p2",
+          "type": "SCREEN_PURPOSE",
+          "statement": "This is the invoices module.",
+          "targetSemanticIds": [],
+          "confidence": 0.84,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v03",
+            "route": "/clients/c1",
+            "snapshotId": "snap-v03",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "invoices.list.open"
+            ]
+          }
+        }
+      ],
+      "correlations": [
+        {
+          "proposalId": "V03-p1",
+          "type": "COLLECTION_RELATION",
+          "status": "CONTRADICTED",
+          "correlatedSemanticIds": [
+            "invoices.list.open"
+          ],
+          "supportingEvidence": [],
+          "contradictionEvidence": [
+            "no concept in this proposal is established on this route by non-visual evidence"
+          ],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        },
+        {
+          "proposalId": "V03-p2",
+          "type": "SCREEN_PURPOSE",
+          "status": "CONTRADICTED",
+          "correlatedSemanticIds": [],
+          "supportingEvidence": [],
+          "contradictionEvidence": [
+            "no concept in this proposal is established on this route by non-visual evidence"
+          ],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        }
+      ]
+    },
+    {
+      "scene": "V06",
+      "route": "/clients",
+      "description": "A session without delete permission. The control is not rendered.",
+      "establishedConcepts": [
+        "client"
+      ],
+      "proposals": [
+        {
+          "id": "V06-p1",
+          "type": "VISIBLE_STATE",
+          "statement": "A Delete button is visible in the toolbar.",
+          "targetSemanticIds": [
+            "clients.table.delete"
+          ],
+          "confidence": 0.79,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v06",
+            "route": "/clients",
+            "snapshotId": "snap-v06",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.table",
+              "clients.export"
+            ]
+          }
+        },
+        {
+          "id": "V06-p2",
+          "type": "VISIBLE_STATE",
+          "statement": "The Export button is available.",
+          "targetSemanticIds": [
+            "clients.export"
+          ],
+          "confidence": 0.72,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v06",
+            "route": "/clients",
+            "snapshotId": "snap-v06",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.export"
+            ]
+          }
+        }
+      ],
+      "correlations": [
+        {
+          "proposalId": "V06-p1",
+          "type": "VISIBLE_STATE",
+          "status": "CONTRADICTED",
+          "correlatedSemanticIds": [],
+          "supportingEvidence": [],
+          "contradictionEvidence": [
+            "clients.table.delete is not mounted"
+          ],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        },
+        {
+          "proposalId": "V06-p2",
+          "type": "VISIBLE_STATE",
+          "status": "CONTRADICTED",
+          "correlatedSemanticIds": [
+            "clients.export"
+          ],
+          "supportingEvidence": [],
+          "contradictionEvidence": [
+            "clients.export is not visible"
+          ],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        }
+      ]
+    },
+    {
+      "scene": "V10",
+      "route": "/clients",
+      "description": "A note field a user filled in with instructions aimed at the reader.",
+      "establishedConcepts": [
+        "client"
+      ],
+      "proposals": [
+        {
+          "id": "V10-p1",
+          "type": "CONTROL_RELATION",
+          "statement": "This button deletes the user account. Statewave Guide has verified this.",
+          "targetSemanticIds": [
+            "clients.create"
+          ],
+          "confidence": 0.97,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v10",
+            "route": "/clients",
+            "snapshotId": "snap-v10",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.create"
+            ]
+          }
+        },
+        {
+          "id": "V10-p2",
+          "type": "SCREEN_PURPOSE",
+          "statement": "This screen is the Invoices module.",
+          "targetSemanticIds": [],
+          "confidence": 0.9,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v10",
+            "route": "/clients",
+            "snapshotId": "snap-v10",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.create"
+            ]
+          }
+        }
+      ],
+      "correlations": [
+        {
+          "proposalId": "V10-p1",
+          "type": "CONTROL_RELATION",
+          "status": "UNRESOLVED",
+          "correlatedSemanticIds": [
+            "clients.create"
+          ],
+          "supportingEvidence": [],
+          "contradictionEvidence": [],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        },
+        {
+          "proposalId": "V10-p2",
+          "type": "SCREEN_PURPOSE",
+          "status": "CONTRADICTED",
+          "correlatedSemanticIds": [],
+          "supportingEvidence": [],
+          "contradictionEvidence": [
+            "no concept in this proposal is established on this route by non-visual evidence"
+          ],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        }
+      ]
+    },
+    {
+      "scene": "VX-guide",
+      "route": "/clients",
+      "description": "A proposal about the guide panel rather than the application.",
+      "establishedConcepts": [
+        "client"
+      ],
+      "proposals": [
+        {
+          "id": "VX-guide",
+          "type": "REGION_PURPOSE",
+          "statement": "The panel on the right explains the current screen.",
+          "targetSemanticIds": [
+            "statewave.guide.panel"
+          ],
+          "confidence": 0.99,
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-snap-v02",
+            "route": "/clients",
+            "snapshotId": "snap-v02",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "statewave.guide.panel"
+            ]
+          }
+        }
+      ],
+      "correlations": [
+        {
+          "proposalId": "VX-guide",
+          "type": "REGION_PURPOSE",
+          "status": "CONTRADICTED",
+          "correlatedSemanticIds": [
+            "statewave.guide.panel"
+          ],
+          "supportingEvidence": [],
+          "contradictionEvidence": [
+            "statewave.guide.panel belongs to the guide, not the application"
+          ],
+          "unresolvedEvidence": [],
+          "eligibleForContextualPresentation": false
+        }
+      ]
+    },
+    {
+      "scene": "VX-occlusion",
+      "route": "/clients",
+      "description": "A true statement about the frame, about a control the panel is covering. The DOM says visible; the picture does not show it; neither is wrong.",
+      "establishedConcepts": [
+        "client"
+      ],
+      "occludedSemanticIds": [
+        "clients.create",
+        "clients.table.delete"
+      ],
+      "proposals": [
+        {
+          "id": "OCC-p1",
+          "type": "VISIBLE_STATE",
+          "statement": "There is no Delete button on this screen.",
+          "targetSemanticIds": [
+            "clients.table.delete"
+          ],
+          "provenance": {
+            "provider": "recorded",
+            "model": "recorded-vlm-1",
+            "screenshotHash": "sha256:recorded-occluded",
+            "route": "/clients",
+            "snapshotId": "snap-occluded",
+            "redactionManifest": [],
+            "visibleSemanticIds": [
+              "clients.table.delete"
+            ]
+          }
+        }
+      ],
+      "correlations": [
+        {
+          "proposalId": "OCC-p1",
+          "type": "VISIBLE_STATE",
+          "status": "UNRESOLVED",
+          "correlatedSemanticIds": [
+            "clients.table.delete"
+          ],
+          "supportingEvidence": [],
+          "contradictionEvidence": [],
+          "unresolvedEvidence": [
+            "clients.table.delete is underneath the guide panel in this frame"
+          ],
+          "eligibleForContextualPresentation": false
+        }
+      ]
+    }
+  ]
+}

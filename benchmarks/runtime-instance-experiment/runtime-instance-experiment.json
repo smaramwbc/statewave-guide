@@ -1,0 +1,93 @@
+{
+  "experiment": "runtime-instance-grounding",
+  "version": 1,
+  "purpose": "engineering evidence for one capability; not a subjective benchmark",
+  "harness": "playwright/chromium",
+  "pageErrors": [],
+  "frames": [
+    {
+      "file": "screenshots/01-instance-choice.png",
+      "scenario": "choice",
+      "route": "/invoices",
+      "state": "Two invoices on screen: the guide offers both rather than picking one.",
+      "sha256": "82beac71a43ff144c951361dba320d5752185c57d34d718817f323ffaeeaef66"
+    },
+    {
+      "file": "screenshots/02-inv-001-highlighted.png",
+      "scenario": "INV-001",
+      "route": "/invoices",
+      "highlightedTarget": "invoices.list.open",
+      "instance": "INV-001",
+      "state": "After choosing INV-001: that row is highlighted and the other is untouched.",
+      "sha256": "2056c19b4124ec7b43898d21c7a2f681d58f1541faa0ce9918ae8744518f3426"
+    },
+    {
+      "file": "screenshots/03-inv-002-highlighted.png",
+      "scenario": "INV-002",
+      "route": "/invoices",
+      "highlightedTarget": "invoices.list.open",
+      "instance": "INV-002",
+      "state": "After choosing INV-002: that row is highlighted and the other is untouched.",
+      "sha256": "795d129aadb2e9c5d8031334471e4874db459b4f0c2eaf02f5696b77340867a9"
+    }
+  ],
+  "results": [
+    {
+      "id": "choice",
+      "route": "/invoices",
+      "question": "How do I open an invoice?",
+      "choices": [
+        "INV-001",
+        "INV-002"
+      ],
+      "screenshots": [
+        "screenshots/01-instance-choice.png"
+      ]
+    },
+    {
+      "id": "INV-001",
+      "route": "/invoices",
+      "chosen": "INV-001",
+      "highlighted": "INV-001",
+      "screenshots": [
+        "screenshots/02-inv-001-highlighted.png"
+      ]
+    },
+    {
+      "id": "INV-002",
+      "route": "/invoices",
+      "chosen": "INV-002",
+      "highlighted": "INV-002",
+      "screenshots": [
+        "screenshots/03-inv-002-highlighted.png"
+      ]
+    },
+    {
+      "id": "concept-not-established",
+      "route": "/clients/c1",
+      "question": "How do I open an invoice?",
+      "choicesOffered": 0,
+      "note": "The same two rows render here. Nothing on this screen establishes \"invoice\" — the component is named InvoiceList and the ids begin invoices., and neither is evidence — so no instance is offered."
+    },
+    {
+      "id": "delete-show-me",
+      "route": "/clients/c1",
+      "deleteRendered": 0,
+      "buttons": []
+    },
+    {
+      "id": "secret-show-me-target",
+      "resolvedTo": "settings.rotate-key"
+    },
+    {
+      "id": "secret-target",
+      "route": "/settings",
+      "revealedPresentInHost": true,
+      "revealedInGuide": false,
+      "buttons": [
+        "Show me"
+      ],
+      "note": "No screenshot: the host is displaying a secret."
+    }
+  ]
+}

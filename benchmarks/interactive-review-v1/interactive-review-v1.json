@@ -1,0 +1,297 @@
+{
+  "version": 1,
+  "harness": "playwright/chromium",
+  "base": "http://127.0.0.1:4319",
+  "gate": "DEVELOPMENT_INTERACTIVE_REVIEW",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "reviewerType": null,
+  "scoredBy": null,
+  "timings": {
+    "firstOpenMs": 211,
+    "queryMs": 26,
+    "showMeMs": 618,
+    "contextRefreshMs": 50
+  },
+  "accessibility": {
+    "composerFocused": true,
+    "role": "complementary",
+    "labelled": true,
+    "unlabelledButtons": 0,
+    "liveRegions": 1,
+    "closed": true,
+    "focusRestored": true,
+    "idsUnchanged": true,
+    "namesUnchanged": true
+  },
+  "pageErrors": [],
+  "scenarios": [
+    {
+      "id": "IR01",
+      "scenario": "Create client",
+      "initialRoute": "/clients",
+      "question": "How do I create a client?",
+      "response": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "summary": "You can create a new client using \"New client\".",
+        "conditions": [
+          "You need permission to create a client."
+        ],
+        "steps": [
+          {
+            "text": "Choose \"New client\" to create client.",
+            "semanticId": "clients.create"
+          },
+          {
+            "text": "Enter the client's Billing email, Name, Plan.",
+            "semanticId": "clients.create"
+          }
+        ],
+        "hasShowMe": true,
+        "allText": "New clientLets you create a new client.You can create a new client using \"New client\".You need permission to create a client.Choose \"New client\" to create client.Enter the client's Billing email, Name, Plan.Show meStep through"
+      },
+      "routeAfter": "/clients",
+      "interaction": {
+        "dialogOpenedByGuide": false
+      },
+      "screenshots": [
+        "screenshots/C-create-client-response.png"
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR02",
+      "scenario": "Filter clients — unnamed target",
+      "initialRoute": "/clients",
+      "question": "How do I filter clients?",
+      "response": {
+        "purpose": "Lets you filter clients.",
+        "summary": "You can filter clients.",
+        "conditions": [],
+        "steps": [],
+        "note": "That is all I can show for this one.",
+        "hasShowMe": true,
+        "allText": "Lets you filter clients.You can filter clients.That is all I can show for this one.Show me"
+      },
+      "expectedTarget": "clients.search",
+      "actualTarget": "clients.search",
+      "routeAfter": "/clients",
+      "interaction": {
+        "targetVisible": true,
+        "focused": true,
+        "highlightDrawn": true
+      },
+      "safety": {
+        "fabricatedNames": 0,
+        "valueTyped": ""
+      },
+      "screenshots": [
+        "screenshots/E-filter-clients-response.png",
+        "screenshots/F-unnamed-input-highlighted.png"
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR03",
+      "scenario": "Find Export CSV from another screen",
+      "initialRoute": "/settings",
+      "question": "Where is Export CSV?",
+      "response": {
+        "title": "Export CSV",
+        "conditions": [],
+        "steps": [
+          {
+            "text": "Open Clients."
+          },
+          {
+            "text": "Choose \"Export CSV\".",
+            "semanticId": "clients.export"
+          }
+        ],
+        "hasShowMe": true,
+        "allText": "Export CSVOpen Clients.Choose \"Export CSV\".Show meStep through"
+      },
+      "expectedTarget": "clients.export",
+      "actualTarget": "clients.export",
+      "routeAfter": "/clients",
+      "interaction": {
+        "navigated": true,
+        "targetVisible": true
+      },
+      "screenshots": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR04",
+      "scenario": "Explain a missing Delete",
+      "initialRoute": "/clients/c1",
+      "question": "Why can't I see Delete?",
+      "response": {
+        "title": "Delete",
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "steps": [],
+        "hasShowMe": true,
+        "allText": "DeleteYou need permission to do this.Show me"
+      },
+      "routeAfter": "/clients/c1",
+      "interaction": {},
+      "safety": {
+        "inventedReasons": 0
+      },
+      "screenshots": [
+        "screenshots/G-permission-explanation.png"
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR05",
+      "scenario": "Focused \"What does this do?\"",
+      "initialRoute": "/clients",
+      "question": "What does this do?",
+      "context": {
+        "focusedSemanticId": "clients.create"
+      },
+      "response": {
+        "conditions": [],
+        "steps": [],
+        "note": "I do not have anything verified about that.",
+        "hasShowMe": false,
+        "allText": "I do not have anything verified about that."
+      },
+      "routeAfter": "/clients",
+      "interaction": {},
+      "screenshots": [
+        "screenshots/D-showme-highlight-new-client.png"
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR06",
+      "scenario": "Ambiguous \"What does this do?\"",
+      "initialRoute": "/clients",
+      "question": "What does this do?",
+      "response": {
+        "conditions": [],
+        "steps": [],
+        "note": "I do not have anything verified about that.",
+        "hasShowMe": false,
+        "allText": "I do not have anything verified about that."
+      },
+      "routeAfter": "/clients",
+      "interaction": {},
+      "safety": {
+        "featureIdsExposed": 0
+      },
+      "screenshots": [
+        "screenshots/H-ambiguous-response.png"
+      ],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR07",
+      "scenario": "Unsupported invoice-open case",
+      "initialRoute": "/invoices",
+      "question": "How do I open an invoice?",
+      "response": {
+        "conditions": [],
+        "steps": [],
+        "note": "I do not have anything verified about that.",
+        "hasShowMe": false,
+        "allText": "I do not have anything verified about that."
+      },
+      "routeAfter": "/invoices",
+      "interaction": {},
+      "safety": {
+        "substitutedFeature": false
+      },
+      "screenshots": [],
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR08",
+      "scenario": "Stale context",
+      "note": "Exercised in the contract suite; the host always supplies its own live version.",
+      "response": null,
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR09",
+      "scenario": "Dynamic runtime instance target",
+      "initialRoute": "/clients/c1",
+      "runtimeInstanceNames": [],
+      "note": "Invoice rows carry a runtime accessible name (the invoice number). It is present in the running application and is not promoted into the ProductModel or into any guide sentence.",
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    },
+    {
+      "id": "IR10",
+      "scenario": "Secret / redaction",
+      "initialRoute": "/settings",
+      "question": "Where is the new key?",
+      "response": {
+        "conditions": [],
+        "steps": [],
+        "note": "I do not have anything verified about that.",
+        "hasShowMe": false,
+        "allText": "I do not have anything verified about that."
+      },
+      "revealedValuePresentInHost": true,
+      "revealedValueInGuide": false,
+      "safety": {
+        "secretLeaks": 0
+      },
+      "scores": {
+        "usefulness": null,
+        "correctness": null,
+        "taskCompletion": null,
+        "clarity": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,781 @@
+{
+  "package": "human-review-round-8-r1",
+  "gateVersion": "v2",
+  "scoredBy": null,
+  "reviewerType": null,
+  "scoredAt": null,
+  "instructions": [
+    "Judge the output as if you were an end user encountering this help inside an application.",
+    "Do not award points because the output is technically safe, evidence-backed, or generated through an impressive architecture.",
+    "The only question is whether the resulting help is correct and useful.",
+    "Score every item. Leave nothing null.",
+    "Score correctness as \"not_assessable\" when no checkable facts were supplied — do NOT score it 0. Zero means you found something untrue.",
+    "\"knownSupportedFacts\" lists what the application genuinely does, so you can judge correctness without reading source code. It is not part of the output being scored.",
+    "An item that is accurate but tells a user nothing is not a good item. Say so with a low usefulness score.",
+    "Silence is a deliberate choice in this system. A feature that says less than you expected may be correct to do so — judge whether what IS said helps, and whether what is missing was needed.",
+    "Set \"reviewerType\" to \"human\" or \"non_human_independent\". The formal Human Usefulness Gate closes only on a human review."
+  ],
+  "rubric": {
+    "usefulness": {
+      "0": "Useless. Accurate or not, this would not meaningfully help a user — repeats technical identifiers, or contains no understandable purpose or actionable guidance.",
+      "1": "Minimally useful. The user can roughly understand what the feature is, but guidance is incomplete, awkward, or too technical.",
+      "2": "Useful. A normal end user could understand the feature and get meaningful help. Accurate, understandable, sufficiently actionable.",
+      "3": "Excellent. Clear, concise, natural and genuinely helpful. Explains the purpose well and provides strong supported guidance without unnecessary technical language."
+    },
+    "correctness": {
+      "0": "Says something untrue of the application, judged against knownSupportedFacts.",
+      "1": "Acceptable: nothing untrue, but imprecise or overreaching in places.",
+      "2": "Strong: everything it says is supported by the facts supplied.",
+      "not_assessable": "No checkable facts were supplied for this item. Use this rather than 0 — it is not a judgement about the output."
+    },
+    "dimensions": {
+      "scale": {
+        "0": "poor",
+        "1": "acceptable",
+        "2": "strong"
+      },
+      "clarity": "Would a non-technical user understand it on one read?",
+      "actionability": "Could a user act on it, or does it only describe?",
+      "naturalLanguage": "Does it read like a person wrote it for a user?"
+    },
+    "flags": [
+      "too_technical",
+      "too_vague",
+      "missing_capability",
+      "missing_workflow",
+      "incorrect_fact",
+      "irrelevant_information",
+      "repetitive",
+      "good_as_is"
+    ]
+  },
+  "itemCount": 21,
+  "items": [
+    {
+      "reviewId": "R01",
+      "featureId": "clients.export",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Export CSV",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Export CSV\".",
+        "There is a screen at /clients."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R02",
+      "featureId": "clients.table.forbidden",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "You do not have access to the client list.",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"You do not have access to the client list.\".",
+        "There is a screen at /clients."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R03",
+      "featureId": "settings.danger-zone",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "There is a screen at /settings."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R04",
+      "featureId": "client-detail.audit",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Audit trail",
+        "summary": "You can view a client using \"Audit trail\".",
+        "purpose": "Lets you view the audit trail for a client.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ],
+        "conditions": [
+          "You need permission to view a client."
+        ],
+        "questions": [
+          "How do I view the audit trail for a client?",
+          "Why can't I see \"Audit trail\"?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a GET request to /api/clients/:clientId/audit.",
+        "The screen has a control labelled \"Audit trail\".",
+        "Using this requires the \"clients:read\" permission.",
+        "There is a screen at /clients/:clientId."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R05",
+      "featureId": "settings.rotate-key",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Rotate API key",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Rotate API key\".",
+        "There is a screen at /settings.",
+        "Activating the control labelled \"Rotate API key\" made an element appear that was not there before.",
+        "Activating the control labelled \"Rotate API key\" sent a POST request to /api/settings/api-key/rotate, which succeeded.",
+        "All of this was observed on the /settings screen, with these permissions granted: clients:create, clients:delete, clients:read, clients:update, invoices:create, invoices:read, settings:update."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R06",
+      "featureId": "clients.error",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "There is a screen at /clients."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R07",
+      "featureId": "settings.save",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Save changes",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Save changes\".",
+        "There is a screen at /settings."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R08",
+      "featureId": "invoices.create-form.submit",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Raise invoice",
+        "summary": "You can create a new invoice using \"Raise invoice\".",
+        "purpose": "Lets you create a new invoice.",
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ],
+        "conditions": [
+          "You need permission to create an invoice."
+        ],
+        "questions": [
+          "How do I create a new invoice?",
+          "Why can't I see \"Raise invoice\"?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a POST request to /api/invoices.",
+        "The screen has a control labelled \"Raise invoice\".",
+        "Using this requires the \"invoices:create\" permission.",
+        "There is a screen at /invoices."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R09",
+      "featureId": "client-detail.rename",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Rename",
+        "summary": "You can change a client using \"Rename\".",
+        "purpose": "Lets you change a client.",
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ],
+        "conditions": [
+          "You need permission to change a client."
+        ],
+        "questions": [
+          "How do I change a client?",
+          "Why can't I see \"Rename\"?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a PUT request to /api/clients/:clientId.",
+        "The screen has a control labelled \"Rename\".",
+        "Using this requires the \"clients:update\" permission.",
+        "There is a screen at /clients/:clientId.",
+        "Activating the control labelled \"Rename\" sent a GET request to /api/clients/c1, which succeeded.",
+        "Activating the control labelled \"Rename\" sent a PUT request to /api/clients/c1, which succeeded.",
+        "All of this was observed on the /clients/c1 screen, with these permissions granted: clients:create, clients:delete, clients:read, clients:update, invoices:create, invoices:read, settings:update."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R10",
+      "featureId": "clients.search",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": "You can filter clients.",
+        "purpose": "Lets you filter clients.",
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I filter clients?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The Clients screen contains a text input.",
+        "There is a screen at /clients.",
+        "Typing into an unnamed text input on this screen reduced the number of items in a table on the screen from 5 items to 2.",
+        "Typing into an unnamed text input on this screen sent a GET request to /api/clients, which succeeded.",
+        "All of this was observed on the /clients screen, with these permissions granted: clients:create, clients:delete, clients:read, clients:update, invoices:create, invoices:read, settings:update."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R11",
+      "featureId": "invoices.list.clear",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Clear selection",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Choose \"Clear selection\"."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Clear selection\"."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R12",
+      "featureId": "invoices.list.open",
+      "userContext": {
+        "screen": "Invoices",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": null,
+        "purpose": null,
+        "steps": [],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [],
+      "factsNote": "No independently checkable facts were available for this item. This says nothing about whether the output is correct — score correctness as \"not_assessable\".",
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R13",
+      "featureId": "settings.form",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": "You can change a setting.",
+        "purpose": "Lets you change a setting.",
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ],
+        "conditions": [],
+        "questions": [
+          "How do I change a setting?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The Settings screen contains a form.",
+        "The screen has a control labelled \"Save changes\".",
+        "There is a screen at /settings.",
+        "Submitting an unnamed form on this screen sent a PUT request to /api/settings, which succeeded.",
+        "All of this was observed on the /settings screen, with these permissions granted: clients:create, clients:delete, clients:read, clients:update, invoices:create, invoices:read, settings:update."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R14",
+      "featureId": "clients.create",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "New client",
+        "summary": "You can create a new client using \"New client\".",
+        "purpose": "Lets you create a new client.",
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "conditions": [
+          "You need permission to create a client."
+        ],
+        "questions": [
+          "How do I create a new client?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The application can send a POST request to /api/clients.",
+        "The screen has a control labelled \"New client\".",
+        "The screen has a control labelled \"Clients appear in the list as soon as they are created.\".",
+        "The screen has a control labelled \"Cancel\".",
+        "The screen has a control labelled \"Billing email\".",
+        "The Clients screen contains a form.",
+        "The screen has a control labelled \"Name\".",
+        "The screen has a control labelled \"Plan\".",
+        "The screen has a control labelled \"Create client\".",
+        "Using this requires the \"clients:create\" permission.",
+        "There is a screen at /clients.",
+        "Activating the control labelled \"New client\" made an element appear that was not there before.",
+        "Activating the control labelled \"New client\" made a contentinfo appear on the screen.",
+        "Activating the control labelled \"New client\" made a dialog appear on the screen.",
+        "Activating the control labelled \"New client\" made a form appear on the screen.",
+        "All of this was observed on the /clients screen, with these permissions granted: clients:create, clients:delete, clients:read, clients:update, invoices:create, invoices:read, settings:update."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R15",
+      "featureId": "client-detail.delete",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Delete",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why can't I see \"Delete\"?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Delete\".",
+        "Using this requires the \"clients:delete\" permission.",
+        "There is a screen at /clients/:clientId."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R16",
+      "featureId": "dashboard.new-client",
+      "userContext": {
+        "screen": "Dashboard",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "New client",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Dashboard."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why can't I see \"New client\"?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"New client\".",
+        "Using this requires the \"clients:create\" permission.",
+        "There is a screen at /.",
+        "Activating the control labelled \"New client\" made an element appear that was not there before.",
+        "Activating the control labelled \"New client\" sent a GET request to /api/clients, which succeeded.",
+        "Activating the control labelled \"New client\" made a banner appear on the screen.",
+        "Activating the control labelled \"New client\" made a region appear on the screen.",
+        "Activating the control labelled \"New client\" made a table appear on the screen.",
+        "Activating the control labelled \"New client\" moved the screen from / to /clients.",
+        "All of this was observed on the /clients screen, with these permissions granted: clients:create, clients:delete, clients:read, clients:update, invoices:create, invoices:read, settings:update."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R17",
+      "featureId": "client-detail.change-plan",
+      "userContext": {
+        "screen": "Client-detail",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Upgrade",
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": [
+          "Why can't I see \"Upgrade\"?"
+        ]
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"Upgrade\".",
+        "Using this requires the \"clients:update\" permission.",
+        "There is a screen at /clients/:clientId."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R18",
+      "featureId": "api.get.partial-clients",
+      "userContext": {
+        "screen": "Api",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": null,
+        "purpose": null,
+        "steps": [],
+        "conditions": [
+          "You need permission to do this."
+        ],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The application can send a GET request to ?/clients.",
+        "Using this requires the \"clients:read\" permission."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R19",
+      "featureId": "clients.table",
+      "userContext": {
+        "screen": "Clients",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Clients."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The Clients screen contains a table.",
+        "There is a screen at /clients."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R20",
+      "featureId": "settings.new-key",
+      "userContext": {
+        "screen": "Settings",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": null,
+        "summary": null,
+        "purpose": null,
+        "steps": [
+          "Open Settings."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The Settings screen contains a read-only code display.",
+        "There is a screen at /settings."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    },
+    {
+      "reviewId": "R21",
+      "featureId": "nav.clients",
+      "userContext": {
+        "screen": "Nav",
+        "goal": "Understand or use this feature"
+      },
+      "productOutput": {
+        "title": "Clients",
+        "summary": "Open Clients.",
+        "purpose": null,
+        "steps": [
+          "Choose \"Clients\"."
+        ],
+        "conditions": [],
+        "questions": []
+      },
+      "knownSupportedFacts": [
+        "The screen has a control labelled \"New client\".",
+        "The screen has a control labelled \"Export CSV\".",
+        "The screen has a control labelled \"Refresh\".",
+        "The Nav screen contains a text input.",
+        "The screen has a control labelled \"Clients\".",
+        "There is a screen at /clients.",
+        "Activating the control labelled \"Clients\" made an element appear that was not there before.",
+        "Activating the control labelled \"Clients\" sent a GET request to /api/clients, which succeeded.",
+        "Activating the control labelled \"Clients\" made a banner appear on the screen.",
+        "Activating the control labelled \"Clients\" made a region appear on the screen.",
+        "Activating the control labelled \"Clients\" made a table appear on the screen.",
+        "Activating the control labelled \"Clients\" made a toolbar appear on the screen.",
+        "Activating the control labelled \"Clients\" moved the screen from /settings to /clients.",
+        "All of this was observed on the /clients screen, with these permissions granted: clients:create, clients:delete, clients:read, clients:update, invoices:create, invoices:read, settings:update."
+      ],
+      "factsNote": null,
+      "usefulness": null,
+      "correctness": null,
+      "clarity": null,
+      "actionability": null,
+      "naturalLanguage": null,
+      "flags": [],
+      "note": ""
+    }
+  ],
+  "supersedes": "human-review-round-8",
+  "supersededReason": "RUNTIME_REVIEW_FACT_ATTRIBUTION_DEFECT",
+  "revisionNote": "Identical experiment. Only the runtime-derived entries in knownSupportedFacts changed: the issued package rendered every collection change as \"Typing into\" regardless of the interaction, every count as \"reduced\" regardless of direction, and a page section gaining a child as a collection. Product outputs, review ids, ordering, gate version and seed are unchanged."
+}

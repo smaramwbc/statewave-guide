@@ -85,7 +85,7 @@ describe('a real title is untouched', () => {
     // the title line rather than on the whole item, because `**Screen:**` and
     // `**Goal:**` are bold on purpose.
     const lines = renderReviewItem(item({ title: '   ' }));
-    expect(lines.filter((line) => /^\*\*\s*\*\*$/.test(line))).toEqual([]);
+    expect(lines.filter((line: string) => /^\*\*\s*\*\*$/.test(line))).toEqual([]);
     expect(lines).not.toContain('**   **');
   });
 });

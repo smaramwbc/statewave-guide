@@ -1,0 +1,15 @@
+{
+  "name": "@statewavedev/guide-fixture-realistic-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The frozen benchmark fixture. Source is the input to the indexer; these dependencies exist only so the same source can also be RENDERED, for Closed Loop #9 runtime observation.",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.1",
+    "react-hook-form": "^7.64.0",
+    "axios": "^1.13.1",
+    "zod": "^4.1.11"
+  }
+}

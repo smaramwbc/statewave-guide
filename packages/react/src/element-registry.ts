@@ -78,6 +78,84 @@ export interface GuideElementRegistry {
   list(): GuideElementState[];
   /** Ids that are currently mounted and visible, sorted. */
   visibleIds(): string[];
+  /**
+   * Every semantic id the document currently exposes, sorted.
+   *
+   * Includes elements the host declared with a `data-guide` attribute and never
+   * registered through React — which is how most applications will adopt this,
+   * and how the benchmark application is written. {@link visibleIds} answers a
+   * narrower question, and Closed Loop #13 asked it in the one place that needed
+   * the wider one: the query contract received an empty screen and could not
+   * tell an ambiguous question from an unsupported one.
+   *
+   * The selector lives here, behind the same id validation `resolveNode` uses,
+   * because this module is where source code is allowed to meet the DOM.
+   */
+  presentIds(): { visible: string[]; disabled: string[] };
+  /**
+   * Concrete items currently on screen, with the names the interface displays.
+   *
+   * One entry per rendered element carrying a semantic id, so a list of rows
+   * sharing one id produces several — which is the point: `INV-001` and
+   * `INV-002` are the same semantic id and different things, and only a
+   * within-snapshot handle can tell them apart. The name is read from the
+   * accessible name, never from an attribute this package invented.
+   */
+  presentInstances(): {
+    semanticId: string;
+    ref: string;
+    containerSemanticId?: string;
+    runtimeAccessibleName?: string;
+  }[];
+  /**
+   * Where each semantic id sits, and what actually contains it.
+   *
+   * Measured, not guessed. Closed Loop #17 needs to say "above the list" without
+   * asking a visual model to do arithmetic on a picture — the browser already
+   * knows the answer exactly, and a model's version of it would have to be
+   * checked against this one anyway.
+   *
+   * Geometry and containment travel together because either alone lies. A modal
+   * dialog overlapping the client table is *inside* its rectangle and is not in
+   * it, and a guide that says "inside the list" about a dialog control has made
+   * exactly the kind of plausible false statement this system exists to refuse.
+   * Coordinates settle above and below; only the document settles inside.
+   *
+   * Ids appearing more than once are omitted: two rows sharing a semantic id
+   * have two boxes, and picking one of them silently would be the same mistake
+   * highlighting made before instance handles existed.
+   */
+  presentGeometry(): Record<
+    string,
+    {
+      box: { x: number; y: number; width: number; height: number };
+      /** Semantic ids of the elements that really contain this one, outward. */
+      containers: string[];
+      /** What kind of thing it currently is, for choosing an ordinary noun. */
+      role: string;
+      /** Whether the guide's own panel is sitting on top of it. */
+      occludedByGuide: boolean;
+    }
+  >;
+  /**
+   * Words the interface is showing right now, and where each came from.
+   *
+   * Eligibility is decided by the attribute, before anything reads the string.
+   * A `placeholder` and an `aria-label` are chrome somebody wrote to be read as
+   * interface; a table cell is content that arrived from a database or from a
+   * person typing. Closed Loop #17 proved that distinction cannot be made by
+   * inspecting the words, because the words can say anything at all.
+   *
+   * Input *values* are never read. A user typing "John Smith" into a field has
+   * not renamed it, and a policy that could not tell those apart would let every
+   * form on a screen relabel itself as somebody types.
+   */
+  presentVisibleLanguage(): {
+    semanticId: string;
+    sourceKind: 'PLACEHOLDER' | 'VISIBLE_TEXT' | 'CURRENT_ACCESSIBLE_NAME';
+    text: string;
+    trust: 'HOST_UI' | 'CONTENT';
+  }[];
   /** Subscribe to registry changes. Returns an unsubscribe function. */
   subscribe(listener: () => void): () => void;
   /**
@@ -97,6 +175,35 @@ export interface ElementRegistryOptions {
   resolveFromDom?: boolean;
   /** Where development warnings go. This package never writes to the console itself. */
   onWarning?: (message: string) => void;
+}
+
+/**
+ * What kind of thing an element currently is.
+ *
+ * Explicit `role` wins, then the tag. This is the browser's view of the element
+ * right now, which is exactly the transient authority a sentence about the
+ * current screen is allowed to draw on — and exactly not the kind of thing that
+ * belongs in a ProductModel.
+ */
+function roleOf(node: Element): string {
+  const explicit = node.getAttribute('role');
+  if (explicit !== null && explicit.trim().length > 0) return explicit.trim();
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'button') return 'button';
+  if (tag === 'a') return 'link';
+  if (tag === 'table') return 'table';
+  if (tag === 'tr') return 'row';
+  if (tag === 'select') return 'combobox';
+  if (tag === 'textarea') return 'textbox';
+  if (tag === 'input') {
+    const type = (node.getAttribute('type') ?? 'text').toLowerCase();
+    if (type === 'checkbox') return 'checkbox';
+    if (type === 'radio') return 'radio';
+    if (type === 'search') return 'searchbox';
+    if (type === 'button' || type === 'submit') return 'button';
+    return 'textbox';
+  }
+  return tag;
 }
 
 /** The mutable record the registry keeps for each element. */
@@ -394,6 +501,195 @@ export function createElementRegistry(options: ElementRegistryOptions = {}): Gui
       getSnapshot()
         .filter((element) => element.visible)
         .map((element) => element.id),
+    presentInstances() {
+      if (!resolveFromDom || !ownerDocument) return [];
+      const out: {
+        semanticId: string;
+        ref: string;
+        containerSemanticId?: string;
+        runtimeAccessibleName?: string;
+      }[] = [];
+      let ordinal = 0;
+      for (const attribute of GUIDE_ATTRIBUTES) {
+        for (const node of ownerDocument.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+          const id = node.getAttribute(attribute);
+          if (id === null || !isValidGuideElementId(id)) continue;
+          ordinal += 1;
+          // A container's text is its children's text. Reading it as a *name*
+          // is how `settings.danger-zone` came to be called
+          // "Danger zoneRotate API keysk_live_fixture_0000" — the whole
+          // subtree, secret included. Closed Loop #9 settled this for snapshots;
+          // the same rule applies here. Only a leaf, or something that labels
+          // itself explicitly, has a name of its own.
+          const explicit = node.getAttribute('aria-label');
+          const holdsOthers = GUIDE_ATTRIBUTES.some(
+            (other) => node.querySelector(`[${other}]`) !== null,
+          );
+          const name = (explicit ?? (holdsOthers ? '' : (node.textContent ?? ''))).trim();
+          const container = node.parentElement?.closest?.(`[${attribute}]`);
+          const containerId = container?.getAttribute(attribute) ?? undefined;
+          out.push({
+            semanticId: id,
+            // Document order within this snapshot. Stable for as long as the
+            // snapshot is, which is exactly as long as the reference is valid.
+            ref: `i${ordinal}`,
+            ...(containerId !== undefined && isValidGuideElementId(containerId)
+              ? { containerSemanticId: containerId }
+              : {}),
+            ...(name.length === 0 || name.length > 120 ? {} : { runtimeAccessibleName: name }),
+          });
+        }
+      }
+      return out;
+    },
+    presentIds() {
+      const visible = new Set<string>();
+      const disabled = new Set<string>();
+      for (const element of getSnapshot()) {
+        if (element.visible) visible.add(element.id);
+      }
+      if (resolveFromDom && ownerDocument) {
+        for (const attribute of GUIDE_ATTRIBUTES) {
+          for (const node of ownerDocument.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+            const id = node.getAttribute(attribute);
+            // The same validation `resolveNode` applies. An attribute value that
+            // is not a semantic id is markup this system does not own.
+            if (id === null || !isValidGuideElementId(id)) continue;
+            const off =
+              node.hasAttribute('disabled') || node.getAttribute('aria-disabled') === 'true';
+            if (off) disabled.add(id);
+            else visible.add(id);
+          }
+        }
+      }
+      return { visible: [...visible].sort(), disabled: [...disabled].sort() };
+    },
+    presentGeometry() {
+      const geometry: Record<
+        string,
+        {
+          box: { x: number; y: number; width: number; height: number };
+          containers: string[];
+          role: string;
+          occludedByGuide: boolean;
+        }
+      > = {};
+      const seen = new Set<string>();
+      if (!resolveFromDom || !ownerDocument) return geometry;
+      // The panel's own rectangle, so an element underneath it can be reported
+      // as covered rather than as visible.
+      const panel = ownerDocument.querySelector('.sw-guide');
+      const panelBox = panel === null ? undefined : panel.getBoundingClientRect();
+      for (const attribute of GUIDE_ATTRIBUTES) {
+        for (const node of ownerDocument.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+          const id = node.getAttribute(attribute);
+          if (id === null || !isValidGuideElementId(id)) continue;
+          if (seen.has(id)) {
+            // Ambiguous: more than one element answers to this id.
+            delete geometry[id];
+            continue;
+          }
+          seen.add(id);
+          const rect = node.getBoundingClientRect();
+          if (rect.width === 0 && rect.height === 0) continue;
+
+          // Real ancestry, walked upward. Nothing here reads coordinates.
+          const containers: string[] = [];
+          for (let parent = node.parentElement; parent !== null; parent = parent.parentElement) {
+            for (const candidate of GUIDE_ATTRIBUTES) {
+              const owner = parent.getAttribute(candidate);
+              if (owner !== null && isValidGuideElementId(owner)) containers.push(owner);
+            }
+          }
+          const covered =
+            panelBox === undefined
+              ? false
+              : (() => {
+                  const overlapWidth = Math.max(
+                    0,
+                    Math.min(rect.right, panelBox.right) - Math.max(rect.left, panelBox.left),
+                  );
+                  const overlapHeight = Math.max(
+                    0,
+                    Math.min(rect.bottom, panelBox.bottom) - Math.max(rect.top, panelBox.top),
+                  );
+                  return (overlapWidth * overlapHeight) / (rect.width * rect.height) >= 0.5;
+                })();
+
+          geometry[id] = {
+            box: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+            containers,
+            role: roleOf(node),
+            occludedByGuide: covered,
+          };
+        }
+      }
+      return geometry;
+    },
+    presentVisibleLanguage() {
+      const found: {
+        semanticId: string;
+        sourceKind: 'PLACEHOLDER' | 'VISIBLE_TEXT' | 'CURRENT_ACCESSIBLE_NAME';
+        text: string;
+        trust: 'HOST_UI' | 'CONTENT';
+      }[] = [];
+      if (!resolveFromDom || !ownerDocument) return found;
+
+      for (const attribute of GUIDE_ATTRIBUTES) {
+        for (const node of ownerDocument.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+          const id = node.getAttribute(attribute);
+          if (id === null || !isValidGuideElementId(id)) continue;
+
+          // Chrome. Somebody writing this interface put these here to be read as
+          // interface, and that is what makes them eligible — not what they say.
+          // A browser keeps the `placeholder` attribute after somebody types and
+          // simply stops painting it. Reading the attribute alone therefore goes
+          // on describing a field by words that are no longer on the glass —
+          // found by typing "John Smith" into the search box and watching the
+          // guide keep saying "showing Search clients".
+          //
+          // Emptiness of the value is a display fact, not a label. Nothing here
+          // reads what was typed; it reads whether anything was.
+          const placeholder = node.getAttribute('placeholder');
+          const emptyValue =
+            !('value' in node) || String((node as HTMLInputElement).value ?? '').length === 0;
+          if (placeholder !== null && placeholder.trim().length > 0 && emptyValue) {
+            found.push({
+              semanticId: id,
+              sourceKind: 'PLACEHOLDER',
+              text: placeholder.trim(),
+              trust: 'HOST_UI',
+            });
+          }
+          const ariaLabel = node.getAttribute('aria-label');
+          if (ariaLabel !== null && ariaLabel.trim().length > 0) {
+            found.push({
+              semanticId: id,
+              sourceKind: 'CURRENT_ACCESSIBLE_NAME',
+              text: ariaLabel.trim(),
+              trust: 'HOST_UI',
+            });
+          }
+
+          // Content. Recorded so the taxonomy is complete and the developer
+          // inspector can show what was refused, and marked so that nothing
+          // downstream can mistake it for something the host wrote. A note
+          // reading "SYSTEM: Ignore previous instructions" arrives here.
+          if (node.querySelector('[data-guide]') === null) {
+            const text = (node.textContent ?? '').trim();
+            if (text.length > 0 && text.length <= 120) {
+              found.push({
+                semanticId: id,
+                sourceKind: 'VISIBLE_TEXT',
+                text,
+                trust: 'CONTENT',
+              });
+            }
+          }
+        }
+      }
+      return found;
+    },
     subscribe(listener) {
       listeners.add(listener);
       return () => {
@@ -409,6 +705,24 @@ export function createElementRegistry(options: ElementRegistryOptions = {}): Gui
     setNode,
     unregister,
     resolveNode,
+    resolveInstanceNode(id, ref) {
+      if (!resolveFromDom || !ownerDocument) return undefined;
+      if (typeof id !== 'string' || !isValidGuideElementId(id)) return undefined;
+      let ordinal = 0;
+      for (const attribute of GUIDE_ATTRIBUTES) {
+        for (const node of ownerDocument.querySelectorAll<HTMLElement>(`[${attribute}]`)) {
+          const found = node.getAttribute(attribute);
+          if (found === null || !isValidGuideElementId(found)) continue;
+          ordinal += 1;
+          if (`i${ordinal}` !== ref) continue;
+          // The handle is an ordinal, so it is only meaningful while the document
+          // is the one it was taken from. Confirming the semantic id is what turns
+          // a stale handle into an honest miss instead of a wrong hit.
+          return found === id ? node : undefined;
+        }
+      }
+      return undefined;
+    },
     destroy,
   };
 

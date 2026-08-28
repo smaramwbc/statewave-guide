@@ -11,6 +11,9 @@ export default tseslint.config(
       '**/coverage/**',
       '**/.statewave-guide/**',
       '**/test/fixtures/**',
+      // Throwaway worktrees: whole copies of this repository, already linted
+      // where they actually live.
+      '.claude/**',
     ],
   },
   js.configs.recommended,
@@ -41,7 +44,7 @@ export default tseslint.config(
   },
   {
     // Repo-level Node CLI programs: they talk to a terminal by design.
-    files: ['scripts/**/*.mjs'],
+    files: ['scripts/**/*.mjs', 'e2e/**/*.mjs'],
     languageOptions: {
       globals: {
         console: 'readonly',
@@ -49,6 +52,20 @@ export default tseslint.config(
         Buffer: 'readonly',
         globalThis: 'readonly',
         URL: 'readonly',
+        URLSearchParams: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+        // The end-to-end suite runs `page.evaluate` callbacks, whose bodies are
+        // serialised and executed inside the browser. They are lexically in this
+        // file and never run in Node, which is why `document` is legitimate here
+        // and would not be anywhere else.
+        document: 'readonly',
+        FocusEvent: 'readonly',
+        getComputedStyle: 'readonly',
+        // Closed Loop #17 reads geometry and the route from inside the page.
+        window: 'readonly',
+        // Closed Loop #18 paints over a region of a screenshot inside a canvas.
+        Image: 'readonly',
       },
     },
     rules: { 'no-console': 'off' },

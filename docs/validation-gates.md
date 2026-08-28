@@ -33,6 +33,28 @@ against the identical bar the proxy rounds cleared.
 | incorrect factual claims | 0                  | ✓ = 0                   |
 | share scoring 0          | 4.8%               | ✓ ≤ 15%                 |
 
+`DEVELOPMENT_VISUAL_CONTEXT_REVIEW` — **FROZEN, UNSCORED**, Closed Loop #17, 2026-08-28. Eight items
+built from a real-browser capture, every score `null`, reviewer type `non_human_independent`. Nobody
+has judged whether the location sentence helps or whether the two refusals leave a user stuck; the
+package exists so somebody can. Pinned by `pnpm test:visual-context-freeze`; see
+[the freeze record](visual-context-review-v1-freeze-record.md).
+
+Nothing in that package's engineering facts may be converted into a score. A `SUPPORTED` correlation,
+correct geometry, a zero ProductModel delta, a resisted prompt injection and a successful redaction
+all say the boundary held. None of them says anybody was helped.
+
+`DEVELOPMENT_RUNTIME_LANGUAGE_REVIEW` — **UNSCORED**, Closed Loop #18, 2026-08-28. Seven items, each
+carrying the same answer twice — once with the geometry-only sentence, once with the words the
+interface is showing — every score `null`. The previous round scored the geometry-only sentence
+1.00/3 for helpfulness, so this round asks which of the two a person would rather have read, and
+accepts `NEITHER` as an answer.
+
+`DEVELOPMENT_RUNTIME_LANGUAGE_REVIEW` — **FROZEN, UNSCORED**, Closed Loop #18, 2026-08-28. Seven
+items, three sentence forms each — no contextual sentence, the position, or the words the control is
+showing — every score `null`. `preferredForm` accepts `NEITHER`, and the previous round's numbers make
+that the outcome worth leaving room for. Pinned by `pnpm test:runtime-language-freeze`; see
+[the freeze record](runtime-visible-language-review-v1-freeze-record.md).
+
 `FORMAL_HUMAN_VALIDATION_GATE` — **`DEFERRED_UNTIL_PRE_RELEASE`**. Not attempted. No human has scored
 any round of this benchmark, and none will be asked to until the product is feature-complete.
 
@@ -50,6 +72,36 @@ Every round of this benchmark has been scored by a model. **None of it is human 
 Rounds 2 through 5 were reported with the sentence _"Human Usefulness Gate: STILL OPEN"_. That was
 correct when written and remains correct; read it as `FORMAL_HUMAN_VALIDATION_GATE`, unattempted. No
 historical report, artefact or commit message has been edited to say otherwise, and none may be.
+
+## The gates run by themselves now
+
+Until Closed Loop #18 they did not. There was no CI workflow, no git hook, and `verify` covers build,
+typecheck, unit tests, lint and format without invoking a single `test:` script — so every guarantee
+written down here held only while somebody remembered to type the command. Closed Loop #17's freeze
+audit found it.
+
+There is one manifest and it is not a list anybody maintains: the `test:` scripts in `package.json`
+_are_ the manifest, `scripts/gates.mjs` enumerates them, and `.github/workflows/quality-gates.yml`
+invokes the runner. `test:ci-gate-manifest` fails if a workflow names a gate individually, because
+two lists diverge and the gate that quietly stops running is the one that was supposed to catch a
+regression.
+
+```
+pnpm gates                 every gate
+pnpm gates --list          the manifest
+pnpm gates --only visual   a subset
+```
+
+## Checks read, captures write
+
+`capture:*` commands may create and update artifacts. `test:*` commands must not, and
+`pnpm test:capture-immutability` enforces it structurally rather than by convention.
+
+The rule was written after Closed Loop #17 ran its full gate sweep and rewrote the frozen Interactive
+Review V2 record, invalidated the visual review package by re-capturing the evidence it cites, and
+left the tree dirty — from three commands registered as `test:` that were actually captures. Closed
+Loop #15 had already paid for the same mistake in a different form, which is why it is now a gate and
+not a paragraph.
 
 ## Rules
 

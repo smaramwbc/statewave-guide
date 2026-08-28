@@ -31,3 +31,31 @@ benchmarks/*/guidance-round-2-vs-3.md
 benchmarks/*/human-review-*.json
 benchmarks/*/*.scored.json
 benchmarks/*/human-review-*.md
+# What a browser watched, written byte-for-byte by the runtime probe. The
+# emit-evidence gate compares the file against a fresh run, so any reformatting
+# here fails a check that is supposed to detect a change in behaviour.
+benchmarks/*/runtime-evidence-v1.json
+# The compiled knowledge bundle is written byte-for-byte by
+# scripts/build-guide-bundle.mjs, and `--check` compares against a fresh run.
+# Reformatting it would fail a gate that exists to detect a change in meaning.
+packages/core/test/fixtures/guide-bundle.json
+# Engineering artefacts written by the interactive E2E run.
+benchmarks/interactive-review-v1/
+benchmarks/interactive-review-v1-r1/
+# Presentation screenshots and their index, written by the e2e capture.
+docs/product/
+benchmarks/interactive-review-v1-r2/
+benchmarks/interactive-review-v2/
+benchmarks/runtime-instance-experiment/
+# Closed Loop #17's evidence, correlations and review instrument. Written
+# byte-for-byte by their builders, and two of them are compared against a fresh
+# derivation by `--check`. Reformatting would fail a gate that exists to detect
+# a change in meaning, and would move hashes a frozen review depends on.
+benchmarks/visual-context-review-v1/
+
+# Agent scratch and throwaway worktrees — copies of this repository.
+.claude
+
+# Closed Loop #18's capture and review instrument. Written byte-for-byte by
+# their builders and compared against a fresh derivation by `--check`.
+benchmarks/runtime-visible-language-review-v1/

@@ -41,7 +41,12 @@ export type {
   ProductModel,
 } from './semantic.js';
 
-export { FACTUAL_CLAIM_TYPES, LANGUAGE_CLAIM_TYPES, isFactualClaimType } from './semantic.js';
+export {
+  isVerifiedClaim,
+  FACTUAL_CLAIM_TYPES,
+  LANGUAGE_CLAIM_TYPES,
+  isFactualClaimType,
+} from './semantic.js';
 
 export {
   SEMANTIC_LIMITS,
@@ -152,3 +157,4 @@ export {
   UNSUPPORTED_CAPABILITY_ACTIONS,
   findBuiltInRule,
 } from './verification-matrix.js';
+export * from './capability-registry.js';

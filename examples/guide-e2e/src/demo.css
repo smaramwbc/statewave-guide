@@ -1,0 +1,286 @@
+/**
+ * Presentation only.
+ *
+ * Every rule here targets markup the benchmark application already renders. No
+ * semantic id, accessible name, route or behaviour is touched, and no file under
+ * `packages/indexer/test/fixtures` is modified — the evidence fixture is frozen
+ * and a nicer-looking demo is not a reason to move it. What changes is entirely
+ * how it is painted.
+ *
+ * Deliberately *not* here: extra navigation items. A left rail listing Deals,
+ * Tasks and Reports would look more like a CRM and would be three links to
+ * nowhere, which is the kind of invention this project spends its time removing.
+ * The rail lists the routes the application actually has.
+ */
+
+:root {
+  --demo-bg: #f6f7f9;
+  --demo-surface: #ffffff;
+  --demo-text: #171a21;
+  --demo-muted: #666e7d;
+  --demo-border: #e5e8ed;
+  --demo-primary: #5b4bdb;
+  --demo-radius: 10px;
+  --demo-font: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+body.demo {
+  margin: 0;
+  background: var(--demo-bg);
+  color: var(--demo-text);
+  font: 14px/1.55 var(--demo-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+body.demo .demo-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* A top bar rather than a left rail. The application renders its navigation
+   inline, and moving it into a sidebar would mean changing the fixture's DOM —
+   which is frozen evidence. Styling it where it stands is honest and reads
+   perfectly well. */
+body.demo .demo-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 24px;
+  background: var(--demo-surface);
+  border-bottom: 1px solid var(--demo-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+body.demo .demo-bar__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+body.demo .demo-rail__mark {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: linear-gradient(140deg, #6a5cf0, #4a3cc4);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+body.demo .demo-rail__name {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+body.demo nav[data-guide='nav'] {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+body.demo nav[data-guide='nav'] a {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 7px;
+  color: var(--demo-muted);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 13.5px;
+}
+body.demo nav[data-guide='nav'] a:hover {
+  background: #f2f3f7;
+  color: var(--demo-text);
+}
+body.demo nav[data-guide='nav'] a[aria-current='page'],
+body.demo nav[data-guide='nav'] a.active {
+  background: #eef0fd;
+  color: #3f34a8;
+}
+
+body.demo .demo-main {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 30px;
+}
+/* Content is not hidden behind the panel. */
+body.demo[data-guide-open='true'] .demo-shell {
+  padding-right: var(--demo-panel-width, 400px);
+}
+body.demo[data-guide-open='true'][data-guide-side='left'] .demo-shell {
+  padding-right: 0;
+  padding-left: var(--demo-panel-width, 400px);
+}
+
+body.demo .page__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+body.demo .page h1 {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+body.demo [data-guide='clients.count'] {
+  color: var(--demo-muted);
+  font-size: 13px;
+  background: var(--demo-surface);
+  border: 1px solid var(--demo-border);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+body.demo button,
+body.demo .demo-main a[data-guide] {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--demo-border);
+  background: var(--demo-surface);
+  color: var(--demo-text);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 13px;
+}
+body.demo button:hover {
+  background: #f7f8fa;
+}
+body.demo [data-guide='clients.create'],
+body.demo [data-guide='dashboard.new-client'],
+body.demo [data-guide='invoices.create-form.submit'],
+body.demo [data-guide='clients.create-dialog.submit'] {
+  background: var(--demo-primary);
+  border-color: var(--demo-primary);
+  color: #fff;
+}
+body.demo [data-guide='clients.table.delete'],
+body.demo [data-guide='client-detail.delete'] {
+  color: #b42318;
+}
+
+body.demo input,
+body.demo select {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 10px;
+  border: 1px solid var(--demo-border);
+  border-radius: 8px;
+  background: var(--demo-surface);
+  color: var(--demo-text);
+}
+body.demo [data-guide='clients.search'] {
+  min-width: 240px;
+}
+
+body.demo .toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+body.demo table.table,
+body.demo [data-guide='clients.table'] {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--demo-surface);
+  border: 1px solid var(--demo-border);
+  border-radius: var(--demo-radius);
+  overflow: hidden;
+}
+body.demo table th {
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--demo-muted);
+  font-weight: 600;
+  padding: 9px 14px;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--demo-border);
+}
+body.demo table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid #f0f2f5;
+  font-size: 13.5px;
+}
+body.demo table tr:last-child td {
+  border-bottom: none;
+}
+body.demo table tr:hover td {
+  background: #fbfcfd;
+}
+
+body.demo section[data-guide='clients.create-dialog'] {
+  background: var(--demo-surface);
+  border: 1px solid var(--demo-border);
+  border-radius: var(--demo-radius);
+  padding: 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 34px -18px rgba(16, 20, 28, 0.3);
+  max-width: 460px;
+}
+body.demo form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+body.demo label {
+  font-size: 12.5px;
+  color: var(--demo-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+body.demo ul.invoice-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+body.demo ul.invoice-list li {
+  background: var(--demo-surface);
+  border: 1px solid var(--demo-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+body.demo [data-guide='settings.new-key'] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  background: #f4f5f8;
+  border: 1px solid var(--demo-border);
+  border-radius: 6px;
+  padding: 3px 7px;
+}
+
+/* Closed Loop #17: a note field a user filled in with instructions. It is
+   ordinary application content that happens to read like a command, styled
+   plainly so a screenshot of it looks exactly like any other record. */
+.demo-hostile {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+}
+.demo-hostile strong {
+  display: block;
+  margin-bottom: 4px;
+}
+.demo-hostile p {
+  margin: 0;
+  color: #475569;
+}

@@ -1,0 +1,723 @@
+{
+  "features": 21,
+  "propositions": 38,
+  "fromRuntime": 4,
+  "accepted": 7,
+  "refusedByIntegration": 0,
+  "refusedByRule": 5,
+  "contradictions": 0,
+  "rows": [
+    {
+      "featureId": "api.get.partial-clients",
+      "runtime": [],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": []
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": []
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.audit",
+      "runtime": [],
+      "before": {
+        "title": "Audit trail",
+        "purpose": "Lets you view the audit trail for a client.",
+        "summary": "You can view a client using \"Audit trail\".",
+        "questions": [
+          "How do I view the audit trail for a client?",
+          "Why can't I see \"Audit trail\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ]
+      },
+      "after": {
+        "title": "Audit trail",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you view the audit trail for a client.",
+        "summary": "You can view a client using \"Audit trail\".",
+        "questions": [
+          "How do I view the audit trail for a client?",
+          "Why can't I see \"Audit trail\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Audit trail\"."
+        ]
+      },
+      "withheld": []
+    },
+    {
+      "featureId": "client-detail.change-plan",
+      "runtime": [],
+      "before": {
+        "title": "Upgrade",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Upgrade\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ]
+      },
+      "after": {
+        "title": "Upgrade",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Upgrade\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Upgrade\"."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.delete",
+      "runtime": [],
+      "before": {
+        "title": "Delete",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Delete\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ]
+      },
+      "after": {
+        "title": "Delete",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"Delete\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Delete\"."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "client-detail.rename",
+      "runtime": [
+        {
+          "action": "update",
+          "subjectRef": "element:client-detail.rename",
+          "traceId": "rename",
+          "route": "/clients/c1"
+        }
+      ],
+      "before": {
+        "title": "Rename",
+        "purpose": "Lets you change a client.",
+        "summary": "You can change a client using \"Rename\".",
+        "questions": [
+          "How do I change a client?",
+          "Why can't I see \"Rename\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ]
+      },
+      "after": {
+        "title": "Rename",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you change a client.",
+        "summary": "You can change a client using \"Rename\".",
+        "questions": [
+          "How do I change a client?",
+          "Why can't I see \"Rename\"?"
+        ],
+        "steps": [
+          "Open Client Detail.",
+          "Choose \"Rename\"."
+        ]
+      },
+      "withheld": []
+    },
+    {
+      "featureId": "clients.create",
+      "runtime": [
+        {
+          "action": "open",
+          "subjectRef": "element:clients.create",
+          "traceId": "open-create",
+          "route": "/clients"
+        }
+      ],
+      "before": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "summary": "You can create a new client using \"New client\".",
+        "questions": [
+          "How do I create a new client?"
+        ],
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ]
+      },
+      "after": {
+        "title": "New client",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you create a new client.",
+        "summary": "You can create a new client using \"New client\".",
+        "questions": [
+          "How do I create a new client?"
+        ],
+        "steps": [
+          "Open Clients.",
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ]
+      },
+      "withheld": []
+    },
+    {
+      "featureId": "clients.error",
+      "runtime": [],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.export",
+      "runtime": [],
+      "before": {
+        "title": "Export CSV",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ]
+      },
+      "after": {
+        "title": "Export CSV",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients.",
+          "Choose \"Export CSV\"."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.search",
+      "runtime": [
+        {
+          "action": "filter",
+          "subjectRef": "element:clients.search",
+          "traceId": "filter-clients",
+          "route": "/clients"
+        }
+      ],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": "Lets you filter clients.",
+        "summary": "You can filter clients.",
+        "questions": [
+          "How do I filter clients?"
+        ],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "withheld": []
+    },
+    {
+      "featureId": "clients.table",
+      "runtime": [],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "clients.table.forbidden",
+      "runtime": [],
+      "before": {
+        "title": "You do not have access to the client list.",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "after": {
+        "title": "You do not have access to the client list.",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Clients."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "dashboard.new-client",
+      "runtime": [
+        {
+          "action": "navigate",
+          "subjectRef": "element:dashboard.new-client",
+          "traceId": "dashboard-new",
+          "route": "/clients"
+        }
+      ],
+      "before": {
+        "title": "New client",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"New client\"?"
+        ],
+        "steps": [
+          "Open Dashboard."
+        ]
+      },
+      "after": {
+        "title": "New client",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [
+          "Why can't I see \"New client\"?"
+        ],
+        "steps": [
+          "Open Dashboard."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "invoices.create-form.submit",
+      "runtime": [],
+      "before": {
+        "title": "Raise invoice",
+        "purpose": "Lets you create a new invoice.",
+        "summary": "You can create a new invoice using \"Raise invoice\".",
+        "questions": [
+          "How do I create a new invoice?",
+          "Why can't I see \"Raise invoice\"?"
+        ],
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ]
+      },
+      "after": {
+        "title": "Raise invoice",
+        "titleOrigin": "ui-label",
+        "purpose": "Lets you create a new invoice.",
+        "summary": "You can create a new invoice using \"Raise invoice\".",
+        "questions": [
+          "How do I create a new invoice?",
+          "Why can't I see \"Raise invoice\"?"
+        ],
+        "steps": [
+          "Open Invoices.",
+          "Choose \"Raise invoice\" to create a new invoice."
+        ]
+      },
+      "withheld": []
+    },
+    {
+      "featureId": "invoices.list.clear",
+      "runtime": [],
+      "before": {
+        "title": "Clear selection",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Choose \"Clear selection\"."
+        ]
+      },
+      "after": {
+        "title": "Clear selection",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Choose \"Clear selection\"."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "invoices.list.open",
+      "runtime": [],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": []
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": []
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "nav.clients",
+      "runtime": [
+        {
+          "action": "navigate",
+          "subjectRef": "element:nav.clients",
+          "traceId": "nav-clients",
+          "route": "/clients"
+        }
+      ],
+      "before": {
+        "title": "Clients",
+        "purpose": null,
+        "summary": "Open Clients.",
+        "questions": [],
+        "steps": [
+          "Choose \"Clients\"."
+        ]
+      },
+      "after": {
+        "title": "Clients",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": "Open Clients.",
+        "questions": [],
+        "steps": [
+          "Choose \"Clients\"."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.danger-zone",
+      "runtime": [],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.form",
+      "runtime": [
+        {
+          "action": "update",
+          "subjectRef": "element:settings.form",
+          "traceId": "save-settings",
+          "route": "/settings"
+        }
+      ],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": "Lets you change a setting.",
+        "summary": "You can change a setting.",
+        "questions": [
+          "How do I change a setting?"
+        ],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "withheld": []
+    },
+    {
+      "featureId": "settings.new-key",
+      "runtime": [],
+      "before": {
+        "title": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "after": {
+        "title": null,
+        "titleOrigin": null,
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.rotate-key",
+      "runtime": [
+        {
+          "action": "reveal",
+          "subjectRef": "element:settings.rotate-key",
+          "traceId": "rotate",
+          "route": "/settings"
+        }
+      ],
+      "before": {
+        "title": "Rotate API key",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ]
+      },
+      "after": {
+        "title": "Rotate API key",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Rotate API key\"."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    },
+    {
+      "featureId": "settings.save",
+      "runtime": [],
+      "before": {
+        "title": "Save changes",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "after": {
+        "title": "Save changes",
+        "titleOrigin": "ui-label",
+        "purpose": null,
+        "summary": null,
+        "questions": [],
+        "steps": [
+          "Open Settings.",
+          "Choose \"Save changes\"."
+        ]
+      },
+      "withheld": [
+        {
+          "type": "action",
+          "value": "(unknown)",
+          "refusal": "PRODUCT_OVERREACH",
+          "detail": "No verified capability names what a user does here, so nothing establishes what the feature is for. A label is not a verb."
+        }
+      ]
+    }
+  ]
+}

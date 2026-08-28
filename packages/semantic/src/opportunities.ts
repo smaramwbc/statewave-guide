@@ -78,7 +78,24 @@ export interface ClaimOpportunity {
   ownershipPath: readonly OwnershipStep[];
   /** How the ownership path reads. */
   ownershipSummary: string;
+  /**
+   * What proved this opportunity was available.
+   *
+   * Optional so every existing opportunity keeps its shape and its id; absent
+   * means `static`, which is what every opportunity was before Closed Loop #10.
+   * Recorded rather than inferred, because "the graph shows this is possible"
+   * and "a browser watched it happen" are different guarantees and a reader
+   * looking at an accepted claim is entitled to know which one they have.
+   */
+  evidenceSource?: ClaimEvidenceSource;
 }
+
+/** Where the evidence behind an opportunity came from. */
+export type ClaimEvidenceSource =
+  /** The ApplicationGraph. True of every run, because the code cannot do otherwise. */
+  | 'static'
+  /** An observed interaction, under a recorded `RuntimeContext`. */
+  | 'runtime';
 
 /** A model's answer to one opportunity. */
 export type ClaimDecision =
