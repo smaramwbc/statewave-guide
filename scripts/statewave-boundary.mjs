@@ -102,7 +102,15 @@ function fakeStatewave(options = {}) {
       const subject = decodeURIComponent(new URL(url).searchParams.get('subject_id') ?? '');
       const scripted = options.onTimeline?.(subject);
       if (scripted !== undefined) return scripted;
-      return json({ subject_id: subject, episodes: episodes.get(subject) ?? [], memories: [] });
+      // A modern server reports its window; the adapter treats a missing
+      // has-more flag as a pre-pagination server and degrades, correctly.
+      return json({
+        subject_id: subject,
+        episodes: episodes.get(subject) ?? [],
+        memories: [],
+        episodes_has_more: false,
+        memories_has_more: false,
+      });
     }
     if (url.includes('/v1/subjects/') && method === 'DELETE') {
       const subject = decodeURIComponent(url.split('/v1/subjects/')[1] ?? '');

@@ -458,6 +458,7 @@ export function createStatewaveGuideMemoryStore(
       let subject: string;
       let episodes: readonly Episode[];
       let memories: readonly Record<string, unknown>[] = [];
+      let hasMoreReported: boolean | undefined;
       let degradedThisCall = false;
       try {
         subject = statewaveSubjectFor(scope);
@@ -486,6 +487,7 @@ export function createStatewaveGuideMemoryStore(
           memories = Array.isArray(timeline?.memories)
             ? (timeline.memories as unknown as Record<string, unknown>[])
             : [];
+          hasMoreReported = (timeline as { episodesHasMore?: boolean }).episodesHasMore;
         } else {
           // A 200 whose body is not the shape the contract promises is a failed
           // read wearing a success code. Returning absence is right; calling it
@@ -506,6 +508,23 @@ export function createStatewaveGuideMemoryStore(
       }
 
       diagnostics.recordsFetched += episodes.length;
+
+      // A server that predates the pagination work accepts `limit` and
+      // `newest_first` with a 200 and silently ignores both — the read comes
+      // back as the OLDEST hundred and nothing on the wire says so. The one
+      // tell is `episodes_has_more`, which only a server that understood the
+      // request emits. Its absence is not proof of an empty page; it is proof
+      // the server never said, and a memory read whose window cannot be
+      // trusted is reported as degraded rather than presented as complete.
+      if (episodes.length > 0 && hasMoreReported === undefined) {
+        diagnostics.truncatedReads += 1;
+        degradedThisCall = true;
+        degrade(
+          'the server did not report episodes_has_more, so it predates pagination (statewave < 1.5.0) ' +
+            'and this read is the oldest window, not the recent one',
+        );
+      }
+
       if (episodes.length >= STATEWAVE_READ_LIMIT) {
         // At the ceiling, a complete read and a truncated one are the same
         // response. Reporting the possibility is right; it is deliberately not

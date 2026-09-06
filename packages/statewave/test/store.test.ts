@@ -98,7 +98,15 @@ function fakeStatewave(
       const subject = decodeURIComponent(new URL(url).searchParams.get('subject_id') ?? '');
       const scripted = options.onTimeline?.(subject);
       if (scripted !== undefined) return scripted;
-      return json({ subject_id: subject, episodes: episodes.get(subject) ?? [], memories: [] });
+      return json({
+        subject_id: subject,
+        episodes: episodes.get(subject) ?? [],
+        memories: [],
+        // A modern server reports its window; the old-server test omits these
+        // deliberately, because their absence is exactly what it detects.
+        episodes_has_more: false,
+        memories_has_more: false,
+      });
     }
 
     if (url.includes('/v1/subjects/') && method === 'DELETE') {
@@ -390,10 +398,19 @@ describe('failure costs personalisation and nothing else', () => {
     }));
     const fake = fakeStatewave({
       onTimeline: (subject) =>
-        new Response(JSON.stringify({ subject_id: subject, episodes: many, memories: [] }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }),
+        new Response(
+          JSON.stringify({
+            subject_id: subject,
+            episodes: many,
+            memories: [],
+            episodes_has_more: true,
+            memories_has_more: false,
+          }),
+          {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        ),
     });
     const { store, restore } = storeWith(fake);
     await store.read(SCOPE);
@@ -752,6 +769,8 @@ describe('a preference resolved from an active claim', () => {
             subject_id: subject,
             episodes: fake.episodes.get(subject) ?? [],
             memories,
+            episodes_has_more: false,
+            memories_has_more: false,
           }),
           { status: 200, headers: { 'Content-Type': 'application/json' } },
         ),
@@ -847,5 +866,58 @@ describe('a preference resolved from an active claim', () => {
       'EXPLICIT_PREFERENCE_SET',
       'STEP_THROUGH_COMPLETED',
     ]);
+  });
+});
+
+describe('a server that ignores the paging parameters', () => {
+  it('is reported rather than trusted', async () => {
+    // statewave < 1.5.0 accepts `limit` and `newest_first` with a 200 and
+    // silently ignores both, so the page that comes back is the OLDEST window.
+    // The tell is the absent has-more flag, which only a server that understood
+    // the request emits.
+    const fake = fakeStatewave({
+      onTimeline: (subject) =>
+        new Response(
+          JSON.stringify({
+            subject_id: subject,
+            episodes: [
+              {
+                id: 'ep_old',
+                subject_id: statewaveSubjectFor(SCOPE),
+                source: GUIDE_EPISODE_SOURCE,
+                type: GUIDE_EPISODE_TYPE,
+                payload: { ...EVENT({ eventId: 'ev-old-1' }) },
+                metadata: {},
+                provenance: {},
+                created_at: '2026-08-29T10:00:00Z',
+              },
+            ],
+            memories: [],
+            // no episodes_has_more — the pre-pagination response shape
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+    });
+    const { store, restore } = storeWith(fake);
+    const read = await store.read(SCOPE);
+    restore();
+
+    // The events still come back — absence would punish the user for the
+    // host's deployment drift — but the read is marked untrustworthy.
+    expect(read).toHaveLength(1);
+    const diagnostics = store.diagnostics();
+    expect(diagnostics.mode).toBe('REMOTE_DEGRADED');
+    expect(diagnostics.truncatedReads).toBe(1);
+    expect(diagnostics.lastFailure).toContain('predates pagination');
+  });
+
+  it('a modern response with the flag present stays trusted', async () => {
+    const fake = fakeStatewave();
+    const { store, restore } = storeWith(fake);
+    await store.append(EVENT({ eventId: 'ev-mod-1' }));
+    await store.read(SCOPE);
+    restore();
+    expect(store.diagnostics().mode).toBe('REMOTE');
+    expect(store.diagnostics().truncatedReads).toBe(0);
   });
 });
