@@ -8,6 +8,7 @@
  * result means anything.
  */
 import path from 'node:path';
+import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
@@ -15,6 +16,8 @@ import { defineConfig } from 'vite';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, '..', '..');
 const fixture = path.join(repo, 'packages/indexer/test/fixtures/realistic-app/frontend/src');
+const GUIDE_MEMORY_BACKEND = `http://127.0.0.1:${process.env['GUIDE_MEMORY_PORT'] ?? 4320}`;
+console.log('[vite.config] guide-memory proxy ->', GUIDE_MEMORY_BACKEND);
 
 export default defineConfig({
   resolve: {
@@ -33,7 +36,16 @@ export default defineConfig({
     },
   },
   plugins: [react()],
-  server: { port: 4318, strictPort: true },
-  preview: { port: 4319, strictPort: true },
+  /**
+   * The trusted tier sits behind this proxy.
+   *
+   * `/guide-memory/*` is a path on this origin, so the page never learns a
+   * Statewave URL and never holds a credential — both live in the separate Node
+   * process the harness starts beside this one. When that process is not
+   * running the proxy fails and the guide behaves exactly as it does with no
+   * memory at all, which is the fallback the scenarios exercise.
+   */
+  server: { port: 4318, strictPort: true, proxy: { '/guide-memory': GUIDE_MEMORY_BACKEND } },
+  preview: { port: 4319, strictPort: true, proxy: { '/guide-memory': GUIDE_MEMORY_BACKEND } },
   build: { outDir: 'dist', emptyOutDir: true },
 });

@@ -1,0 +1,622 @@
+{
+  "experiment": "memory-ux-resolution-review-v1",
+  "version": 1,
+  "reviewerType": "non_human_independent",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "status": "UNSCORED",
+  "question": "After Closed Loop #19.1, do the surviving memory adaptations produce real user-visible value — and is the one that produces none honest about it?",
+  "derivedFrom": {
+    "file": "benchmarks/memory-ux-resolution-review-v1/memory-ux-evidence.json",
+    "sha256": "sha256:e824b4f6476f7dc70ce7225a0b24174d80d3722a9d31b693c70ff6c2fba45bba"
+  },
+  "instructions": [
+    "Every score is null and stays null until an independent reviewer fills it in. Nothing here has been scored by the author.",
+    "Judge the screens, not the intent. Each item names its two captures; the screenshots are in this directory.",
+    "A pair whose sides are identical is not a failure of the capture. UX03 is expected to be identical, and whether an adaptation that changes nothing should exist at all is a real question with a real answer either way.",
+    "NEITHER is a permitted preference on every item. So is preferring the left-hand, unadapted side.",
+    "The engineering facts beside each item (identicalScreenshots, verifiedTextIdentical, actionLabelsIdentical, primaryActionIdentical) are stated so you do not have to take a claim on trust. They are not answers to the scored questions.",
+    "Identity is by exact hash. Two screens that look the same to you may hash differently over a single antialiased pixel, so identicalScreenshots: false is not a claim that you will see a difference — reusedCaptures below lists which captures are literally the same file.",
+    "Some dimensions are scored once for the pair (scope PAIR in the rubric) because the question is about the difference rather than about either screen. UX05 has score slots on the right only: its left side is a quotation from a frozen record, not a screen."
+  ],
+  "rubric": {
+    "worthTheChange": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "scope": "PAIR",
+      "asks": "Is the difference between these two screens worth making at all?"
+    },
+    "naturalness": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "scope": "PER_SIDE",
+      "asks": "Does it read like a product that knows you, or one telling you it knows you?"
+    },
+    "reversibility": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "scope": "PAIR",
+      "asks": "If the shorter version is not what you wanted, is getting the rest obvious and cheap?"
+    },
+    "predictability": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "scope": "PAIR",
+      "asks": "Could you tell why it changed, and would you expect the same next time?"
+    },
+    "restraint": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "scope": "PER_SIDE",
+      "asks": "Does it say as little as it can get away with, rather than as much as it knows?"
+    },
+    "truthfulness": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "scope": "PER_SIDE",
+      "asks": "Is everything on the screen true of the screen the user is looking at?"
+    }
+  },
+  "preferenceOptions": [
+    "LEFT",
+    "RIGHT",
+    "NEITHER"
+  ],
+  "objectiveMetrics": {
+    "captures": 11,
+    "pageErrors": 0,
+    "distinctScreenshots": 4,
+    "memoryLinesRendered": 0,
+    "identicalGroups": [
+      [
+        "UX01-first-time",
+        "UX03-base",
+        "UX03-derived-show-me",
+        "UX04-base-full",
+        "UX04-explicit-full",
+        "UX05-context-after",
+        "UX06-memory-off"
+      ],
+      [
+        "UX02-returning-collapsed",
+        "UX06-memory-on"
+      ]
+    ],
+    "searchFieldSentence": "Use the field showing \"Search clients\" above the list."
+  },
+  "reusedCaptures": [
+    {
+      "image": "sha256:1dddac89c3b4",
+      "appearances": [
+        "UX01-first-time",
+        "UX03-base",
+        "UX03-derived-show-me",
+        "UX04-base-full",
+        "UX04-explicit-full",
+        "UX05-context-after",
+        "UX06-memory-off"
+      ]
+    },
+    {
+      "image": "sha256:3dd085ba0d42",
+      "appearances": [
+        "UX02-returning-collapsed",
+        "UX02-returning-collapsed",
+        "UX06-memory-on"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "UX01",
+      "label": "FIRST_TIME vs RETURNING_COLLAPSED",
+      "question": "A person asks the same question twice, weeks apart, having finished the guide the first time. Is the second answer better for them?",
+      "context": "Same build, same question, same verified content. What differs is whether the three steps start on screen or behind a control. Read verifiedTextIdentical beside the item rather than taking that on trust.",
+      "left": {
+        "capture": "UX01-first-time",
+        "note": "never seen this guide",
+        "screenshot": "screenshots/UX01-first-time.png",
+        "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "right": {
+        "capture": "UX02-returning-collapsed",
+        "note": "finished this guide once before",
+        "screenshot": "screenshots/UX02-returning-collapsed.png",
+        "screenshotSha256": "sha256:3dd085ba0d423276a5f06809ba8e904aca4e716fb409401a3ebd0b1f81ed58c1",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": false,
+        "stepsShown": 0,
+        "expandControl": "Show full steps (3)",
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "identicalScreenshots": false,
+      "verifiedTextIdentical": true,
+      "actionLabelsIdentical": true,
+      "primaryActionIdentical": true,
+      "dimensions": [
+        "worthTheChange",
+        "naturalness",
+        "reversibility",
+        "predictability",
+        "restraint"
+      ],
+      "scores": {
+        "worthTheChange": {
+          "pair": null
+        },
+        "naturalness": {
+          "left": null,
+          "right": null
+        },
+        "reversibility": {
+          "pair": null
+        },
+        "predictability": {
+          "pair": null
+        },
+        "restraint": {
+          "left": null,
+          "right": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "UX02",
+      "label": "RETURNING_COLLAPSED vs RETURNING_EXPANDED",
+      "question": "The returning user wants the steps after all and presses the control. Is getting back to them cheap enough to justify folding them?",
+      "context": "One click apart, same session. The question is about the cost of being wrong: if folding is a mistake for this person, how much does the mistake cost them?",
+      "left": {
+        "capture": "UX02-returning-collapsed",
+        "note": "as the answer arrived",
+        "screenshot": "screenshots/UX02-returning-collapsed.png",
+        "screenshotSha256": "sha256:3dd085ba0d423276a5f06809ba8e904aca4e716fb409401a3ebd0b1f81ed58c1",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": false,
+        "stepsShown": 0,
+        "expandControl": "Show full steps (3)",
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "right": {
+        "capture": "UX02-returning-expanded",
+        "note": "after pressing the control",
+        "screenshot": "screenshots/UX02-returning-expanded.png",
+        "screenshotSha256": "sha256:26b5e9cacbbfdea35740b17577a8c8225852ed1818889cdeb0baeb1a78308400",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "identicalScreenshots": false,
+      "verifiedTextIdentical": true,
+      "actionLabelsIdentical": true,
+      "primaryActionIdentical": true,
+      "dimensions": [
+        "reversibility",
+        "worthTheChange",
+        "predictability"
+      ],
+      "scores": {
+        "reversibility": {
+          "pair": null
+        },
+        "worthTheChange": {
+          "pair": null
+        },
+        "predictability": {
+          "pair": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "UX03",
+      "label": "BASE vs DERIVED_SHOW_ME_PATTERN",
+      "question": "The guide has watched this person press Show me three times and has decided to emphasise it. Look at both screens. Should this adaptation exist?",
+      "context": "These two screens are the same picture — identicalScreenshots beside the item says whether they are byte-identical. Show me is already the primary action on any answer with more than one step, so the inference asks for what the interface was doing anyway. The right-hand button does carry one machine-readable marker recording that memory chose it (`memoryMarked` in the actions below); it has no styling, so it changes nothing on screen. An earlier round drew a ring there to make the change visible; this loop removed the ring and reports ALREADY_SATISFIED instead. Whether that is honesty or a feature that should not exist is the question.",
+      "left": {
+        "capture": "UX03-base",
+        "note": "no pattern observed",
+        "screenshot": "screenshots/UX03-base.png",
+        "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "right": {
+        "capture": "UX03-derived-show-me",
+        "note": "three Show me presses observed",
+        "screenshot": "screenshots/UX03-derived-show-me.png",
+        "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": true
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "identicalScreenshots": true,
+      "verifiedTextIdentical": true,
+      "actionLabelsIdentical": true,
+      "primaryActionIdentical": true,
+      "dimensions": [
+        "worthTheChange",
+        "naturalness",
+        "truthfulness",
+        "restraint"
+      ],
+      "scores": {
+        "worthTheChange": {
+          "pair": null
+        },
+        "naturalness": {
+          "left": null,
+          "right": null
+        },
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "restraint": {
+          "left": null,
+          "right": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "UX04",
+      "label": "BASE_FULL vs EXPLICIT_FULL",
+      "question": "This person finished the guide, and then explicitly asked for full detail. Does the explicit request read as having been honoured?",
+      "context": "The completion alone would have folded the steps; the stated preference overrules it, so the fold is refused and both screens show the full answer. identicalScreenshots beside the item is the exact-hash comparison and may say false over an antialiased pixel — reusedCaptures says which files are literally the same. A preference that produces no visible difference is either reassuring or invisible, and which one it is is the question.",
+      "left": {
+        "capture": "UX04-base-full",
+        "note": "no memory",
+        "screenshot": "screenshots/UX04-base-full.png",
+        "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "right": {
+        "capture": "UX04-explicit-full",
+        "note": "completed the guide, then asked for full detail",
+        "screenshot": "screenshots/UX04-explicit-full.png",
+        "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "identicalScreenshots": true,
+      "verifiedTextIdentical": true,
+      "actionLabelsIdentical": true,
+      "primaryActionIdentical": true,
+      "dimensions": [
+        "worthTheChange",
+        "predictability",
+        "truthfulness",
+        "restraint"
+      ],
+      "scores": {
+        "worthTheChange": {
+          "pair": null
+        },
+        "predictability": {
+          "pair": null
+        },
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "restraint": {
+          "left": null,
+          "right": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "UX05",
+      "label": "CREATE_CLIENT_CONTEXT_BEFORE vs AFTER",
+      "question": "Where does the guide say the New client button is? Is the sentence true of the screen in front of the user?",
+      "context": "The button sits in a toolbar above the client table. The left-hand sentence is quoted from the frozen Closed Loop #19 capture — it is not re-photographed, because reproducing it would mean shipping it again — and the right-hand one is from this build. A page section really did contain the button, in the document and in the coordinates; the word that was wrong is \"list\".",
+      "left": {
+        "capture": "historical",
+        "note": "Closed Loop #19, quoted from frozen evidence",
+        "source": "benchmarks/memory-adaptation-review-v1/memory-evidence.json",
+        "sourceSha256": "sha256:efbe7f636e4ff5273e244ef9e7c05ed1391b235298907ed11a2642460127d311",
+        "location": "On this screen, it is inside the list.",
+        "screenshot": null,
+        "screenshotSha256": null,
+        "actions": []
+      },
+      "right": {
+        "capture": "UX05-context-after",
+        "note": "this build",
+        "screenshot": "screenshots/UX05-context-after.png",
+        "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "notComparable": "the left-hand side is quoted from a frozen record, not captured",
+      "identicalScreenshots": null,
+      "verifiedTextIdentical": null,
+      "actionLabelsIdentical": null,
+      "primaryActionIdentical": null,
+      "dimensions": [
+        "truthfulness",
+        "worthTheChange",
+        "naturalness"
+      ],
+      "scores": {
+        "truthfulness": {
+          "right": null
+        },
+        "worthTheChange": {
+          "pair": null
+        },
+        "naturalness": {
+          "right": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "UX06",
+      "label": "MEMORY_ON vs MEMORY_OFF",
+      "question": "One of these guides remembers this person and one has no memory at all. Is the remembering one better to use?",
+      "context": "The blunt version of the whole loop. Memory-off is this same build with memory switched off, not a different release. These are the same two states as UX01 reached by a different route — a memory-less guide and one that remembers a completed guide — so a reviewer who scored UX01 is looking at the same pair of screens again, deliberately, with the question asked about the feature rather than about the visit.",
+      "left": {
+        "capture": "UX06-memory-off",
+        "note": "no memory at all",
+        "screenshot": "screenshots/UX06-memory-off.png",
+        "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": true,
+        "stepsShown": 3,
+        "expandControl": null,
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "right": {
+        "capture": "UX06-memory-on",
+        "note": "remembers a completed guide",
+        "screenshot": "screenshots/UX06-memory-on.png",
+        "screenshotSha256": "sha256:3dd085ba0d423276a5f06809ba8e904aca4e716fb409401a3ebd0b1f81ed58c1",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "location": "On this screen, it is directly above the list.",
+        "stepsVisible": false,
+        "stepsShown": 0,
+        "expandControl": "Show full steps (3)",
+        "memoryLines": [],
+        "actions": [
+          {
+            "label": "Show me",
+            "primary": true,
+            "memoryMarked": false
+          },
+          {
+            "label": "Step through",
+            "primary": false,
+            "memoryMarked": false
+          }
+        ],
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "identicalScreenshots": false,
+      "verifiedTextIdentical": true,
+      "actionLabelsIdentical": true,
+      "primaryActionIdentical": true,
+      "dimensions": [
+        "worthTheChange",
+        "naturalness",
+        "restraint",
+        "truthfulness"
+      ],
+      "scores": {
+        "worthTheChange": {
+          "pair": null
+        },
+        "naturalness": {
+          "left": null,
+          "right": null
+        },
+        "restraint": {
+          "left": null,
+          "right": null
+        },
+        "truthfulness": {
+          "left": null,
+          "right": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    }
+  ]
+}

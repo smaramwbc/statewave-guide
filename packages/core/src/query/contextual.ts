@@ -141,9 +141,18 @@ export function verifyContextualStatement(input: {
   textTrust: RuntimeLanguageTrust | 'NONE';
   textPrivacy: 'SAFE' | 'WITHHELD' | 'NOT_APPLICABLE';
   relationProof: 'GEOMETRY' | 'DOCUMENT' | 'NONE';
+  /**
+   * Containments the describer would not claim, in its own words.
+   *
+   * A sentence that came out shorter than expected is only explainable if the
+   * thing that shortened it was written down. These are not in the statement
+   * digest — `statementIdOf` hashes what a sentence *says*, not what it declined
+   * to say — so recording them cannot move a receipt id.
+   */
+  containmentRefusals?: readonly string[];
 }): ContextualVerification {
   const { statement } = input;
-  const refusals: string[] = [];
+  const refusals: string[] = [...(input.containmentRefusals ?? [])];
 
   const mounted =
     input.visibleSemanticIds === undefined ||

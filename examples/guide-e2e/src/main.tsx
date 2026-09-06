@@ -17,7 +17,7 @@ import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import { App, SessionProvider, api } from 'fixture-app';
 import { CLIENTS, backend } from 'harness-backend';
 import { recordNetwork } from '@statewavedev/guide-runtime';
-import { createGuideQueryEngine } from '@statewavedev/guide-core';
+import { createFailingGuideMemoryStore, createGuideQueryEngine } from '@statewavedev/guide-core';
 import type { GuideKnowledgeBundle } from '@statewavedev/guide-core';
 import {
   StatewaveGuide,
@@ -25,7 +25,9 @@ import {
   createElementRegistry,
   createHighlightController,
   useGuideQuery,
+  useGuideMemory,
   useHostFocus,
+  createRemoteGuideMemoryStore,
 } from '@statewavedev/guide-react';
 import type { GuideBranding, GuideLayoutInput, GuideThemeInput } from '@statewavedev/guide-react';
 import { Customizer, usePlayground } from './Customizer.js';
@@ -67,6 +69,16 @@ recordNetwork(api as unknown as Parameters<typeof recordNetwork>[0], backend(sta
  *   ?stale=1           report a build identity the bundle does not know
  *   ?hostile=1         render user-authored text that instructs the reader
  *   ?language=geometry  render the geometry-only contextual sentence
+ *   ?memory=off        run with Guide memory disabled
+ *   ?subject=<id>      run as a different opaque subject
+ *   ?workspace=<id>    scope memory to a workspace
+ *   ?memfail=<mode>    a memory store that throws, or returns nonsense
+ *   ?appver=old        report a different application version to memory only
+ *
+ * The memory seams exist because Closed Loop #19's hardest claims are about
+ * absence and failure — a guide with no memory, a guide whose memory is broken,
+ * and one user's history not reaching another. None of those can be produced by
+ * an application behaving normally.
  *
  * The fourth is Closed Loop #18's, and it exists because that loop must not
  * assume its own answer. The independent review of #17 scored the geometry-only
@@ -109,6 +121,55 @@ const HOSTILE = params.get('hostile') === '1';
 const APPLICATION_VERSION =
   params.get('stale') === '1' ? 'stale-build-not-in-this-bundle' : bundle.applicationVersion;
 
+/**
+ * Memory configuration, from the query string.
+ *
+ * Opaque ids, supplied by the host. Nothing here reads a name, an email or a
+ * route to decide who somebody is.
+ */
+const MEMORY_ENABLED = params.get('memory') !== 'off';
+const SUBJECT_ID = params.get('subject') ?? 'usr_fixture';
+const WORKSPACE_ID = params.get('workspace') ?? undefined;
+const MEMORY_FAIL = params.get('memfail');
+/**
+ * Where memory lives.
+ *
+ * `?memory=remote` is Closed Loop #20's headline: the guide keeps nothing in the
+ * browser and everything in Statewave, so a second process with an empty
+ * `localStorage` can still recognise the same person.
+ */
+const MEMORY_REMOTE = params.get('memory') === 'remote';
+/**
+ * The browser's real `fetch`, captured before anything replaces it.
+ *
+ * The benchmark harness installs an observing `fetch` that answers every request
+ * from the fixture's in-memory routes and never falls through — that is how this
+ * application "physically cannot reach anything real", which several earlier
+ * loops depend on. Guide memory is not part of the fixture's API surface, so a
+ * memory request routed through that observer comes back 404 with no explanation
+ * and the guide looks like it has forgotten everybody.
+ *
+ * Taken from the document, which runs before the first module is evaluated —
+ * a module-scope capture here is already too late, because importing the
+ * runtime is what installs the observer.
+ */
+const REAL_FETCH = ((globalThis as { __GUIDE_REAL_FETCH__?: typeof fetch }).__GUIDE_REAL_FETCH__ ??
+  globalThis.fetch.bind(globalThis)) as typeof fetch;
+
+/**
+ * Where the host's own memory backend lives. Never a Statewave URL.
+ *
+ * `?memendpoint=` points it somewhere else, which is how the scenarios exercise
+ * a backend that is down without taking the real one down.
+ */
+const MEMORY_ENDPOINT =
+  params.get('memendpoint') ??
+  (import.meta.env['VITE_GUIDE_MEMORY_ENDPOINT'] as string | undefined) ??
+  '/guide-memory';
+/** A version memory sees as different, without changing what the bundle says. */
+const MEMORY_APP_VERSION =
+  params.get('appver') === 'old' ? 'older-build-0000' : bundle.applicationVersion;
+
 const registry = createElementRegistry({});
 const highlight = createHighlightController({ registry });
 const engine = createGuideQueryEngine({ bundle });
@@ -138,6 +199,48 @@ function Host() {
     ...(focused === undefined ? {} : { focusedSemanticId: focused }),
     navigate: (route: string) => navigate(route),
     ...(instanceRef === undefined ? {} : { selectedInstanceRef: instanceRef }),
+  });
+
+  /**
+   * Guide memory, as a host would wire it.
+   *
+   * The store is a parameter rather than an assumption: the default remembers
+   * in the browser, and the failing ones exist so this loop can prove that a
+   * memory that cannot answer costs personalisation and nothing else.
+   */
+  const memoryStore = useMemo(() => {
+    if (MEMORY_FAIL !== null) {
+      return createFailingGuideMemoryStore(
+        MEMORY_FAIL === 'malformed'
+          ? 'malformed'
+          : MEMORY_FAIL === 'unknown'
+            ? 'unknown-kind'
+            : 'throw',
+      );
+    }
+    // `?memory=remote` puts memory in Statewave, through this application's own
+    // backend. No credential reaches the page: the endpoint below is a path on
+    // this origin, and the key — if the operator configured one at all — lives
+    // in the Node process serving it.
+    if (MEMORY_REMOTE) {
+      // A path on this origin is what a real host uses. The demo serves its
+      // backend on a second port, so the harness supplies an absolute URL at
+      // build time; either way the browser holds no credential.
+      return createRemoteGuideMemoryStore({ endpoint: MEMORY_ENDPOINT, fetch: REAL_FETCH });
+    }
+    return undefined;
+  }, []);
+
+  // The options object is rebuilt every render, which is fine because the hook
+  // depends on primitives — but the store inside it must be stable, or the load
+  // effect refires forever. The failing stores are already memoised above.
+  const memory = useGuideMemory({
+    enabled: MEMORY_ENABLED,
+    appId: 'statewave-crm-fixture',
+    subjectId: SUBJECT_ID,
+    ...(WORKSPACE_ID === undefined ? {} : { workspaceId: WORKSPACE_ID }),
+    applicationVersion: MEMORY_APP_VERSION,
+    ...(memoryStore === undefined ? {} : { store: memoryStore }),
   });
 
   const developer = useMemo(
@@ -176,8 +279,16 @@ function Host() {
   const forcedDark = params.get('appearance') === 'dark';
 
   const ask = useCallback(
-    (query: string, options?: { developer?: boolean }) => guide.ask(query, options),
-    [guide],
+    (query: string, options?: { developer?: boolean }) => {
+      const response = guide.ask(query, options);
+      // Recorded after the answer, from the answer. A feature id and a kind —
+      // never the question, which is the user's words.
+      if (response.featureId !== undefined) {
+        memory.record('GUIDANCE_VIEWED', { featureId: response.featureId });
+      }
+      return response;
+    },
+    [guide, memory],
   );
 
   // Demo-only: keeps the application's content out from under the panel.
@@ -238,6 +349,22 @@ function Host() {
           layout={layout}
           developer={developer}
           onSelectInstance={setInstanceRef}
+          presentationFor={memory.plan}
+          memoryDiagnostics={memory.diagnostics}
+          onMemoryEvent={(kind, input) => memory.record(kind, input ?? {})}
+          {...(MEMORY_ENABLED
+            ? {
+                // Only when memory is on. An audit found the preference and
+                // reset controls rendered identically with memory disabled —
+                // a menu offering to forget something nothing was remembering.
+                memory: {
+                  guidanceDetail: memory.profile?.explicitPreferences.guidanceDetail ?? 'AUTO',
+                  onSetDetail: (value: 'AUTO' | 'CONCISE' | 'FULL') =>
+                    memory.setPreference('guidanceDetail', value),
+                  onReset: () => memory.clear(),
+                },
+              }
+            : {})}
           {...(CONTEXTUAL_FORM === undefined ? {} : { contextualForm: CONTEXTUAL_FORM })}
           {...(forcedDark ? { prefersDark: true } : {})}
         />

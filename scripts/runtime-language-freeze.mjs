@@ -50,8 +50,19 @@ const FROZEN = {
    */
   'packages/core/src/query/runtime-language.ts':
     '0d55f96f3d84cafa06d32020f89929a8ff976b2034d844232cab7e76dc7246ac',
+  /**
+   * Repinned by Closed Loop #19.1, deliberately.
+   *
+   * `verifyContextualStatement` gained one optional input: containment refusals
+   * the describer had already decided, appended to the receipt so that a missing
+   * sentence is explainable. It is additive — no existing clause, refusal or
+   * verdict changed, and `statementIdOf` does not hash refusals, so every receipt
+   * id in the frozen artifact still reconciles. The gate below re-derives all
+   * four of them from the shipped verifier and they still match, which is what
+   * makes moving this hash a record rather than a shrug.
+   */
   'packages/core/src/query/contextual.ts':
-    '4e8c595fa4925c496b6632227c66454169b5a280216ebac14011ad6331769344',
+    'e1e1bc1b2cd29230a0a7b825b4fbaeee58f5bacb4a76cbfc3c01b6e7fd53448f',
 };
 
 for (const [file, expected] of Object.entries(FROZEN)) {

@@ -1,0 +1,699 @@
+{
+  "package": "memory-adaptation-review-v1",
+  "version": 1,
+  "evaluates": "whether remembering a user makes guidance better, given that memory may never establish product truth",
+  "derivedFrom": {
+    "file": "memory-evidence.json",
+    "sha256": "efbe7f636e4ff5273e244ef9e7c05ed1391b235298907ed11a2642460127d311"
+  },
+  "harness": "playwright/chromium",
+  "memoryBackend": "browser localStorage; no network, no credentials",
+  "gate": "DEVELOPMENT_MEMORY_ADAPTATION_REVIEW",
+  "reviewerType": "non_human_independent",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "scoredBy": null,
+  "scoredAt": null,
+  "reviewQuestions": {
+    "A": "Does being remembered make the guide more useful, or only shorter?",
+    "B": "Is \"You've completed this guide before.\" the right thing to say, and is it said at the right moment?",
+    "C": "Is a collapsed set of steps a help or a hiding place?",
+    "D": "When memory changes the emphasis of a button, is that noticeable in a good way or an unsettling one?",
+    "E": "Does anything the guide remembers feel like something it should not have kept?",
+    "F": "Would you rather the guide did not remember you at all?"
+  },
+  "questionAnswers": {
+    "A": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "B": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "C": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "D": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "E": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    "F": {
+      "answer": null,
+      "confidence": null,
+      "dominantCause": null,
+      "comment": null
+    }
+  },
+  "preferredValues": [
+    "LEFT",
+    "RIGHT",
+    "NEITHER"
+  ],
+  "instructions": [
+    "Judge this as somebody using the application, not as somebody auditing it.",
+    "Each item is the same question with one thing different. Score both sides, then set preferred — LEFT, RIGHT or NEITHER.",
+    "intrusiveness and restraintCost count the other way: higher is worse. Every dimension states its direction.",
+    "The previous two rounds both found the guide adding words that were true and not worth reading. That may be true of memory as well, and saying so is a useful outcome.",
+    "verifiedSentenceIdentical and actionInventoryIdentical are computed from the capture. They tell you the verified sentence and the available actions did not move; they do not tell you whether the adaptation helped.",
+    "stepTextRendered says whether step text was on screen. MP01 carries a capture of the same answer after Show full steps was pressed, so you can see for yourself what folding does and does not remove — question C asks whether that is a help or a hiding place, and this package does not answer it.",
+    "Answer questions A-F in questionAnswers.",
+    "Every score is null and none may be inferred. A passing gate, a correct refusal and an empty memory store are engineering facts, not usefulness."
+  ],
+  "rubric": {
+    "adaptationHelpfulness": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "asks": "Did the adapted version get you where you were going faster?"
+    },
+    "naturalness": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "asks": "Does it read like a product that knows you, or one that is telling you it knows you?"
+    },
+    "continuity": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "asks": "Did coming back feel like continuing, rather than starting again?"
+    },
+    "predictability": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "asks": "Could you tell why it changed, and would you expect the same next time?"
+    },
+    "intrusiveness": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": false,
+      "asks": "How much did being remembered get in the way? Higher is worse."
+    },
+    "trust": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "asks": "How much would you trust this guide about facts, having seen it adapt? Higher is more trust.",
+      "note": "Phrased positively on purpose. An audit pointed out the first version asked whether anything reduced trust while being scored higher-is-better, so an honest answer and a high score pulled in opposite directions."
+    },
+    "restraintCost": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": false,
+      "asks": "Where memory declined to help, how stuck were you left? Higher is worse."
+    }
+  },
+  "failureClassifications": [
+    "ADAPTATION_HELPS",
+    "ADAPTATION_NOT_USEFUL",
+    "ADAPTATION_INTRUSIVE",
+    "WRONG_MOMENT",
+    "OVERCLAIMED_MEMORY",
+    "HID_SOMETHING_NEEDED",
+    "UNPREDICTABLE",
+    "PRIVACY_CONCERN",
+    "CORRECT_REFUSAL",
+    "PREFER_NO_MEMORY",
+    "OTHER"
+  ],
+  "objectiveMetrics": {
+    "scenarios": 18,
+    "pageErrors": 0,
+    "rawUserTextPersisted": 0,
+    "runtimeInstanceNamesPersisted": 0,
+    "secretShapedStringsPersisted": 0,
+    "bytesPersistedMax": 1742,
+    "distinctScopes": 11,
+    "crossUserLeaks": 0,
+    "crossWorkspaceLeaks": 0,
+    "adaptationsApplied": 3,
+    "derivedPatternsApplied": 1,
+    "fallbacksExercised": 3,
+    "productModelDelta": 0,
+    "productClaims": 113,
+    "establishedBy": {
+      "productModelDelta": "test:memory-productmodel-invariance",
+      "productClaims": "test:memory-productmodel-invariance"
+    }
+  },
+  "whatIsStored": {
+    "fields": [
+      "eventId",
+      "appId",
+      "subjectId",
+      "workspaceId (optional)",
+      "featureId (a semantic id)",
+      "kind (one of six)",
+      "occurredAt",
+      "applicationVersion",
+      "authority",
+      "metadata: preference | value | stepCount"
+    ],
+    "neverStored": [
+      "the question the user typed",
+      "the answer the guide gave",
+      "any DOM text, placeholder or accessible name",
+      "runtime instance labels such as INV-001",
+      "input values",
+      "client names, invoice ids, keys, tokens or anything secret-shaped"
+    ],
+    "example": {
+      "featureId": "clients.create",
+      "kind": "STEP_THROUGH_COMPLETED"
+    },
+    "scope": "statewave-guide:<appId>:user:<subjectId>[:workspace:<workspaceId>]",
+    "retention": "the most recent 200 events per scope; cleared entirely by Reset Guide memory",
+    "backend": "browser localStorage; no network, no credentials"
+  },
+  "reusedCaptures": [
+    {
+      "scenario": "M02",
+      "appearances": 4
+    }
+  ],
+  "items": [
+    {
+      "id": "MP01",
+      "label": "FIRST_TIME vs RETURNING_USER",
+      "bearsOnQuestions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "asks": "The same question, before and after completing the guide and reloading the browser.",
+      "context": "The same question before and after completing the guide and reloading. verifiedSentenceIdentical and actionInventoryIdentical are computed beside the item; read them rather than taking this line for it.",
+      "left": {
+        "scenario": "M01",
+        "label": "FIRST_TIME",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memorySentence": null,
+        "stepsShown": true,
+        "showFullStepsOffered": false,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M01-first-time.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      },
+      "right": {
+        "scenario": "M02",
+        "label": "RETURNING_USER",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.You've completed this guide before.Show full steps (3)Show meStep through",
+        "memorySentence": "You've completed this guide before.",
+        "stepsShown": false,
+        "showFullStepsOffered": true,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M02-returning.png",
+        "screenshotSha256": "sha256:2bb8f86bfbfeb7a2c8a40eaf2c62ebe259df4a95e96b9d4baf75574228f47b67"
+      },
+      "comparable": true,
+      "verifiedSentence": {
+        "left": "Lets you create a new client.",
+        "right": "Lets you create a new client."
+      },
+      "verifiedSentenceIdentical": true,
+      "stepTextRendered": {
+        "left": true,
+        "right": false
+      },
+      "actionInventoryIdentical": false,
+      "controls": {
+        "showMe": {
+          "left": true,
+          "right": true
+        },
+        "stepThrough": {
+          "left": true,
+          "right": true
+        },
+        "showFullSteps": {
+          "left": false,
+          "right": true
+        },
+        "note": "Show me and Step through are the ways of being helped. Show full steps appears only where steps were folded, so a difference there is a control gained, never one removed."
+      },
+      "scores": {
+        "left": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        },
+        "right": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        }
+      },
+      "preferred": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "MP02",
+      "label": "MEMORY_ON vs MEMORY_OFF",
+      "bearsOnQuestions": [
+        "A",
+        "F"
+      ],
+      "asks": "A remembered user, and the same product with memory switched off.",
+      "context": "Memory-off is the Closed Loop #18 behaviour exactly. Judge whether the difference earns its keep.",
+      "left": {
+        "scenario": "M02",
+        "label": "RETURNING_USER",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.You've completed this guide before.Show full steps (3)Show meStep through",
+        "memorySentence": "You've completed this guide before.",
+        "stepsShown": false,
+        "showFullStepsOffered": true,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M02-returning.png",
+        "screenshotSha256": "sha256:2bb8f86bfbfeb7a2c8a40eaf2c62ebe259df4a95e96b9d4baf75574228f47b67"
+      },
+      "right": {
+        "scenario": "M05",
+        "label": "MEMORY_OFF",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memorySentence": null,
+        "stepsShown": true,
+        "showFullStepsOffered": false,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M05-memory-off.png",
+        "screenshotSha256": "sha256:31f3f8f5b68909c505b857980b2459d169ea3821ebe231a4a9b317439a736301"
+      },
+      "comparable": true,
+      "verifiedSentence": {
+        "left": "Lets you create a new client.",
+        "right": "Lets you create a new client."
+      },
+      "verifiedSentenceIdentical": true,
+      "stepTextRendered": {
+        "left": false,
+        "right": true
+      },
+      "actionInventoryIdentical": false,
+      "controls": {
+        "showMe": {
+          "left": true,
+          "right": true
+        },
+        "stepThrough": {
+          "left": true,
+          "right": true
+        },
+        "showFullSteps": {
+          "left": true,
+          "right": false
+        },
+        "note": "Show me and Step through are the ways of being helped. Show full steps appears only where steps were folded, so a difference there is a control gained, never one removed."
+      },
+      "scores": {
+        "left": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        },
+        "right": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        }
+      },
+      "preferred": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "MP03",
+      "label": "DERIVED_PATTERN vs EXPLICIT_PREFERENCE",
+      "bearsOnQuestions": [
+        "D",
+        "B"
+      ],
+      "asks": "An emphasis the guide inferred, and a detail level the user chose.",
+      "context": "The left rests on three observed Show me presses; the right on a detail level the user selected. Whether the difference between them reads the way it should is the question.",
+      "left": {
+        "scenario": "M03",
+        "label": "DERIVED_PATTERN",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Based on how you have used Guide beforeChoose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memorySentence": null,
+        "stepsShown": true,
+        "showFullStepsOffered": false,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": true,
+        "screenshot": "screenshots/M03-show-me-pattern.png",
+        "screenshotSha256": "sha256:52ddd1227ae5626011e23072dd73f994d0933b3567a4899045324120ac3d5ac9"
+      },
+      "right": {
+        "scenario": "M04",
+        "label": "EXPLICIT_PREFERENCE",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memorySentence": null,
+        "stepsShown": true,
+        "showFullStepsOffered": false,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M04-explicit-full.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      },
+      "comparable": true,
+      "verifiedSentence": {
+        "left": "Lets you create a new client.",
+        "right": "Lets you create a new client."
+      },
+      "verifiedSentenceIdentical": true,
+      "stepTextRendered": {
+        "left": true,
+        "right": true
+      },
+      "actionInventoryIdentical": true,
+      "controls": {
+        "showMe": {
+          "left": true,
+          "right": true
+        },
+        "stepThrough": {
+          "left": true,
+          "right": true
+        },
+        "showFullSteps": {
+          "left": false,
+          "right": false
+        },
+        "note": "Show me and Step through are the ways of being helped. Show full steps appears only where steps were folded, so a difference there is a control gained, never one removed."
+      },
+      "scores": {
+        "left": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        },
+        "right": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        }
+      },
+      "preferred": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "MP04",
+      "label": "CURRENT_PERMISSION vs HISTORICAL_MEMORY",
+      "bearsOnQuestions": [
+        "E",
+        "B"
+      ],
+      "asks": "Two things the guide remembers and still refuses to act on.",
+      "context": "A user who previously saw delete guidance, in a session without the permission; and a user with every plausible invoice memory, on a screen where nothing establishes the concept. Judge what the guide says to each.",
+      "left": {
+        "scenario": "M11",
+        "label": "HISTORICAL_MEMORY",
+        "userFacingText": "DeleteYou need permission to do this.",
+        "memorySentence": null,
+        "stepsShown": false,
+        "showFullStepsOffered": false,
+        "showMeOffered": false,
+        "stepThroughOffered": false,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M11-delete-permission.png",
+        "screenshotSha256": "sha256:b19cc5e9a2675a4188a81146eed860beab7ce7bf085ecbe36daabfeeec907ff1"
+      },
+      "right": {
+        "scenario": "M10",
+        "label": "CURRENT_PERMISSION_VS_HISTORY",
+        "userFacingText": "I do not have anything verified about that.",
+        "memorySentence": null,
+        "stepsShown": false,
+        "showFullStepsOffered": false,
+        "showMeOffered": false,
+        "stepThroughOffered": false,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M10-invoice-negative.png",
+        "screenshotSha256": "sha256:3623c62738980d9dbd3d2e846d1d3caa624613facf62e48e63e1f3eaa009b0cb"
+      },
+      "comparable": false,
+      "notComparableBecause": "the two sides ask different questions; they are paired to show two different refusals, not to be diffed",
+      "verifiedSentence": {
+        "left": "You need permission to do this.",
+        "right": "I do not have anything verified about that."
+      },
+      "actionInventoryIdentical": true,
+      "controls": {
+        "showMe": {
+          "left": false,
+          "right": false
+        },
+        "stepThrough": {
+          "left": false,
+          "right": false
+        },
+        "showFullSteps": {
+          "left": false,
+          "right": false
+        },
+        "note": "Show me and Step through are the ways of being helped. Show full steps appears only where steps were folded, so a difference there is a control gained, never one removed."
+      },
+      "scores": {
+        "left": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        },
+        "right": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        }
+      },
+      "preferred": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "MP05",
+      "label": "REMEMBERED vs RESET",
+      "bearsOnQuestions": [
+        "E",
+        "F"
+      ],
+      "asks": "A remembered user, and a different user who has just asked to be forgotten.",
+      "context": "Not the same person: M02 is the default subject and M14 is its own, because each scenario runs in its own browser context. What the pair shows is the shape of being remembered against the shape of having been forgotten, and an audit was right that calling it \"the same user\" was a claim the capture does not support.",
+      "left": {
+        "scenario": "M02",
+        "label": "RETURNING_USER",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.You've completed this guide before.Show full steps (3)Show meStep through",
+        "memorySentence": "You've completed this guide before.",
+        "stepsShown": false,
+        "showFullStepsOffered": true,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M02-returning.png",
+        "screenshotSha256": "sha256:2bb8f86bfbfeb7a2c8a40eaf2c62ebe259df4a95e96b9d4baf75574228f47b67"
+      },
+      "right": {
+        "scenario": "M14",
+        "label": "RESET",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memorySentence": null,
+        "stepsShown": true,
+        "showFullStepsOffered": false,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M14-after-reset.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      },
+      "comparable": true,
+      "verifiedSentence": {
+        "left": "Lets you create a new client.",
+        "right": "Lets you create a new client."
+      },
+      "verifiedSentenceIdentical": true,
+      "stepTextRendered": {
+        "left": false,
+        "right": true
+      },
+      "actionInventoryIdentical": false,
+      "controls": {
+        "showMe": {
+          "left": true,
+          "right": true
+        },
+        "stepThrough": {
+          "left": true,
+          "right": true
+        },
+        "showFullSteps": {
+          "left": true,
+          "right": false
+        },
+        "note": "Show me and Step through are the ways of being helped. Show full steps appears only where steps were folded, so a difference there is a control gained, never one removed."
+      },
+      "scores": {
+        "left": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        },
+        "right": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        }
+      },
+      "preferred": null,
+      "dominantCause": null,
+      "comment": null
+    },
+    {
+      "id": "MP06",
+      "label": "WORKING vs BROKEN MEMORY",
+      "bearsOnQuestions": [
+        "A",
+        "F"
+      ],
+      "asks": "A guide whose memory works, and one whose memory store throws.",
+      "context": "One store works and one throws. Judge whether you could tell which is which from what is on screen.",
+      "left": {
+        "scenario": "M02",
+        "label": "RETURNING_USER",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.You've completed this guide before.Show full steps (3)Show meStep through",
+        "memorySentence": "You've completed this guide before.",
+        "stepsShown": false,
+        "showFullStepsOffered": true,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M02-returning.png",
+        "screenshotSha256": "sha256:2bb8f86bfbfeb7a2c8a40eaf2c62ebe259df4a95e96b9d4baf75574228f47b67"
+      },
+      "right": {
+        "scenario": "M06-throw",
+        "label": "MEMORY_FAILURE",
+        "userFacingText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memorySentence": null,
+        "stepsShown": true,
+        "showFullStepsOffered": false,
+        "showMeOffered": true,
+        "stepThroughOffered": true,
+        "showMeEmphasised": false,
+        "screenshot": "screenshots/M06-memory-broken.png",
+        "screenshotSha256": "sha256:652ee00de9f50ec51c233195002519cf55edb2a0ff12c65e60fd5ab6838a86d3"
+      },
+      "comparable": true,
+      "verifiedSentence": {
+        "left": "Lets you create a new client.",
+        "right": "Lets you create a new client."
+      },
+      "verifiedSentenceIdentical": true,
+      "stepTextRendered": {
+        "left": false,
+        "right": true
+      },
+      "actionInventoryIdentical": false,
+      "controls": {
+        "showMe": {
+          "left": true,
+          "right": true
+        },
+        "stepThrough": {
+          "left": true,
+          "right": true
+        },
+        "showFullSteps": {
+          "left": true,
+          "right": false
+        },
+        "note": "Show me and Step through are the ways of being helped. Show full steps appears only where steps were folded, so a difference there is a control gained, never one removed."
+      },
+      "scores": {
+        "left": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        },
+        "right": {
+          "adaptationHelpfulness": null,
+          "naturalness": null,
+          "continuity": null,
+          "predictability": null,
+          "intrusiveness": null,
+          "trust": null,
+          "restraintCost": null
+        }
+      },
+      "preferred": null,
+      "dominantCause": null,
+      "comment": null
+    }
+  ]
+}

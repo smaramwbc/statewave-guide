@@ -1,0 +1,117 @@
+{
+  "loop": "closed-loop-20-2-bounded-statewave-memory",
+  "rule": "Remember state, not every time state became true.",
+  "reviewerType": "non_human_independent",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "scores": null,
+  "derived": {
+    "keyModel": {
+      "completion": {
+        "key": "guide.state:completion:demo:clients.create:build-1",
+        "dedupeOnWrite": true,
+        "resolution": "first write wins at ingest (Statewave idempotency)"
+      },
+      "preference": {
+        "key": "guide.state:preference:demo:guidanceDetail",
+        "dedupeOnWrite": false,
+        "claimKeys": {
+          "guidanceDetail": "guide.preference.guidancedetail",
+          "assistanceMode": "guide.preference.assistancemode"
+        },
+        "resolution": "claim supersession at compile; latest by claim valid_from, then created_at, then memory id"
+      }
+    },
+    "growthModel": [
+      {
+        "features": 10,
+        "sessions": 1,
+        "oldPolicyEpisodes": 11,
+        "cl201Episodes": 3,
+        "cl202ActiveState": 3
+      },
+      {
+        "features": 10,
+        "sessions": 100,
+        "oldPolicyEpisodes": 1100,
+        "cl201Episodes": 102,
+        "cl202ActiveState": 12
+      },
+      {
+        "features": 10,
+        "sessions": 10000,
+        "oldPolicyEpisodes": 110000,
+        "cl201Episodes": 10002,
+        "cl202ActiveState": 12
+      },
+      {
+        "features": 100,
+        "sessions": 1,
+        "oldPolicyEpisodes": 11,
+        "cl201Episodes": 3,
+        "cl202ActiveState": 3
+      },
+      {
+        "features": 100,
+        "sessions": 100,
+        "oldPolicyEpisodes": 1100,
+        "cl201Episodes": 102,
+        "cl202ActiveState": 102
+      },
+      {
+        "features": 100,
+        "sessions": 10000,
+        "oldPolicyEpisodes": 110000,
+        "cl201Episodes": 10002,
+        "cl202ActiveState": 102
+      },
+      {
+        "features": 1000,
+        "sessions": 1,
+        "oldPolicyEpisodes": 11,
+        "cl201Episodes": 3,
+        "cl202ActiveState": 3
+      },
+      {
+        "features": 1000,
+        "sessions": 100,
+        "oldPolicyEpisodes": 1100,
+        "cl201Episodes": 102,
+        "cl202ActiveState": 102
+      },
+      {
+        "features": 1000,
+        "sessions": 10000,
+        "oldPolicyEpisodes": 110000,
+        "cl201Episodes": 10002,
+        "cl202ActiveState": 1002
+      }
+    ]
+  },
+  "measured": {
+    "server": "statewave main (claim registration, newest_first, status=active, #373/#374)",
+    "scenarios": {
+      "BS01": "1000 observations of one completion -> 1 durable record, completed=true",
+      "BS02": "4 preference changes -> active value CONCISE; 4 episodes, 1 active claim",
+      "BS03": "200 distinct completion keys -> 200 records, 200 features in profile",
+      "BS04": "newest of 150 records reachable via newest_first",
+      "BS06": "3 ingest orders -> one outcome (CONCISE)",
+      "BS07": "build-1 completion does not mark build-2 complete",
+      "BS10": "reset leaves nothing and resurrects nothing",
+      "BS11": "a retried write is one record",
+      "BS12": "retry deduplicates; a new value supersedes — different mechanisms, both held",
+      "BS13": "read failure -> absence, REMOTE_DEGRADED, nothing thrown",
+      "BS14": "write failure counted, interaction unaffected",
+      "BS15": "26 records swept, 0 forbidden values (instances, secrets, emails, questions, UI text)",
+      "BS16": "active invoice-adjacent state; unsupported question still refused",
+      "BS17": "remembered delete completion adds no Delete action",
+      "BS19": "same-instant competing writes -> arbitrary but stable winner (documented tie)",
+      "combined": "504 writes -> 5 durable episodes -> 2 events read (completed=true, CONCISE)"
+    },
+    "limitations": [
+      "preference supersession requires a tenant id and a host-registered claim key; without both, Guide falls back to replaying preference episodes (correct, unbounded)",
+      "physical episode history grows with distinct facts plus preference changes; superseded memory rows are retained by Statewave as history",
+      "the SDK does not yet expose status=active (unpublished); the adapter filters the documented status field client-side",
+      "same-instant competing preference writes resolve arbitrarily but stably; \"latest\" is claim valid_from, then created_at, then memory id"
+    ]
+  }
+}

@@ -66,6 +66,10 @@ const notes = [];
  * as changed as one that loses a byte.
  */
 const FROZEN_LOCATIONS = [
+  // Closed Loop #19's capture, frozen by #19.1. It was the only review directory
+  // with nothing protecting it — an audit pointed that out, and the loop that
+  // followed had every reason to overwrite it while rebuilding what it measured.
+  'benchmarks/memory-adaptation-review-v1',
   'benchmarks/runtime-visible-language-review-v1',
   'benchmarks/visual-context-review-v1',
   'benchmarks/interactive-review-v1',

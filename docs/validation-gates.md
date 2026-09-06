@@ -55,6 +55,10 @@ showing — every score `null`. `preferredForm` accepts `NEITHER`, and the previ
 that the outcome worth leaving room for. Pinned by `pnpm test:runtime-language-freeze`; see
 [the freeze record](runtime-visible-language-review-v1-freeze-record.md).
 
+`DEVELOPMENT_MEMORY_ADAPTATION_REVIEW` — **UNSCORED**, Closed Loop #19, 2026-08-29. Six paired items —
+first time against returning, memory on against off, an inferred pattern against a stated preference,
+and two refusals memory did not soften — every score `null`. `preferred` accepts `NEITHER`.
+
 `FORMAL_HUMAN_VALIDATION_GATE` — **`DEFERRED_UNTIL_PRE_RELEASE`**. Not attempted. No human has scored
 any round of this benchmark, and none will be asked to until the product is feature-complete.
 

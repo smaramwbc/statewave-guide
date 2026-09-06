@@ -7,6 +7,22 @@
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      The browser's own fetch, kept before any module runs.
+
+      The benchmark harness installs an observing `fetch` that answers every
+      request from the fixture's in-memory routes and never falls through — that
+      is how this application "physically cannot reach anything real", which
+      several earlier loops depend on and which must stay true. Guide memory is
+      not part of the fixture's API, so a memory request routed through the
+      observer comes back 404 and the guide looks like it has forgotten
+      everybody. Module imports install the observer, so capturing it here — in
+      the document, before the first module is evaluated — is the only point that
+      is reliably earlier.
+    -->
+    <script>
+      window.__GUIDE_REAL_FETCH__ = window.fetch.bind(window);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

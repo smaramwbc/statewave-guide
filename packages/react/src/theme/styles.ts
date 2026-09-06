@@ -168,6 +168,10 @@ export const GUIDE_CSS = `
 .sw-guide .sw-guide__prompt { font-size: ${v('font-size-md')}; color: ${v('text')}; }
 .sw-guide .sw-guide__summary { font-size: ${v('font-size-sm')}; color: ${v('muted-text')}; }
 .sw-guide .sw-guide__where { font-size: ${v('font-size-sm')}; color: ${v('muted-text')}; font-style: italic; }
+.sw-guide .sw-guide__memory-note { font-size: ${v('font-size-sm')}; color: ${v('muted-text')}; }
+.sw-guide .sw-guide__step-count { opacity: 0.7; }
+.sw-guide .sw-guide__menu-rule { height: 1px; background: ${v('border')}; margin: 4px 0; }
+.sw-guide .sw-guide__menu-label { display: block; padding: 6px 12px 2px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: ${v('muted-text')}; }
 
 .sw-guide .sw-guide__condition {
   display: flex; gap: 9px; align-items: center;
