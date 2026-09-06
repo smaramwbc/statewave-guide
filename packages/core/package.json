@@ -38,10 +38,10 @@
   },
   "dependencies": {
     "@statewavedev/guide-actions": "workspace:*",
-    "@statewavedev/guide-shared": "workspace:*",
-    "@statewavedev/guide-semantic": "workspace:*"
+    "@statewavedev/guide-shared": "workspace:*"
   },
   "devDependencies": {
+    "@statewavedev/guide-semantic": "workspace:*",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11",

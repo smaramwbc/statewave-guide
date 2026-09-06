@@ -78,6 +78,14 @@ const FROZEN_LOCATIONS = [
   'benchmarks/interactive-review-v2',
   'benchmarks/runtime-instance-experiment',
   'benchmarks/provider-reality-check',
+  // The #19.1 and #20.x evidence. Found missing by the Day 10 docs fact-check:
+  // the newest four review directories were the unprotected ones, which is the
+  // same defect the first entry in this list was added to close — the freshest
+  // evidence is always what the next loop has a motive to overwrite.
+  'benchmarks/memory-ux-resolution-review-v1',
+  'benchmarks/statewave-persistence-review-v1',
+  'benchmarks/remote-memory-retention-review-v1',
+  'benchmarks/bounded-statewave-memory-review-v1',
   'docs/product',
 ];
 

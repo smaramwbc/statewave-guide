@@ -19,7 +19,7 @@
     "react-hook-form": "^7.66.0",
     "@statewavedev/guide-runtime": "workspace:*",
     "@statewavedev/guide-statewave": "workspace:*",
-    "@statewavedev/sdk": "^1.4.0"
+    "@statewavedev/sdk": "^1.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.0",

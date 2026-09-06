@@ -44,13 +44,20 @@ wanting that to be the _only_ way to address a piece of the interface.
 
 ## Packages and their boundaries
 
-| Package                       | Runs in  | Depends on            | May import               |
-| ----------------------------- | -------- | --------------------- | ------------------------ |
-| `@statewavedev/guide-shared`  | anywhere | —                     | `zod`                    |
-| `@statewavedev/guide-actions` | anywhere | shared                | `zod`                    |
-| `@statewavedev/guide-core`    | anywhere | shared, actions       | —                        |
-| `@statewavedev/guide-react`   | browser  | shared, actions, core | `react` (peer)           |
-| `@statewavedev/guide-indexer` | Node     | shared                | `ts-morph`, `picocolors` |
+| Package                         | Runs in  | Depends on            | May import               |
+| ------------------------------- | -------- | --------------------- | ------------------------ |
+| `@statewavedev/guide-shared`    | anywhere | —                     | `zod`                    |
+| `@statewavedev/guide-actions`   | anywhere | shared                | `zod`                    |
+| `@statewavedev/guide-core`      | anywhere | shared, actions       | —                        |
+| `@statewavedev/guide-runtime`   | browser  | shared                | —                        |
+| `@statewavedev/guide-react`     | browser  | shared, actions, core | `react` (peer)           |
+| `@statewavedev/guide-statewave` | server   | core                  | `@statewavedev/sdk`      |
+| `@statewavedev/guide-indexer`   | Node     | shared                | `ts-morph`, `picocolors` |
+| `@statewavedev/guide-semantic`  | Node     | shared, indexer       | `zod`, `picocolors`      |
+
+(This file's deep sections were written package by package as each landed; the table above is the
+current full set. `guide-statewave` is the one package allowed to hold the Statewave SDK, and a gate
+fails if any browser-bound package imports it.)
 
 The rules that keep this honest:
 
@@ -864,11 +871,20 @@ reaches step 7.
 
 ## What is deliberately absent
 
-- No LLM SDK, no prompt templates, no conversational loop.
-- No Statewave client, no HTTP, no hosted-service assumption.
-- No database. The indexer writes a JSON file; providers keep state in memory.
+Updated as built — the original version of this list predated the semantic, runtime and Statewave
+packages and denied things that now exist.
+
+- **From `guide-core`:** no browser API, no React, no HTTP client, no model SDK, no Statewave
+  client. Everything arrives as an interface implementation — that rule is unchanged and gated.
+- **From the browser:** no Statewave SDK and no credential, ever. Durable memory is
+  browser → host backend → Statewave ([ADR 0032](adr/0032-remote-memory-persists-experience-not-authority.md)).
+- **From the model:** factual authority. Providers exist (`guide-semantic`) and select meaning from
+  deterministically planned opportunities; the verifier fails closed on everything else.
+- No database of our own — the indexer writes JSON; durable state lives in Statewave.
 - No third-party tour library.
 - No confirmation UI — the risk model is enforced, the prompt is not built.
-- No Product Model generation from the application graph yet.
+- No vision model. A vision-_proposal_ seam exists and is non-authoritative by contract
+  ([ADR 0027](adr/0027-vision-may-describe-the-screen-it-may-not-define-the-product.md)); no live
+  VLM is wired to it. No RAG, no autonomous actions.
 
-See the roadmap in the [README](../README.md) for when each of these is expected.
+The honest not-built list lives in the [README](../README.md#what-is-not-built-yet).
