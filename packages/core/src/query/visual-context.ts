@@ -60,21 +60,108 @@ export function spatialRelationOf(
 }
 
 /**
- * What a container may be called, when the runtime proves it holds members.
+ * Roles the runtime reports for something that holds a collection.
  *
- * Returns `the list` for any observed collection, and a named list only when
- * the container's owning feature and the current route agree on the noun.
+ * An allow-list, and the second attempt at this. The first version asked only
+ * whether the runtime had observed a *repetition* inside a region, which sounds
+ * like the definition of a list and is not: an adversarial audit walked a
+ * toolbar button, a card, a table row and a custom-element page wrapper through
+ * it, and each was called "the list" because something inside it happened to
+ * repeat. Repetition is a property of *content*; being a list is a property of
+ * the *element*, and the runtime already reports which element this is.
+ *
+ * It also fixes the opposite failure, which the same audit found: a client table
+ * filtered down to one row stopped being a collection and took Closed Loop #18's
+ * sentence with it. A table with one row is still a table.
+ *
+ * Tag names appear beside ARIA roles because `roleOf` falls back to the tag, so
+ * `<ul>` reports "ul" and never "list".
  */
+const COLLECTION_ROLES: ReadonlySet<string> = new Set([
+  'table',
+  'grid',
+  'treegrid',
+  'list',
+  'listbox',
+  'tree',
+  'feed',
+  'menu',
+  'menubar',
+  'tablist',
+  'rowgroup',
+  'ul',
+  'ol',
+  'dl',
+  'tbody',
+  'select',
+]);
+
+/** Whether the runtime reported anything at all inside this region. */
+function holdsMembers(context: GuideQueryContext, regionSemanticId: string): boolean {
+  return (context.runtimeInstances ?? []).some(
+    (instance) => instance.containerSemanticId === regionSemanticId,
+  );
+}
+
+/**
+ * Did the runtime observe a repetition inside this region?
+ *
+ * Used now only to decide which of a collection's members are its *items* — the
+ * things it repeats — because containment is authorised through an item and not
+ * through whatever else the collection happens to hold.
+ *
+ * The definition is not invented here: `resolveRuntimeChoices` already decides
+ * what a collection's items are by exactly this test.
+ */
+function repeatedMembers(context: GuideQueryContext, regionSemanticId: string): Set<string> {
+  const counts = new Map<string, number>();
+  for (const instance of context.runtimeInstances ?? []) {
+    if (instance.containerSemanticId !== regionSemanticId) continue;
+    counts.set(instance.semanticId, (counts.get(instance.semanticId) ?? 0) + 1);
+  }
+  const repeated = new Set<string>();
+  for (const [semanticId, count] of counts) if (count > 1) repeated.add(semanticId);
+  return repeated;
+}
+
+/**
+ * May this region be described as containing the target?
+ *
+ * Being a collection is not enough. A grid root that also holds a toolbar
+ * contains that toolbar's buttons — in the document and in the coordinates — and
+ * a reader told a button is "inside the list" looks at the rows. So containment
+ * is authorised only through the collection itself or through one of the things
+ * it repeats:
+ *
+ *   - the target's nearest marked container **is** the region (a control the
+ *     list itself holds, like the Clear button at the top of the invoice list),
+ *     or
+ *   - the target's nearest marked container is one of the region's repeated
+ *     items (a delete button in a table row).
+ *
+ * A toolbar between the two is neither, which is the whole point.
+ */
+function mayContain(
+  context: GuideQueryContext,
+  regionSemanticId: string,
+  targetSemanticId: string,
+): boolean {
+  const containers = context.elementContainers?.[targetSemanticId] ?? [];
+  const nearest = containers[0];
+  if (nearest === undefined) return false;
+  if (nearest === regionSemanticId) return true;
+  return repeatedMembers(context, regionSemanticId).has(nearest);
+}
+
 function collectionPhrase(
   bundle: GuideKnowledgeBundle,
   context: GuideQueryContext,
   containerSemanticId: string,
 ): string | undefined {
-  // Membership is runtime-observed, never inferred from a shape on screen.
-  const hasMembers = (context.runtimeInstances ?? []).some(
-    (instance) => instance.containerSemanticId === containerSemanticId,
-  );
-  if (!hasMembers) return undefined;
+  // What kind of element this is, as the runtime reports it. Membership is not
+  // collection-hood: a page section holds things and is not a list.
+  const role = context.elementRoles?.[containerSemanticId];
+  if (role === undefined || !COLLECTION_ROLES.has(role)) return undefined;
 
   const owner = bundle.features.find((feature) =>
     feature.controls.some((control) => control.semanticId === containerSemanticId),
@@ -122,6 +209,9 @@ export function describeVisualContext(input: {
   const boxes = context.elementBoxes;
   const target = boxes?.[targetSemanticId];
 
+  /** Containments this screen refused, so a receipt can explain a short sentence. */
+  const containmentRefusals: string[] = [];
+
   let best:
     | {
         phrase: string;
@@ -136,7 +226,19 @@ export function describeVisualContext(input: {
     for (const [semanticId, box] of Object.entries(boxes)) {
       if (semanticId === targetSemanticId) continue;
       const phrase = collectionPhrase(bundle, context, semanticId);
-      if (phrase === undefined) continue;
+      if (phrase === undefined) {
+        // Worth writing down only for a region that holds something and that the
+        // target has a computable relation to — the set that would have produced
+        // a sentence before this rule existed. Anything wider is noise about
+        // every box on the page.
+        if (holdsMembers(context, semanticId) && spatialRelationOf(target, box) !== undefined) {
+          const role = context.elementRoles?.[semanticId] ?? 'nothing';
+          containmentRefusals.push(
+            `${semanticId} holds members but reports ${role}, so it is not described as a collection`,
+          );
+        }
+        continue;
+      }
       const relation = spatialRelationOf(target, box);
       // Coordinates cannot tell containment from overlap. A dialog rendered over
       // the client table sits exactly inside its rectangle and is not in it, so
@@ -145,6 +247,16 @@ export function describeVisualContext(input: {
       if (relation === 'inside') {
         const containers = context.elementContainers?.[targetSemanticId] ?? [];
         if (!containers.includes(semanticId)) continue;
+        // Structural containment is not the containment a person perceives. A
+        // wrapper holding a toolbar and a table contains the toolbar's buttons
+        // in the document and in the coordinates, and a reader told one of them
+        // is "inside the list" will look in the wrong half of the screen.
+        if (!mayContain(context, semanticId, targetSemanticId)) {
+          containmentRefusals.push(
+            `${targetSemanticId} is inside ${semanticId} in the document but is neither one of its items nor held by it directly`,
+          );
+          continue;
+        }
       } else if (relation === undefined) {
         continue;
       }
@@ -171,7 +283,12 @@ export function describeVisualContext(input: {
   });
   const describable = describableRuntimeText(fresh);
 
-  if (best === undefined && describable === undefined) return undefined;
+  // A sentence that was refused still owes an explanation. Returning nothing at
+  // all leaves "why is there no location here?" answerable only by re-deriving
+  // it, which is the thing receipts exist to avoid.
+  if (best === undefined && describable === undefined && containmentRefusals.length === 0) {
+    return undefined;
+  }
 
   const statement: ContextualStatement = {
     targetSemanticId,
@@ -212,6 +329,7 @@ export function describeVisualContext(input: {
     textPrivacy: describable === undefined ? 'NOT_APPLICABLE' : describable.privacyClass,
     relationProof:
       best === undefined ? 'NONE' : best.relation === 'inside' ? 'DOCUMENT' : 'GEOMETRY',
+    containmentRefusals,
   });
 
   if (verified === undefined) return { receipt };

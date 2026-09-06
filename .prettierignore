@@ -59,3 +59,16 @@ benchmarks/visual-context-review-v1/
 # Closed Loop #18's capture and review instrument. Written byte-for-byte by
 # their builders and compared against a fresh derivation by `--check`.
 benchmarks/runtime-visible-language-review-v1/
+
+# Closed Loop #19's capture and review instrument, written by their builders.
+benchmarks/memory-adaptation-review-v1/
+
+# Closed Loop #19.1's capture. Same reason: the review builder compares the
+# package against a sha256 of the evidence, and a reformat moves that hash
+# without anything about the experiment having changed.
+benchmarks/memory-ux-resolution-review-v1/
+
+# Closed Loop #20's capture. The review builder compares the package against a
+# sha256 of the evidence, and a reformat moves that hash without anything about
+# the experiment having changed.
+benchmarks/statewave-persistence-review-v1/

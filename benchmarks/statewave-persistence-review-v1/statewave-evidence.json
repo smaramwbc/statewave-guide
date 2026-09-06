@@ -1,0 +1,439 @@
+{
+  "experiment": "statewave-persistence-review-v1",
+  "purpose": "Whether structured guidance experience survives the browser it was recorded in, without remote persistence becoming product authority.",
+  "harness": "playwright/chromium 1440x900, guide -> host backend -> Statewave at http://127.0.0.1:8110",
+  "metrics": {
+    "scenarios": 15,
+    "readCeiling": {
+      "inserted": 105,
+      "returned": 100,
+      "lowestOrdinalReturned": 1,
+      "highestOrdinalReturned": 100,
+      "newestReachable": false
+    },
+    "pageErrors": 0,
+    "statewaveBaseUrl": "http://127.0.0.1:8110",
+    "remoteEpisodesTotal": 29,
+    "remoteBytesTotal": 16929,
+    "rawQueriesPersisted": 0,
+    "rawAnswersPersisted": 0,
+    "domTextPersisted": 0,
+    "runtimeInstanceNamesPersisted": 0,
+    "secretShapedValuesPersisted": 0,
+    "buildIdentitiesPersisted": 28,
+    "emailsPersisted": 0,
+    "statewaveLatencyMs": {
+      "calls": 161,
+      "p50": 3,
+      "p95": 11
+    }
+  },
+  "pageErrors": [],
+  "scenarios": [
+    {
+      "id": "SW01",
+      "label": "REMOTE_WRITE",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW01-process-a-after-completion.png",
+        "screenshotSha256": "sha256:7da40d7af08cbb9276665d9dba8af14b9c36a9518be6c23e7e8167d53e7f4a1a",
+        "remoteEpisodes": 3,
+        "episodeIds": [
+          "31424758-5cdd-40d3-90eb-141aa6ab9f07",
+          "223e5b29-b08c-4bc8-96eb-7de29fe57cb2",
+          "ae3c1bbf-5d05-4396-8809-6c0fc8f0ffce"
+        ],
+        "payloads": [
+          {
+            "kind": "GUIDANCE_VIEWED",
+            "appId": "statewave-crm-fixture",
+            "eventId": "ev-6rqhw0-1",
+            "authority": "OBSERVED_INTERACTION",
+            "featureId": "clients.create",
+            "subjectId": "sw_alice",
+            "occurredAt": "2026-08-29T23:27:39.245Z",
+            "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49"
+          },
+          {
+            "kind": "STEP_THROUGH_STARTED",
+            "appId": "statewave-crm-fixture",
+            "eventId": "ev-6rqhw0-2",
+            "authority": "OBSERVED_INTERACTION",
+            "featureId": "clients.create",
+            "subjectId": "sw_alice",
+            "occurredAt": "2026-08-29T23:27:39.434Z",
+            "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49"
+          },
+          {
+            "kind": "STEP_THROUGH_COMPLETED",
+            "appId": "statewave-crm-fixture",
+            "eventId": "ev-6rqhw0-3",
+            "authority": "OBSERVED_INTERACTION",
+            "featureId": "clients.create",
+            "subjectId": "sw_alice",
+            "occurredAt": "2026-08-29T23:27:39.521Z",
+            "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49"
+          }
+        ]
+      }
+    },
+    {
+      "id": "SW02",
+      "label": "REMOTE_RESTORE_NEW_PROCESS",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "steps": [],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "localStorageBeforeAsking": [],
+        "answerLatencyMs": 206
+      }
+    },
+    {
+      "id": "SW03",
+      "label": "USER_ISOLATION",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW03-other-subject.png",
+        "screenshotSha256": "sha256:65decca42e48e6f3c400612c9e92f8e9e3a75d19e1c895b5d3d56e7c0aa79af3",
+        "otherSubjectEpisodes": 4
+      }
+    },
+    {
+      "id": "SW04",
+      "label": "WORKSPACE_ISOLATION",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW04-other-workspace.png",
+        "screenshotSha256": "sha256:36fa94181de3dca5df6ac6b1c27cfecf5461504a043c16ba41ceb354bd8a2b75"
+      }
+    },
+    {
+      "id": "SW05",
+      "label": "VERSION_SCOPE",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW05-other-version.png",
+        "screenshotSha256": "sha256:65decca42e48e6f3c400612c9e92f8e9e3a75d19e1c895b5d3d56e7c0aa79af3"
+      }
+    },
+    {
+      "id": "SW06",
+      "label": "READ_FAILURE_FALLBACK",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW06-remote-unreachable.png",
+        "screenshotSha256": "sha256:36fa94181de3dca5df6ac6b1c27cfecf5461504a043c16ba41ceb354bd8a2b75",
+        "answerLatencyMs": 197
+      }
+    },
+    {
+      "id": "SW07",
+      "label": "WRITE_FAILURE_TOLERATED",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep throughHighlighted in the app",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW07-write-failure-tolerated.png",
+        "screenshotSha256": "sha256:dbf64074b016dc94c5265435b41e652b4a863bb4cd61f374a93fc04564f01aab"
+      }
+    },
+    {
+      "id": "SW08",
+      "label": "IDEMPOTENCY",
+      "observed": {
+        "writesSent": 2,
+        "remoteEpisodes": 1,
+        "episodeIds": [
+          "a122badc-7409-40a9-8b8e-24324056bfc7"
+        ]
+      }
+    },
+    {
+      "id": "SW09",
+      "label": "MALFORMED_REMOTE_EVENT",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW09-hostile-remote-records.png",
+        "screenshotSha256": "sha256:36fa94181de3dca5df6ac6b1c27cfecf5461504a043c16ba41ceb354bd8a2b75",
+        "remoteEpisodesPresent": 4
+      }
+    },
+    {
+      "id": "SW10",
+      "label": "HOSTILE_WELL_FORMED_REMOTE_EVENT",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW09-hostile-remote-records.png",
+        "screenshotSha256": "sha256:36fa94181de3dca5df6ac6b1c27cfecf5461504a043c16ba41ceb354bd8a2b75",
+        "seeded": [
+          "invented.feature + DELETE_ACCOUNT + route",
+          "another subject's completion"
+        ],
+        "remoteEpisodesPresent": 4
+      }
+    },
+    {
+      "id": "SW11",
+      "label": "RESET",
+      "observed": {
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "steps": [
+          "Choose \"New client\".",
+          "Enter the client's billing email, name and plan.",
+          "Choose \"Create client\"."
+        ],
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW11-after-reset.png",
+        "screenshotSha256": "sha256:65decca42e48e6f3c400612c9e92f8e9e3a75d19e1c895b5d3d56e7c0aa79af3",
+        "episodesBefore": 3,
+        "episodesAfter": 0
+      }
+    },
+    {
+      "id": "SW12",
+      "label": "REMOTE_AUTHORITY_NEGATIVE",
+      "observed": {
+        "title": null,
+        "purpose": null,
+        "condition": null,
+        "stepsVisible": false,
+        "expandControl": null,
+        "steps": [],
+        "actions": [],
+        "answerText": "I do not have anything verified about that.",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW12-remote-memory-is-not-evidence.png",
+        "screenshotSha256": "sha256:7422fdde8a8cd39ede5046594a8c59fa80be35ab22550d19d1e0175818352ee6",
+        "remoteEpisodesPresent": 9
+      }
+    },
+    {
+      "id": "SW13",
+      "label": "CURRENT_PERMISSION_NEGATIVE",
+      "observed": {
+        "title": null,
+        "purpose": null,
+        "condition": null,
+        "stepsVisible": false,
+        "expandControl": null,
+        "steps": [],
+        "actions": [],
+        "answerText": "I do not have anything verified about that.",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW13-permission-outranks-memory.png",
+        "screenshotSha256": "sha256:4e4cdd014b1aab724cfcb3dac35ee97c63e11e9011c6c717d11bd22baae91252"
+      }
+    },
+    {
+      "id": "SW14",
+      "label": "RUNTIME_INSTANCE_NONPERSISTENCE",
+      "observed": {
+        "title": null,
+        "purpose": null,
+        "condition": null,
+        "stepsVisible": false,
+        "expandControl": null,
+        "steps": [],
+        "actions": [
+          "Show me"
+        ],
+        "answerText": "Show me",
+        "localStorageGuideKeys": [],
+        "screenshot": "screenshots/SW14-private-screens.png",
+        "screenshotSha256": "sha256:398d39d45859ecefca7ca7aede7e15c87e19e8d4d752449dbb2ac298710a1120",
+        "remoteEpisodes": 4,
+        "payloads": [
+          {
+            "kind": "GUIDANCE_VIEWED",
+            "appId": "statewave-crm-fixture",
+            "eventId": "ev-njt81b-1",
+            "authority": "OBSERVED_INTERACTION",
+            "featureId": "invoices.list.clear",
+            "subjectId": "sw_private",
+            "occurredAt": "2026-08-29T23:27:45.423Z",
+            "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49"
+          },
+          {
+            "kind": "SHOW_ME_USED",
+            "appId": "statewave-crm-fixture",
+            "eventId": "ev-njt81b-2",
+            "authority": "OBSERVED_INTERACTION",
+            "featureId": "invoices.list.clear",
+            "subjectId": "sw_private",
+            "occurredAt": "2026-08-29T23:27:45.607Z",
+            "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49"
+          },
+          {
+            "kind": "GUIDANCE_VIEWED",
+            "appId": "statewave-crm-fixture",
+            "eventId": "ev-h8fj28-1",
+            "authority": "OBSERVED_INTERACTION",
+            "featureId": "clients.create",
+            "subjectId": "sw_private",
+            "occurredAt": "2026-08-29T23:27:45.847Z",
+            "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49"
+          },
+          {
+            "kind": "GUIDANCE_VIEWED",
+            "appId": "statewave-crm-fixture",
+            "eventId": "ev-pernks-1",
+            "authority": "OBSERVED_INTERACTION",
+            "featureId": "settings.danger-zone",
+            "subjectId": "sw_private",
+            "occurredAt": "2026-08-29T23:28:16.127Z",
+            "applicationVersion": "28146cd001468c454f9cbef837481b7f0a92fe667d7a60fc6a822b2b123a7f49"
+          }
+        ],
+        "instanceLabelsFound": []
+      }
+    },
+    {
+      "id": "SW15",
+      "label": "SECRET_NONPERSISTENCE",
+      "observed": {
+        "screen": "/settings with a rotated key on it",
+        "remoteEpisodes": 4,
+        "forbiddenValuesFound": [],
+        "note": "applicationVersion is a build identity and is exempt from the long-hex rule only; every other shape applies to it."
+      }
+    }
+  ]
+}

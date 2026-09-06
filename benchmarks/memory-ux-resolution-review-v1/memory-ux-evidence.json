@@ -1,0 +1,352 @@
+{
+  "experiment": "memory-ux-resolution-review-v1",
+  "purpose": "Whether the adaptations that survived Closed Loop #19.1 are worth what they cost, and whether the one that changed nothing is honestly reported as changing nothing.",
+  "harness": "playwright/chromium 1440x900, one build, captures minutes apart",
+  "historical": {
+    "source": "benchmarks/memory-adaptation-review-v1/memory-evidence.json",
+    "sha256": "sha256:efbe7f636e4ff5273e244ef9e7c05ed1391b235298907ed11a2642460127d311",
+    "sentence": "On this screen, it is inside the list.",
+    "present": true
+  },
+  "metrics": {
+    "captures": 11,
+    "pageErrors": 0,
+    "memoryLinesRendered": 0,
+    "distinctScreenshots": 4,
+    "identicalGroups": [
+      [
+        "UX01-first-time",
+        "UX03-base",
+        "UX03-derived-show-me",
+        "UX04-base-full",
+        "UX04-explicit-full",
+        "UX05-context-after",
+        "UX06-memory-off"
+      ],
+      [
+        "UX02-returning-collapsed",
+        "UX06-memory-on"
+      ]
+    ]
+  },
+  "identicalGroups": [
+    [
+      "UX01-first-time",
+      "UX03-base",
+      "UX03-derived-show-me",
+      "UX04-base-full",
+      "UX04-explicit-full",
+      "UX05-context-after",
+      "UX06-memory-off"
+    ],
+    [
+      "UX02-returning-collapsed",
+      "UX06-memory-on"
+    ]
+  ],
+  "pageErrors": [],
+  "captures": {
+    "UX01-first-time": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX01-first-time.png",
+      "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c"
+    },
+    "UX02-returning-collapsed": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [],
+      "stepsVisible": false,
+      "expandControl": "Show full steps (3)",
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through",
+      "screenshot": "screenshots/UX02-returning-collapsed.png",
+      "screenshotSha256": "sha256:3dd085ba0d423276a5f06809ba8e904aca4e716fb409401a3ebd0b1f81ed58c1"
+    },
+    "UX02-returning-expanded": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX02-returning-expanded.png",
+      "screenshotSha256": "sha256:26b5e9cacbbfdea35740b17577a8c8225852ed1818889cdeb0baeb1a78308400"
+    },
+    "UX03-base": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX03-base.png",
+      "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c"
+    },
+    "UX03-derived-show-me": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": true
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX03-derived-show-me.png",
+      "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c"
+    },
+    "UX04-base-full": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX04-base-full.png",
+      "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c"
+    },
+    "UX04-explicit-full": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX04-explicit-full.png",
+      "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c"
+    },
+    "UX05-context-after": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX05-context-after.png",
+      "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c"
+    },
+    "UX05-search-after": {
+      "title": null,
+      "purpose": "Lets you filter clients.",
+      "condition": null,
+      "location": "Use the field showing \"Search clients\" above the list.",
+      "steps": [],
+      "stepsVisible": false,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "Lets you filter clients.Use the field showing \"Search clients\" above the list.Show me",
+      "screenshot": "screenshots/UX05-search-after.png",
+      "screenshotSha256": "sha256:f328f084698e8cec29333418a4bfc140f3efe1013039bc1c2f43096cc3cbccf2"
+    },
+    "UX06-memory-on": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [],
+      "stepsVisible": false,
+      "expandControl": "Show full steps (3)",
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through",
+      "screenshot": "screenshots/UX06-memory-on.png",
+      "screenshotSha256": "sha256:3dd085ba0d423276a5f06809ba8e904aca4e716fb409401a3ebd0b1f81ed58c1"
+    },
+    "UX06-memory-off": {
+      "title": "New client",
+      "purpose": "Lets you create a new client.",
+      "condition": "You need permission to create a client.",
+      "location": "On this screen, it is directly above the list.",
+      "steps": [
+        "Choose \"New client\".",
+        "Enter the client's billing email, name and plan.",
+        "Choose \"Create client\"."
+      ],
+      "stepsVisible": true,
+      "expandControl": null,
+      "memoryLines": [],
+      "actions": [
+        {
+          "label": "Show me",
+          "primary": true,
+          "memoryMarked": false
+        },
+        {
+          "label": "Step through",
+          "primary": false,
+          "memoryMarked": false
+        }
+      ],
+      "answerText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+      "screenshot": "screenshots/UX06-memory-off.png",
+      "screenshotSha256": "sha256:1dddac89c3b470f835d6f080bccb36c475530754806588adc2aa9cd2ee565d4c"
+    }
+  }
+}

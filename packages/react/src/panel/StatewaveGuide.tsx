@@ -28,8 +28,15 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, ReactElement, ReactNode } from 'react';
 import type {
   ContextualSentenceForm,
+  GuideMemoryEventKind,
+  GuidePresentationPlan,
   GuideQueryResponse,
   GuideSafeAction,
+} from '@statewavedev/guide-core';
+import {
+  GUIDE_META_COPY,
+  neutralPresentationPlan,
+  resolvePresentation,
 } from '@statewavedev/guide-core';
 import { GUIDE_CSS, GUIDE_STYLE_ID } from '../theme/styles.js';
 import { resolveTheme, themeToCssVariables } from '../theme/resolve.js';
@@ -94,6 +101,49 @@ export interface StatewaveGuideProps {
    * Closed Loop #18 uses it to capture both without rebuilding the product.
    */
   contextualForm?: ContextualSentenceForm;
+  /**
+   * How to present a given response, from whatever the host remembers.
+   *
+   * A function rather than a value because each turn in the conversation is
+   * planned against its own response. Absent means no memory, which renders
+   * identically to a neutral plan.
+   */
+  presentationFor?: (response: GuideQueryResponse) => GuidePresentationPlan;
+  /** Told when the user does something worth remembering. */
+  onMemoryEvent?: (kind: GuideMemoryEventKind, input?: { featureId?: string }) => void;
+  /**
+   * The small memory surface, in the overflow menu.
+   *
+   * Deliberately not a dashboard. Two things a person might want — how much
+   * detail they get, and a way to be forgotten — and neither belongs in the
+   * conversation itself.
+   */
+  /**
+   * What the memory layer is doing, for the developer inspector.
+   *
+   * Scope, counts and failures — never records, never another subject, and
+   * never anything a store said went wrong in words a user would see.
+   */
+  memoryDiagnostics?: {
+    enabled: boolean;
+    scope: string;
+    eventsRead: number;
+    failures: number;
+    lastFailure?: string;
+    /**
+     * How many records the store's retention policy declined to keep.
+     *
+     * Shown because otherwise the write counts read as a fault. A developer
+     * watching events go in and a smaller number come out needs to see that a
+     * policy did it deliberately, not that something is dropping their writes.
+     */
+    storeWithheldByPolicy?: number;
+  };
+  memory?: {
+    guidanceDetail: 'AUTO' | 'CONCISE' | 'FULL';
+    onSetDetail: (value: 'AUTO' | 'CONCISE' | 'FULL') => void;
+    onReset: () => void;
+  };
   onSelectInstance?: (ref: string) => void;
 }
 
@@ -198,11 +248,24 @@ function Answer(props: {
   pointing: boolean;
   note?: string;
   contextualForm?: ContextualSentenceForm;
+  /**
+   * How memory would like this shown. Never what it says.
+   *
+   * A neutral plan is the memory-off shape exactly, so a build with no memory
+   * and a build whose memory is empty render the same pixels.
+   */
+  presentation?: GuidePresentationPlan;
+  onMemoryEvent?: (kind: GuideMemoryEventKind, input?: { featureId?: string }) => void;
 }): ReactElement {
   const { response } = props;
   // Both sentences arrive already verified. The default is the richer one, and
   // the choice is a prop because Closed Loop #18 has to capture both without
   // rebuilding the product between captures.
+  const plan = props.presentation;
+  // Steps start folded only when a plan says so, and unfolding is always one
+  // click away. Nothing here can reduce how many steps exist — `plan.stepCount`
+  // is carried precisely so a renderer showing fewer would be caught.
+  const [expanded, setExpanded] = useState(false);
   const sentences = response.visualContext?.sentences;
   const contextualSentence =
     props.contextualForm === 'GEOMETRY_ONLY'
@@ -212,6 +275,19 @@ function Answer(props: {
   const [stepIndex, setStepIndex] = useState<number | undefined>(undefined);
   const steps = answer?.steps ?? [];
   const stepping = stepIndex !== undefined && steps.length > 1;
+  /**
+   * First paint, decided in core rather than here.
+   *
+   * These rules used to live in the two class expressions below, which meant
+   * the memory planner had to predict what this component would do in order to
+   * say whether an adaptation changed anything — and it predicted wrongly, so a
+   * derived emphasis that selected the class the default had already applied was
+   * reported as a change. Now both sides read the same function.
+   */
+  const presentation = resolvePresentation(response, plan ?? neutralPresentationPlan(response));
+  // Stepping always shows the steps. A plan may fold them to begin with; it may
+  // not fold them while somebody is being walked through them.
+  const stepsHidden = presentation.expandControlVisible && !expanded && stepIndex === undefined;
   const showSummary =
     answer?.summary !== undefined &&
     !isRedundantSummary(answer.purpose, answer.summary, answer.title);
@@ -261,8 +337,37 @@ function Answer(props: {
         </div>
       ))}
 
-      {steps.length > 0 && (
-        <ol className="sw-guide__steps">
+      {/* Memory adds no sentence about a completion, and none about a pattern.
+          A returning user gets the fold and the control that undoes it; being
+          told the software remembers them was true and was the software talking
+          about itself. What is left is one line, and only for a detail level the
+          user chose — that is a setting being confirmed, not an inference being
+          announced. */}
+      {(plan?.metaCopy ?? []).includes('PREFERENCE_APPLIED') && (
+        <p className="sw-guide__memory-note" data-testid="guide-memory-preference">
+          {GUIDE_META_COPY.PREFERENCE_APPLIED}
+        </p>
+      )}
+
+      {stepsHidden && steps.length > 0 && (
+        <button
+          type="button"
+          className="sw-guide__button sw-guide__button--quiet"
+          data-testid="guide-show-full-steps"
+          onClick={() => {
+            setExpanded(true);
+            props.onMemoryEvent?.('FULL_STEPS_EXPANDED', {
+              ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
+            });
+          }}
+        >
+          {GUIDE_META_COPY.SHOW_FULL_STEPS}
+          <span className="sw-guide__step-count"> ({plan?.stepCount ?? steps.length})</span>
+        </button>
+      )}
+
+      {steps.length > 0 && !stepsHidden && (
+        <ol className="sw-guide__steps" data-testid="guide-steps">
           {steps.map((step, index) => (
             <li
               className="sw-guide__step"
@@ -333,16 +438,43 @@ function Answer(props: {
             {response.actions.length > 0 && (
               <button
                 type="button"
-                className={`sw-guide__button${steps.length > 1 || stepping ? ' sw-guide__button--primary' : ''}`}
-                onClick={() => props.onShowMe(response.actions)}
+                className={`sw-guide__button${
+                  presentation.primaryAction === 'SHOW_ME' ? ' sw-guide__button--primary' : ''
+                }`}
+                // Provenance, not effect. It records that memory chose this
+                // emphasis; it is deliberately not styled, because a ring drawn
+                // to make a no-op visible is the no-op wearing a costume.
+                data-emphasis={plan?.emphasisedAction === 'SHOW_ME' ? 'memory' : undefined}
+                onClick={() => {
+                  props.onShowMe(response.actions);
+                  props.onMemoryEvent?.('SHOW_ME_USED', {
+                    ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
+                  });
+                }}
                 disabled={props.busy}
               >
                 <Play />
                 Show me
               </button>
             )}
+            {/* Step through never disappears. Memory may move it behind Show me;
+                it may not remove a way of being helped. */}
             {steps.length > 1 && !stepping && (
-              <button type="button" className="sw-guide__button" onClick={() => setStepIndex(0)}>
+              <button
+                type="button"
+                className={`sw-guide__button${presentation.primaryAction === 'STEP_THROUGH' ? ' sw-guide__button--primary' : ''}`}
+                data-testid="guide-step-through"
+                onClick={() => {
+                  // Unfold first. An audit walked Next three times and pressed
+                  // Done against a collapsed list — completing steps that were
+                  // never on screen, and recording it as a completion.
+                  setExpanded(true);
+                  setStepIndex(0);
+                  props.onMemoryEvent?.('STEP_THROUGH_STARTED', {
+                    ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
+                  });
+                }}
+              >
                 <ListIcon />
                 Step through
               </button>
@@ -372,7 +504,18 @@ function Answer(props: {
                   <button
                     type="button"
                     className="sw-guide__button sw-guide__button--quiet"
-                    onClick={() => setStepIndex(undefined)}
+                    data-testid="guide-step-done"
+                    onClick={() => {
+                      setStepIndex(undefined);
+                      // The one interaction that licenses "You've completed this
+                      // guide before." Reaching the last step and pressing Done
+                      // is the whole of the evidence; nothing weaker counts.
+                      props.onMemoryEvent?.('STEP_THROUGH_COMPLETED', {
+                        ...(response.featureId === undefined
+                          ? {}
+                          : { featureId: response.featureId }),
+                      });
+                    }}
                   >
                     Done
                   </button>
@@ -433,9 +576,14 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
   const narrow = useMedia(`(max-width: ${layout.mobileBreakpoint}px)`, props.document);
   const variables = useMemo(() => themeToCssVariables(theme, dark), [theme, dark]);
 
+  // The callback, not the whole props object. Depending on `props` refires this
+  // on every render, because a host passing `theme={{ … }}` inline hands over a
+  // new object each time — the same shape of defect the memory hook had, found
+  // in the same audit.
+  const onThemeIssues = props.onThemeIssues;
   useEffect(() => {
-    if (issues.length > 0) props.onThemeIssues?.(issues);
-  }, [issues, props]);
+    if (issues.length > 0) onThemeIssues?.(issues);
+  }, [issues, onThemeIssues]);
 
   useEffect(() => {
     if (!props.open) return;
@@ -546,6 +694,41 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
               >
                 Clear conversation
               </button>
+              {props.memory !== undefined && (
+                <>
+                  <div className="sw-guide__menu-rule" aria-hidden="true" />
+                  <span className="sw-guide__menu-label">Answer detail</span>
+                  {(['AUTO', 'CONCISE', 'FULL'] as const).map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={props.memory?.guidanceDetail === value}
+                      className="sw-guide__menu-item"
+                      data-testid={`guide-detail-${value.toLowerCase()}`}
+                      onClick={() => {
+                        props.memory?.onSetDetail(value);
+                        setMenuOpen(false);
+                      }}
+                    >
+                      {value === 'AUTO' ? 'Auto' : value === 'CONCISE' ? 'Concise' : 'Full'}
+                    </button>
+                  ))}
+                  <div className="sw-guide__menu-rule" aria-hidden="true" />
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="sw-guide__menu-item"
+                    data-testid="guide-reset-memory"
+                    onClick={() => {
+                      props.memory?.onReset();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Reset Guide memory
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -599,6 +782,10 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
               {...(props.contextualForm === undefined
                 ? {}
                 : { contextualForm: props.contextualForm })}
+              {...(props.presentationFor === undefined
+                ? {}
+                : { presentation: props.presentationFor(turn.response) })}
+              {...(props.onMemoryEvent === undefined ? {} : { onMemoryEvent: props.onMemoryEvent })}
               {...(props.onSelectInstance === undefined
                 ? {}
                 : { onSelectInstance: props.onSelectInstance })}
@@ -648,6 +835,41 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
           <Send />
         </button>
       </div>
+
+      {/* What memory did, and what it refused to do.
+          
+          A developer surface, never a user one. It shows scope rather than
+          identity, decisions rather than records, and it cannot show another
+          subject's history because the hook never has one. */}
+      {props.developer === true && props.memoryDiagnostics !== undefined && (
+        <details className="sw-guide__inspector" data-testid="guide-memory-inspector">
+          <summary>Memory</summary>
+          <pre>
+            {JSON.stringify(
+              {
+                ...props.memoryDiagnostics,
+                adaptation:
+                  lastResponse === undefined || props.presentationFor === undefined
+                    ? null
+                    : (() => {
+                        const plan = props.presentationFor(lastResponse);
+                        return {
+                          stepsCollapsed: plan.stepsCollapsed,
+                          stepCount: plan.stepCount,
+                          emphasisedAction: plan.emphasisedAction ?? null,
+                          metaCopy: plan.metaCopy,
+                          reasons: plan.reasons,
+                          refusals: plan.refusals,
+                          neutral: plan.neutral,
+                        };
+                      })(),
+              },
+              null,
+              2,
+            )}
+          </pre>
+        </details>
+      )}
 
       {props.developer === true && lastResponse?.diagnostics !== undefined && (
         <details className="sw-guide__inspector">

@@ -705,6 +705,41 @@ API concept, though it is deliberately the shape a Statewave adapter will want. 
 Statewave-backed provider is roadmap Day 5 and will be its own package. Core will
 not gain a dependency on it.
 
+### Guide memory is a different thing, and reading this section for it is a mistake
+
+`MemoryProvider` above is a general port a host may hand the runtime. **Guide
+memory** — Closed Loop #19 — is separate, narrower, and the one that decides how a
+returning user is spoken to:
+
+```ts
+interface GuideMemoryStore {
+  append(event: GuideMemoryEvent): Promise<void>;
+  read(scope: GuideMemoryScope): Promise<readonly GuideMemoryEvent[]>;
+  clear(scope: GuideMemoryScope): Promise<void>;
+}
+```
+
+Three methods, no query language, no search, no similarity. A store that could
+answer _find me something like this_ would be a second knowledge base, and this
+project has exactly one.
+
+**What a host needs to know:**
+
+| question                | answer                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What is stored          | Identifiers and counters: a feature id, one of six event kinds, a timestamp, a build id, an authority class                                                               |
+| What is never stored    | Questions, answers, DOM text, placeholders, accessible names, instance labels, input values, anything secret-shaped                                                       |
+| Where                   | `localStorage` by default — one browser profile, one device. Replaceable with any `GuideMemoryStore`                                                                      |
+| Scope                   | `statewave-guide:<appId>:user:<subjectId>[:workspace:<workspaceId>]`. Subject ids are opaque and supplied by the host                                                     |
+| Retention               | The browser store keeps the most recent **200** events per scope, oldest dropped first. A cap, not a clock — counters do not improve with age. Another store sets its own |
+| How a user is forgotten | The overflow menu's reset, and `clear(scope)` for a host that wants its own control                                                                                       |
+| How to switch it off    | Do not pass memory props. The panel then renders exactly as it did before Closed Loop #19                                                                                 |
+
+Memory is presentation-only. It may fold steps, emphasise an action already
+offered, and add one sentence from a closed list. It may not establish a fact, an
+action, a permission, a route, a title or a semantic id — see
+[ADR 0029](adr/0029-memory-remembers-experience-not-truth.md).
+
 ---
 
 ## React bindings

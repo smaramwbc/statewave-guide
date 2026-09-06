@@ -1,0 +1,416 @@
+{
+  "experiment": "memory-adaptation-review-v1",
+  "version": 1,
+  "purpose": "engineering evidence that memory may adapt presentation and never establish truth",
+  "harness": "playwright/chromium",
+  "memoryBackend": "browser localStorage; no network, no credentials",
+  "visionProvider": "none",
+  "pageErrors": [],
+  "metrics": {
+    "scenarios": 18,
+    "pageErrors": 0,
+    "rawUserTextPersisted": 0,
+    "runtimeInstanceNamesPersisted": 0,
+    "secretShapedStringsPersisted": 0,
+    "bytesPersistedMax": 1742,
+    "distinctScopes": 11
+  },
+  "scenarios": [
+    {
+      "id": "M01",
+      "label": "FIRST_TIME",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:usr_fixture",
+            "[{\"eventId\":\"evg3nxh91\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:36.226Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M01-first-time.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      }
+    },
+    {
+      "id": "M02",
+      "label": "RETURNING_USER",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.You've completed this guide before.Show full steps (3)Show meStep through",
+        "memoryNote": "You've completed this guide before.",
+        "stepsVisible": false,
+        "showFullSteps": true,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:usr_fixture",
+            "[{\"eventId\":\"evg3nxh91\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:36.226Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evg3nxh92\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:36.438Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evg3nxh93\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:36.523Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evc07y241\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:36.689Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M02-returning.png",
+        "screenshotSha256": "sha256:2bb8f86bfbfeb7a2c8a40eaf2c62ebe259df4a95e96b9d4baf75574228f47b67"
+      }
+    },
+    {
+      "id": "M02b",
+      "label": "RETURNING_EXPANDED",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.You've completed this guide before.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": "You've completed this guide before.",
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:usr_fixture",
+            "[{\"eventId\":\"evg3nxh91\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:36.226Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evg3nxh92\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:36.438Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evg3nxh93\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:36.523Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evc07y241\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:36.689Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evc07y242\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"FULL_STEPS_EXPANDED\",\"occurredAt\":\"2026-08-29T08:29:36.905Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M02-expanded.png",
+        "screenshotSha256": "sha256:0cc22f2123f009c5c434d0b943e6ce23099c446a1155c6997e32e07141b1bc8c"
+      }
+    },
+    {
+      "id": "M02c",
+      "label": "RETURNING_STEPPING",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.You've completed this guide before.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show mePrevious1 of 3Next",
+        "memoryNote": "You've completed this guide before.",
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": false,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:usr_fixture",
+            "[{\"eventId\":\"evg3nxh91\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:36.226Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evg3nxh92\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:36.438Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evg3nxh93\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:36.523Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evc07y241\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:36.689Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evc07y242\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"usr_fixture\",\"featureId\":\"clients.create\",\"kind\":\"FULL_STEPS_EXPANDED\",\"occurredAt\":\"2026-08-29T08:29:36.905Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M02-stepping.png",
+        "screenshotSha256": "sha256:dfe2574475860aa558d484883b1df91a48a09211f6747fd806257e8a5db16c8e"
+      }
+    },
+    {
+      "id": "M03",
+      "label": "DERIVED_PATTERN",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Based on how you have used Guide beforeChoose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": true,
+        "memoryBasis": "Based on how you have used Guide before",
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:showme_user",
+            "[{\"eventId\":\"evzk9qjq1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"showme_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:37.730Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evzk9qjq2\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"showme_user\",\"featureId\":\"clients.create\",\"kind\":\"SHOW_ME_USED\",\"occurredAt\":\"2026-08-29T08:29:37.913Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evzk9qjq3\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"showme_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:38.126Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evzk9qjq4\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"showme_user\",\"featureId\":\"clients.create\",\"kind\":\"SHOW_ME_USED\",\"occurredAt\":\"2026-08-29T08:29:38.320Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evzk9qjq5\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"showme_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:38.512Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evzk9qjq6\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"showme_user\",\"featureId\":\"clients.create\",\"kind\":\"SHOW_ME_USED\",\"occurredAt\":\"2026-08-29T08:29:38.722Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"ev8l0lz61\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"showme_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:38.955Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M03-show-me-pattern.png",
+        "screenshotSha256": "sha256:52ddd1227ae5626011e23072dd73f994d0933b3567a4899045324120ac3d5ac9"
+      }
+    },
+    {
+      "id": "M04",
+      "label": "EXPLICIT_PREFERENCE",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:full_user",
+            "[{\"eventId\":\"evl8rb4k1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"full_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:39.318Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evl8rb4k2\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"full_user\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:39.507Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evl8rb4k3\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"full_user\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:39.606Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"pfl8rb4k4\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"full_user\",\"kind\":\"EXPLICIT_PREFERENCE_SET\",\"occurredAt\":\"2026-08-29T08:29:39.675Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"EXPLICIT_USER_PREFERENCE\",\"metadata\":{\"preference\":\"guidanceDetail\",\"value\":\"FULL\"}},{\"eventId\":\"evcrb98k1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"full_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:39.766Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M04-explicit-full.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      }
+    },
+    {
+      "id": "M05",
+      "label": "MEMORY_OFF",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [],
+        "screenshot": "screenshots/M05-memory-off.png",
+        "screenshotSha256": "sha256:31f3f8f5b68909c505b857980b2459d169ea3821ebe231a4a9b317439a736301"
+      }
+    },
+    {
+      "id": "M06-throw",
+      "label": "MEMORY_FAILURE",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [],
+        "screenshot": "screenshots/M06-memory-broken.png",
+        "screenshotSha256": "sha256:652ee00de9f50ec51c233195002519cf55edb2a0ff12c65e60fd5ab6838a86d3"
+      }
+    },
+    {
+      "id": "M06-malformed",
+      "label": "MEMORY_FAILURE",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": []
+      }
+    },
+    {
+      "id": "M06-unknown",
+      "label": "MEMORY_FAILURE",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": []
+      }
+    },
+    {
+      "id": "M07",
+      "label": "USER_ISOLATION",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:user_a",
+            "[{\"eventId\":\"evajvm0u1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_a\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:41.861Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evajvm0u2\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_a\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:42.071Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evajvm0u3\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_a\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:42.193Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ],
+          [
+            "statewave-guide:statewave-crm-fixture:user:user_b",
+            "[{\"eventId\":\"evzltyoj1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_b\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:42.302Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M07-user-b.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      }
+    },
+    {
+      "id": "M08",
+      "label": "WORKSPACE_ISOLATION",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:user_b",
+            "[{\"eventId\":\"evzltyoj1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_b\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:42.302Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ],
+          [
+            "statewave-guide:statewave-crm-fixture:user:user_a",
+            "[{\"eventId\":\"evajvm0u1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_a\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:41.861Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evajvm0u2\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_a\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:42.071Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evajvm0u3\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"user_a\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:42.193Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ],
+          [
+            "statewave-guide:statewave-crm-fixture:user:shared:workspace:w1",
+            "[{\"eventId\":\"evf35p171\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"shared\",\"workspaceId\":\"w1\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:42.587Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evf35p172\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"shared\",\"workspaceId\":\"w1\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:42.764Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evf35p173\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"shared\",\"workspaceId\":\"w1\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:42.826Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M08-workspace-b.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      }
+    },
+    {
+      "id": "M09",
+      "label": "VERSION_SCOPE",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:version_user",
+            "[{\"eventId\":\"evs8wlvc1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"version_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:43.296Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evs8wlvc2\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"version_user\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_STARTED\",\"occurredAt\":\"2026-08-29T08:29:43.522Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evs8wlvc3\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"version_user\",\"featureId\":\"clients.create\",\"kind\":\"STEP_THROUGH_COMPLETED\",\"occurredAt\":\"2026-08-29T08:29:43.583Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M09-old-version.png",
+        "screenshotSha256": "sha256:652ee00de9f50ec51c233195002519cf55edb2a0ff12c65e60fd5ab6838a86d3"
+      }
+    },
+    {
+      "id": "M10",
+      "label": "CURRENT_PERMISSION_VS_HISTORY",
+      "observed": {
+        "answerText": "I do not have anything verified about that.",
+        "memoryNote": null,
+        "stepsVisible": false,
+        "showFullSteps": false,
+        "stepThroughOffered": false,
+        "showMeOffered": false,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [],
+        "screenshot": "screenshots/M10-invoice-negative.png",
+        "screenshotSha256": "sha256:3623c62738980d9dbd3d2e846d1d3caa624613facf62e48e63e1f3eaa009b0cb"
+      }
+    },
+    {
+      "id": "M11",
+      "label": "HISTORICAL_MEMORY",
+      "observed": {
+        "answerText": "DeleteYou need permission to do this.",
+        "memoryNote": null,
+        "stepsVisible": false,
+        "showFullSteps": false,
+        "stepThroughOffered": false,
+        "showMeOffered": false,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:delete_user",
+            "[{\"eventId\":\"ev09txu91\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"delete_user\",\"featureId\":\"client-detail.delete\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:44.981Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"},{\"eventId\":\"evavstfa1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"delete_user\",\"featureId\":\"client-detail.delete\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:45.253Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M11-delete-permission.png",
+        "screenshotSha256": "sha256:b19cc5e9a2675a4188a81146eed860beab7ce7bf085ecbe36daabfeeec907ff1"
+      }
+    },
+    {
+      "id": "M12",
+      "label": "SECRET",
+      "observed": {
+        "answerText": "On this screen, it is directly below the setting list.Show me",
+        "memoryNote": null,
+        "stepsVisible": false,
+        "showFullSteps": false,
+        "stepThroughOffered": false,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:secret_user",
+            "[{\"eventId\":\"ev15tcjz1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"secret_user\",\"featureId\":\"settings.danger-zone\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:45.610Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "rawStoreLength": 401
+      }
+    },
+    {
+      "id": "M14",
+      "label": "RESET",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:reset_user",
+            "[{\"eventId\":\"evyr9pvy1\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"reset_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:46.674Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M14-after-reset.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      }
+    },
+    {
+      "id": "M15",
+      "label": "HOSTILE_MEMORY",
+      "observed": {
+        "answerText": "New clientLets you create a new client.On this screen, it is inside the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through",
+        "memoryNote": null,
+        "stepsVisible": true,
+        "showFullSteps": false,
+        "stepThroughOffered": true,
+        "showMeOffered": true,
+        "showMeEmphasised": false,
+        "memoryBasis": null,
+        "memoryMenuOffered": false,
+        "stored": [
+          [
+            "statewave-guide:statewave-crm-fixture:user:hostile_user",
+            "[{\"eventId\":\"ev4ihh291\",\"appId\":\"statewave-crm-fixture\",\"subjectId\":\"hostile_user\",\"featureId\":\"clients.create\",\"kind\":\"GUIDANCE_VIEWED\",\"occurredAt\":\"2026-08-29T08:29:47.111Z\",\"applicationVersion\":\"[secret-shaped]\",\"authority\":\"OBSERVED_INTERACTION\"}]"
+          ]
+        ],
+        "screenshot": "screenshots/M15-hostile-memory.png",
+        "screenshotSha256": "sha256:664cfd647a50d14058ce5340a8b4328ad60347c51b1e500e568315d8740f8b57"
+      }
+    }
+  ]
+}

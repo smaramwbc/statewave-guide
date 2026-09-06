@@ -56,6 +56,12 @@ importers:
       '@statewavedev/guide-shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@statewavedev/guide-statewave':
+        specifier: workspace:*
+        version: link:../../packages/statewave
+      '@statewavedev/sdk':
+        specifier: ^1.4.0
+        version: 1.4.0
       axios:
         specifier: ^1.13.2
         version: 1.20.0
@@ -346,6 +352,25 @@ importers:
       zod:
         specifier: ^4.4.3
         version: 4.4.3
+    devDependencies:
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(postcss@8.5.26)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.11
+        version: 4.1.11(@types/node@22.20.1)(esbuild@0.27.7)(jsdom@30.0.1)
+
+  packages/statewave:
+    dependencies:
+      '@statewavedev/guide-core':
+        specifier: workspace:*
+        version: link:../core
+      '@statewavedev/sdk':
+        specifier: ^1.5.0
+        version: 1.5.0
     devDependencies:
       tsup:
         specifier: ^8.5.1
@@ -982,6 +1007,14 @@ packages:
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
+  '@statewavedev/sdk@1.4.0':
+    resolution: {integrity: sha512-OGmu/Kx7WGi3HppqKPEpib832iFrepPHuwlnUOi4VB2l/mNzXfWuqYqYdoUzI4udxCvMNBFcRsO4X9OSnoNwVg==}
+    engines: {node: '>=18'}
+
+  '@statewavedev/sdk@1.5.0':
+    resolution: {integrity: sha512-if+EyYyA+gpB6pEvgMKd3hDWwNjcsGsX7zxcr9a4hfdmv9cyaEE4CHrD2NWEJpXmT81ZtSeBOKAiZXJd/MsUtw==}
+    engines: {node: '>=18'}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -2994,6 +3027,10 @@ snapshots:
   '@stablelib/base64@1.0.1': {}
 
   '@standard-schema/spec@1.1.0': {}
+
+  '@statewavedev/sdk@1.4.0': {}
+
+  '@statewavedev/sdk@1.5.0': {}
 
   '@testing-library/dom@10.4.1':
     dependencies:

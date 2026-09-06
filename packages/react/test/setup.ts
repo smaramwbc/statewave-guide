@@ -110,3 +110,19 @@ afterEach(() => {
   document.body.replaceChildren();
   document.querySelectorAll('[data-statewave-guide]').forEach((node) => node.remove());
 });
+
+// A fourth gap: jsdom has no `matchMedia`, and the panel asks for one to decide
+// whether it is on a narrow screen. Non-matching is the desktop case, which is
+// what these tests are describing.
+if (typeof window.matchMedia !== 'function') {
+  window.matchMedia = ((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
+}

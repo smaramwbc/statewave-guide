@@ -44,7 +44,9 @@ export default tseslint.config(
   },
   {
     // Repo-level Node CLI programs: they talk to a terminal by design.
-    files: ['scripts/**/*.mjs', 'e2e/**/*.mjs'],
+    // `examples/**/*.mjs` joins them in Closed Loop #20: the demo host's trusted
+    // backend is a Node program that happens to live beside a browser app.
+    files: ['scripts/**/*.mjs', 'e2e/**/*.mjs', 'examples/**/*.mjs'],
     languageOptions: {
       globals: {
         console: 'readonly',
@@ -66,6 +68,15 @@ export default tseslint.config(
         window: 'readonly',
         // Closed Loop #18 paints over a region of a screenshot inside a canvas.
         Image: 'readonly',
+        // Closed Loop #19 reads and writes the memory store from inside the page.
+        localStorage: 'readonly',
+        // Closed Loop #20 speaks HTTP: a Node 18+ program and a fake socket both
+        // use the platform fetch types.
+        Response: 'readonly',
+        Request: 'readonly',
+        Headers: 'readonly',
+        AbortController: 'readonly',
+        clearTimeout: 'readonly',
       },
     },
     rules: { 'no-console': 'off' },

@@ -84,6 +84,80 @@ export type {
 } from './query/contract.js';
 export { classifyIntent } from './query/intent.js';
 export { describeVisualContext, spatialRelationOf } from './query/visual-context.js';
+
+// --- Closed Loop #19: memory remembers experience, not truth ---------------
+export {
+  acceptMemoryEvents,
+  validateMemoryEvent,
+  ASSISTANCE_MODE_VALUES,
+  GUIDANCE_DETAIL_VALUES,
+  GUIDE_MEMORY_AUTHORITIES,
+  GUIDE_MEMORY_EVENT_KINDS,
+} from './memory/events.js';
+export type {
+  AssistanceModePreference,
+  GuidanceDetailPreference,
+  GuideMemoryAuthority,
+  GuideMemoryEvent,
+  GuideMemoryEventKind,
+  GuideMemoryEventMetadata,
+  MemoryRejection,
+} from './memory/events.js';
+export {
+  GUIDE_PREFERENCE_CLAIM_KEYS,
+  GUIDE_STATE_NAMESPACE,
+  canonicalPreferenceValue,
+  guideStateKey,
+  ingestKeyFor,
+  preferenceForClaimKey,
+  preferenceValueFromCanonical,
+} from './memory/keys.js';
+export type { GuideStateKey, GuideStateKind } from './memory/keys.js';
+export {
+  DURABLE_REMOTE_EVENT_KINDS,
+  GUIDE_MEMORY_DURABILITY,
+  isDurableRemoteEvent,
+  remoteMemoryWriteDecision,
+} from './memory/retention.js';
+export type { GuideMemoryDurability, RemoteMemoryWriteDecision } from './memory/retention.js';
+export { hasCompletedGuide, projectMemoryProfile } from './memory/profile.js';
+export type {
+  GuideExplicitPreferences,
+  GuideFeatureHistory,
+  GuideInteractionPatterns,
+  GuideMemoryProfile,
+} from './memory/profile.js';
+export {
+  classifyAdaptations,
+  GUIDE_META_COPY,
+  hasVisibleAdaptation,
+  neutralPresentationPlan,
+  planPresentation,
+  resolvePresentation,
+  RETIRED_META_COPY,
+} from './memory/planner.js';
+export type {
+  AdaptedGuideResponse,
+  GuideAdaptationDimension,
+  GuideAdaptationOutcome,
+  GuideAdaptationReason,
+  GuideAdaptationRecord,
+  ResolvedGuidePresentation,
+  GuideAdaptationRefusal,
+  GuideMetaCopyId,
+  GuidePresentationPlan,
+} from './memory/planner.js';
+export {
+  createFailingGuideMemoryStore,
+  createInMemoryGuideMemoryStore,
+  scopeKey,
+  statewaveAdapterStatus,
+} from './memory/store.js';
+export type {
+  GuideMemoryScope,
+  GuideMemoryStore,
+  GuideMemoryStoreDiagnostics,
+} from './memory/store.js';
 export { renderContextualSentence, verifyContextualStatement } from './query/contextual.js';
 export type {
   ContextualReceipt,

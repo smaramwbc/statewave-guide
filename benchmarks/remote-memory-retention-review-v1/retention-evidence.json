@@ -1,0 +1,107 @@
+{
+  "loop": "closed-loop-20-1-remote-memory-retention",
+  "rule": "No future presentation effect, no durable guide memory.",
+  "derived": {
+    "readCeiling": 100,
+    "durableKinds": ["EXPLICIT_PREFERENCE_SET", "STEP_THROUGH_COMPLETED"],
+    "classification": [
+      {
+        "kind": "GUIDANCE_VIEWED",
+        "durability": "NOT_USEFUL",
+        "durableRemote": false,
+        "appliedOutcomes": 0,
+        "example": null
+      },
+      {
+        "kind": "SHOW_ME_USED",
+        "durability": "DERIVED_ONLY",
+        "durableRemote": false,
+        "appliedOutcomes": 2,
+        "example": "x3 | steps=1 actions=1 | ASSISTANCE_EMPHASIS"
+      },
+      {
+        "kind": "STEP_THROUGH_STARTED",
+        "durability": "DERIVED_ONLY",
+        "durableRemote": false,
+        "appliedOutcomes": 2,
+        "example": "x3 | steps=3 actions=1 | ASSISTANCE_EMPHASIS"
+      },
+      {
+        "kind": "STEP_THROUGH_COMPLETED",
+        "durability": "DURABLE_REMOTE",
+        "durableRemote": true,
+        "appliedOutcomes": 6,
+        "example": "x1 | steps=3 actions=1 | STEPS_COLLAPSED"
+      },
+      {
+        "kind": "FULL_STEPS_EXPANDED",
+        "durability": "NOT_USEFUL",
+        "durableRemote": false,
+        "appliedOutcomes": 0,
+        "example": null
+      },
+      {
+        "kind": "EXPLICIT_PREFERENCE_SET",
+        "durability": "DURABLE_REMOTE",
+        "durableRemote": true,
+        "appliedOutcomes": 10,
+        "example": "guidanceDetail=CONCISE | steps=3 actions=1 | STEPS_COLLAPSED"
+      }
+    ],
+    "volume": [
+      {
+        "shape": "light",
+        "writtenBefore": 4,
+        "writtenAfter": 0,
+        "reductionPercent": 100,
+        "sessionsToCeilingBefore": 25,
+        "sessionsToCeilingAfter": null
+      },
+      {
+        "shape": "typical",
+        "writtenBefore": 11,
+        "writtenAfter": 1,
+        "reductionPercent": 91,
+        "sessionsToCeilingBefore": 10,
+        "sessionsToCeilingAfter": 100
+      },
+      {
+        "shape": "heavy",
+        "writtenBefore": 33,
+        "writtenAfter": 4,
+        "reductionPercent": 88,
+        "sessionsToCeilingBefore": 4,
+        "sessionsToCeilingAfter": 25
+      }
+    ]
+  },
+  "timings": {
+    "note": "machine-dependent; not compared by --check",
+    "rows": [
+      {
+        "events": 10,
+        "projectMs": 0.0038,
+        "planMs": 0.0013,
+        "profileBytes": 1731
+      },
+      {
+        "events": 100,
+        "projectMs": 0.0207,
+        "planMs": 0.0015,
+        "profileBytes": 3490
+      },
+      {
+        "events": 500,
+        "projectMs": 0.0336,
+        "planMs": 0.0014,
+        "profileBytes": 3511
+      },
+      {
+        "events": 1000,
+        "projectMs": 0.0585,
+        "planMs": 0.0013,
+        "profileBytes": 3522
+      }
+    ]
+  }
+}

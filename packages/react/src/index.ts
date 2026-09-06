@@ -182,3 +182,16 @@ export {
   Send as GuideSendIcon,
   Sparkle as GuideSparkleIcon,
 } from './theme/icons.js';
+
+// --- Closed Loop #19: memory remembers experience, not truth ---------------
+export { createBrowserGuideMemoryStore } from './memory/browser-store.js';
+export { createRemoteGuideMemoryStore } from './memory/remote-store.js';
+export type {
+  RemoteGuideMemoryStore,
+  RemoteGuideMemoryStoreOptions,
+  RemoteGuideMemoryDiagnostics,
+  RemoteMemoryMode,
+} from './memory/remote-store.js';
+export type { BrowserGuideMemoryStore } from './memory/browser-store.js';
+export { useGuideMemory } from './memory/use-guide-memory.js';
+export type { GuideMemoryController, GuideMemoryOptions } from './memory/use-guide-memory.js';

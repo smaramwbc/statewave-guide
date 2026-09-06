@@ -1,0 +1,628 @@
+{
+  "experiment": "statewave-persistence-review-v1",
+  "version": 1,
+  "reviewerType": "non_human_independent",
+  "formalHumanValidation": "DEFERRED_UNTIL_PRE_RELEASE",
+  "status": "UNSCORED",
+  "question": "Does structured guidance experience, persisted in a real Statewave, make a returning user better off — without the persistence becoming authority?",
+  "derivedFrom": {
+    "file": "benchmarks/statewave-persistence-review-v1/statewave-evidence.json",
+    "sha256": "sha256:17fb25fe404ddc6d34e56746d54b01c7ca6ffd39a7ef7731b85210d2bee03767",
+    "statewave": "http://127.0.0.1:8110",
+    "harness": "playwright/chromium 1440x900, guide -> host backend -> Statewave at http://127.0.0.1:8110"
+  },
+  "instructions": [
+    "Every score is null and stays null until an independent reviewer fills it in. Nothing here has been scored by the author.",
+    "Judge the screens, not the architecture. Each item names its two captures; the screenshots are in this directory.",
+    "NEITHER is a permitted preference on every item, and so is preferring the left-hand side.",
+    "Each item carries a `measurements` object, one level away from the questions. It is there so you do not have to take a claim on trust, and it is deliberately not a sibling of the score boxes: `purposeAndConditionIdentical: true` is a fact about two strings, not an answer to whether the screen is truthful.",
+    "`browserStorageKeysEitherSide` is the number of guide keys either page kept in the browser. Zero is the claim of this loop: the continuity you are judging came from a server, not from the machine.",
+    "Some dimensions are scored once for the pair (scope PAIR in the rubric) because the question is about the difference rather than about either screen.",
+    "SW02 — the returning user — is the left-hand side of almost every pair, because it is what the others are compared against. reusedCaptures lists exactly how often each capture appears; you are looking at that one screen more than once, by design.",
+    "`purposeAndConditionIdentical` compares only the purpose sentence and the permission condition — the two things memory must never change. It was called `verifiedTextIdentical`, which promised more than it measured."
+  ],
+  "rubric": {
+    "continuity": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "scope": "PAIR",
+      "asks": "Did coming back on a different machine feel like continuing rather than starting again?"
+    },
+    "worthTheChange": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "scope": "PAIR",
+      "asks": "Is the difference between these two screens worth persisting anything for?"
+    },
+    "truthfulness": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "scope": "PER_SIDE",
+      "asks": "Is everything on the screen true of the screen the user is looking at?"
+    },
+    "restraint": {
+      "min": 0,
+      "max": 2,
+      "higherIsBetter": true,
+      "scope": "PER_SIDE",
+      "asks": "Does it say as little as it can get away with, rather than as much as it knows?"
+    },
+    "trustworthiness": {
+      "min": 0,
+      "max": 3,
+      "higherIsBetter": true,
+      "scope": "PAIR",
+      "asks": "Knowing this is stored on a server, would you be comfortable with what it kept?"
+    }
+  },
+  "preferenceOptions": [
+    "LEFT",
+    "RIGHT",
+    "NEITHER"
+  ],
+  "objectiveMetrics": {
+    "scenarios": 15,
+    "readCeiling": {
+      "inserted": 105,
+      "returned": 100,
+      "lowestOrdinalReturned": 1,
+      "highestOrdinalReturned": 100,
+      "newestReachable": false
+    },
+    "pageErrors": 0,
+    "statewaveBaseUrl": "http://127.0.0.1:8110",
+    "remoteEpisodesTotal": 29,
+    "remoteBytesTotal": 16929,
+    "rawQueriesPersisted": 0,
+    "rawAnswersPersisted": 0,
+    "domTextPersisted": 0,
+    "runtimeInstanceNamesPersisted": 0,
+    "secretShapedValuesPersisted": 0,
+    "buildIdentitiesPersisted": 28,
+    "emailsPersisted": 0,
+    "statewaveLatencyMs": {
+      "calls": 161,
+      "p50": 3,
+      "p95": 11
+    }
+  },
+  "scenarioMatrix": [
+    {
+      "id": "SW01",
+      "label": "REMOTE_WRITE"
+    },
+    {
+      "id": "SW02",
+      "label": "REMOTE_RESTORE_NEW_PROCESS"
+    },
+    {
+      "id": "SW03",
+      "label": "USER_ISOLATION"
+    },
+    {
+      "id": "SW04",
+      "label": "WORKSPACE_ISOLATION"
+    },
+    {
+      "id": "SW05",
+      "label": "VERSION_SCOPE"
+    },
+    {
+      "id": "SW06",
+      "label": "READ_FAILURE_FALLBACK"
+    },
+    {
+      "id": "SW07",
+      "label": "WRITE_FAILURE_TOLERATED"
+    },
+    {
+      "id": "SW08",
+      "label": "IDEMPOTENCY"
+    },
+    {
+      "id": "SW09",
+      "label": "MALFORMED_REMOTE_EVENT"
+    },
+    {
+      "id": "SW10",
+      "label": "HOSTILE_WELL_FORMED_REMOTE_EVENT"
+    },
+    {
+      "id": "SW11",
+      "label": "RESET"
+    },
+    {
+      "id": "SW12",
+      "label": "REMOTE_AUTHORITY_NEGATIVE"
+    },
+    {
+      "id": "SW13",
+      "label": "CURRENT_PERMISSION_NEGATIVE"
+    },
+    {
+      "id": "SW14",
+      "label": "RUNTIME_INSTANCE_NONPERSISTENCE"
+    },
+    {
+      "id": "SW15",
+      "label": "SECRET_NONPERSISTENCE"
+    }
+  ],
+  "reusedCaptures": [
+    {
+      "scenario": "SW02",
+      "appearances": 7
+    }
+  ],
+  "items": [
+    {
+      "id": "SP01",
+      "label": "REMOTE FIRST TIME vs REMOTE RETURNING, NEW BROWSER CONTEXT",
+      "question": "The same person asks the same question twice. Between the two, the browser was thrown away. Is the second answer better for them?",
+      "context": "Both screens come from the same build and the same Statewave server. The second is a second, independent browser context — separate storage, nothing shared — whose local storage was empty before it asked and after. `measurements.browserStorageKeysEitherSide` is that count, and it is the whole claim of this loop.",
+      "left": {
+        "scenario": "SW01",
+        "note": "first visit, nothing remembered anywhere",
+        "screenshot": "screenshots/SW01-process-a-after-completion.png",
+        "screenshotSha256": "sha256:7da40d7af08cbb9276665d9dba8af14b9c36a9518be6c23e7e8167d53e7f4a1a",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": 3,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "right": {
+        "scenario": "SW02",
+        "note": "a second context, recognising a completed guide from the server",
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "measurements": {
+        "identicalScreenshots": false,
+        "purposeAndConditionIdentical": true,
+        "actionsIdentical": true,
+        "browserStorageKeysEitherSide": 0
+      },
+      "dimensions": [
+        "continuity",
+        "worthTheChange",
+        "truthfulness",
+        "restraint"
+      ],
+      "scores": {
+        "continuity": {
+          "pair": null
+        },
+        "worthTheChange": {
+          "pair": null
+        },
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "restraint": {
+          "left": null,
+          "right": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "SP02",
+      "label": "REMOTE RETURNING vs REMOTE UNREACHABLE",
+      "question": "The memory server is down. Compare what the user gets to what they get when it is up. Is the degradation acceptable?",
+      "context": "The right-hand screen was produced with the memory endpoint pointed at a port with nothing on it. Judge whether a person could tell that something was broken, and whether they should be able to.",
+      "left": {
+        "scenario": "SW02",
+        "note": "the server answered",
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "right": {
+        "scenario": "SW06",
+        "note": "the server was unreachable",
+        "screenshot": "screenshots/SW06-remote-unreachable.png",
+        "screenshotSha256": "sha256:36fa94181de3dca5df6ac6b1c27cfecf5461504a043c16ba41ceb354bd8a2b75",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "measurements": {
+        "identicalScreenshots": false,
+        "purposeAndConditionIdentical": true,
+        "actionsIdentical": true,
+        "browserStorageKeysEitherSide": 0
+      },
+      "dimensions": [
+        "truthfulness",
+        "restraint",
+        "worthTheChange"
+      ],
+      "scores": {
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "restraint": {
+          "left": null,
+          "right": null
+        },
+        "worthTheChange": {
+          "pair": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "SP03",
+      "label": "ALICE RETURNING vs BOB FIRST TIME",
+      "question": "Alice finished this guide; Bob never has. Both ask the same question against the same server. Is the separation evident from the screens?",
+      "context": "Alice's completion is still in Statewave while Bob asks — otherSubjectEpisodes in the capture records that it was present and not applied.",
+      "left": {
+        "scenario": "SW02",
+        "note": "Alice, recognised",
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "right": {
+        "scenario": "SW03",
+        "note": "Bob, on the same server, unrecognised",
+        "screenshot": "screenshots/SW03-other-subject.png",
+        "screenshotSha256": "sha256:65decca42e48e6f3c400612c9e92f8e9e3a75d19e1c895b5d3d56e7c0aa79af3",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "measurements": {
+        "identicalScreenshots": false,
+        "purposeAndConditionIdentical": true,
+        "actionsIdentical": true,
+        "browserStorageKeysEitherSide": 0
+      },
+      "dimensions": [
+        "truthfulness",
+        "trustworthiness",
+        "worthTheChange"
+      ],
+      "scores": {
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "trustworthiness": {
+          "pair": null
+        },
+        "worthTheChange": {
+          "pair": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "SP04",
+      "label": "SAME BUILD vs DIFFERENT BUILD",
+      "question": "The same completion, read on a build the application has moved past. Should the guide still shorten the answer?",
+      "context": "Version scoping is a Closed Loop #19 rule this loop did not change: a guide completed against a build the application has moved past is history, not a reason to collapse the steps somebody is looking at now.",
+      "left": {
+        "scenario": "SW02",
+        "note": "the build the completion happened on",
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "right": {
+        "scenario": "SW05",
+        "note": "a different application version",
+        "screenshot": "screenshots/SW05-other-version.png",
+        "screenshotSha256": "sha256:65decca42e48e6f3c400612c9e92f8e9e3a75d19e1c895b5d3d56e7c0aa79af3",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "measurements": {
+        "identicalScreenshots": false,
+        "purposeAndConditionIdentical": true,
+        "actionsIdentical": true,
+        "browserStorageKeysEitherSide": 0
+      },
+      "dimensions": [
+        "truthfulness",
+        "worthTheChange",
+        "trustworthiness"
+      ],
+      "scores": {
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "worthTheChange": {
+          "pair": null
+        },
+        "trustworthiness": {
+          "pair": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "SP05",
+      "label": "REMEMBERED vs RESET",
+      "question": "The user pressed \"Reset Guide memory\", and the records were deleted from the server. Does the guide behave as though it never knew them?",
+      "context": "episodesBefore and episodesAfter in the capture are counts taken from Statewave itself, not from the browser. Deletion here is the real `DELETE /v1/subjects/{id}`, which is why the Statewave subject is the guide scope and nothing else.",
+      "left": {
+        "scenario": "SW02",
+        "note": "remembered",
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "right": {
+        "scenario": "SW11",
+        "note": "after a reset that reached the server",
+        "screenshot": "screenshots/SW11-after-reset.png",
+        "screenshotSha256": "sha256:65decca42e48e6f3c400612c9e92f8e9e3a75d19e1c895b5d3d56e7c0aa79af3",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": true,
+        "expandControl": null,
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Choose \"New client\".Enter the client's billing email, name and plan.Choose \"Create client\".Show meStep through"
+      },
+      "measurements": {
+        "identicalScreenshots": false,
+        "purposeAndConditionIdentical": true,
+        "actionsIdentical": true,
+        "browserStorageKeysEitherSide": 0
+      },
+      "dimensions": [
+        "trustworthiness",
+        "truthfulness",
+        "worthTheChange"
+      ],
+      "scores": {
+        "trustworthiness": {
+          "pair": null
+        },
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "worthTheChange": {
+          "pair": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "SP06",
+      "label": "RICH REMOTE HISTORY vs WHAT THE EVIDENCE SUPPORTS",
+      "question": "This person has nine invoice-related guide records in a real database. On a screen where nothing establishes the concept, they ask how to open an invoice. Is the answer right?",
+      "context": "The left-hand side is the ordinary answer for a supported question. The right-hand side is the refusal. Remote persistence is not more authoritative than local persistence — this is the same negative Closed Loop #16 established, asked again with a database behind it.",
+      "left": {
+        "scenario": "SW02",
+        "note": "a question the evidence supports",
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "right": {
+        "scenario": "SW12",
+        "note": "a question it does not, with a remote history that suggests otherwise",
+        "screenshot": "screenshots/SW12-remote-memory-is-not-evidence.png",
+        "screenshotSha256": "sha256:7422fdde8a8cd39ede5046594a8c59fa80be35ab22550d19d1e0175818352ee6",
+        "title": null,
+        "purpose": null,
+        "condition": null,
+        "stepsVisible": false,
+        "expandControl": null,
+        "actions": [],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": 9,
+        "userFacingText": "I do not have anything verified about that."
+      },
+      "measurements": {
+        "identicalScreenshots": false,
+        "purposeAndConditionIdentical": false,
+        "actionsIdentical": false,
+        "browserStorageKeysEitherSide": 0
+      },
+      "dimensions": [
+        "truthfulness",
+        "trustworthiness"
+      ],
+      "scores": {
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "trustworthiness": {
+          "pair": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    },
+    {
+      "id": "SP07",
+      "label": "REMEMBERED DELETE GUIDE vs CURRENT PERMISSION",
+      "question": "The server remembers this person completing the delete guide. They no longer have the permission. What should they be told?",
+      "context": "What a person may do is a fact about now, and a stored record of having once been shown how is not a grant. Judge whether the screen makes the current state clear.",
+      "left": {
+        "scenario": "SW02",
+        "note": "a feature the user may use",
+        "screenshot": "screenshots/SW02-process-b-returning.png",
+        "screenshotSha256": "sha256:7baaef35e0e2d30dd47b69f0784ff6472fc0fc1dddc323c690a126b07b8789b4",
+        "title": "New client",
+        "purpose": "Lets you create a new client.",
+        "condition": "You need permission to create a client.",
+        "stepsVisible": false,
+        "expandControl": "Show full steps (3)",
+        "actions": [
+          "Show me",
+          "Step through"
+        ],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "New clientLets you create a new client.On this screen, it is directly above the list.You need permission to create a client.Show full steps (3)Show meStep through"
+      },
+      "right": {
+        "scenario": "SW13",
+        "note": "a feature they may not, with history saying they once did",
+        "screenshot": "screenshots/SW13-permission-outranks-memory.png",
+        "screenshotSha256": "sha256:4e4cdd014b1aab724cfcb3dac35ee97c63e11e9011c6c717d11bd22baae91252",
+        "title": null,
+        "purpose": null,
+        "condition": null,
+        "stepsVisible": false,
+        "expandControl": null,
+        "actions": [],
+        "localStorageGuideKeys": [],
+        "remoteEpisodes": null,
+        "userFacingText": "I do not have anything verified about that."
+      },
+      "measurements": {
+        "identicalScreenshots": false,
+        "purposeAndConditionIdentical": false,
+        "actionsIdentical": false,
+        "browserStorageKeysEitherSide": 0
+      },
+      "dimensions": [
+        "truthfulness",
+        "trustworthiness",
+        "restraint"
+      ],
+      "scores": {
+        "truthfulness": {
+          "left": null,
+          "right": null
+        },
+        "trustworthiness": {
+          "pair": null
+        },
+        "restraint": {
+          "left": null,
+          "right": null
+        }
+      },
+      "preferred": null,
+      "freeText": null
+    }
+  ]
+}

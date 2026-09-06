@@ -56,13 +56,26 @@ const onClients = (overrides: Partial<GuideQueryContext> = {}): GuideQueryContex
   snapshotId: 's1',
   applicationVersion: bundle.applicationVersion,
   visibleSemanticIds: ['clients.search', 'clients.table'],
+  // Two rows, not one. A container holding a single thing is a container; a
+  // list is a repetition, and Closed Loop #19.1 made the describer ask for one
+  // before it calls anything "the list" — a page wrapper holding one of each
+  // control had been qualifying.
   runtimeInstances: [
+    // Unnamed on purpose. A named row is a thing a question could be *about*,
+    // and two of them make the engine offer a choice — correctly, and in a
+    // different test than this one. What these fixtures need from the rows is
+    // only that there are two of them.
     {
       semanticId: 'clients.table.row',
       ref: 'i1',
       containerSemanticId: 'clients.table',
       route: '/clients',
-      runtimeAccessibleName: 'Acme Corp',
+    },
+    {
+      semanticId: 'clients.table.row',
+      ref: 'i2',
+      containerSemanticId: 'clients.table',
+      route: '/clients',
     },
   ],
   elementBoxes: { 'clients.search': SEARCH_BOX, 'clients.table': TABLE },
@@ -295,12 +308,20 @@ describe('G · INV-001 visible on a client screen', () => {
         route: '/clients/c1',
         runtimeAccessibleName: 'INV-001',
       },
+      {
+        semanticId: 'invoices.list.open',
+        ref: 'i2',
+        containerSemanticId: 'invoices.list.open',
+        route: '/clients/c1',
+      },
     ],
     elementBoxes: {
       'client-detail.rename': { x: 32, y: 120, width: 120, height: 36 },
       'invoices.list.open': { x: 32, y: 200, width: 800, height: 300 },
     },
-    elementRoles: { 'client-detail.rename': 'button' },
+    // The invoice list reports itself a list; the point of the test is that
+    // saying so does not let the *word* "invoice" into a sentence.
+    elementRoles: { 'client-detail.rename': 'button', 'invoices.list.open': 'list' },
     runtimeVisibleLanguage: [
       {
         semanticId: 'invoices.list.open',

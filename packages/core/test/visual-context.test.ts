@@ -28,16 +28,33 @@ const onClients = (overrides: Partial<GuideQueryContext> = {}): GuideQueryContex
   route: '/clients',
   applicationVersion: bundle.applicationVersion,
   visibleSemanticIds: ['clients.search', 'clients.table'],
+  // Two rows, not one. A container holding a single thing is a container; a
+  // list is a repetition, and Closed Loop #19.1 made the describer ask for one
+  // before it calls anything "the list" — a page wrapper holding one of each
+  // control had been qualifying.
   runtimeInstances: [
+    // Unnamed on purpose. A named row is a thing a question could be *about*,
+    // and two of them make the engine offer a choice — correctly, and in a
+    // different test than this one. What these fixtures need from the rows is
+    // only that there are two of them.
     {
       semanticId: 'clients.table.row',
       ref: 'i1',
       containerSemanticId: 'clients.table',
       route: '/clients',
-      runtimeAccessibleName: 'Acme Corp',
+    },
+    {
+      semanticId: 'clients.table.row',
+      ref: 'i2',
+      containerSemanticId: 'clients.table',
+      route: '/clients',
     },
   ],
   elementBoxes: { 'clients.search': SEARCH, 'clients.table': TABLE },
+  // Roles, because since Closed Loop #19.1 a region is a collection when the
+  // runtime reports it as one. The React binding always supplies these; a
+  // fixture that omitted them was describing a host that does not exist.
+  elementRoles: { 'clients.search': 'searchbox', 'clients.table': 'table' },
   ...overrides,
 });
 
@@ -66,13 +83,24 @@ describe('a location for a control the interface never names', () => {
     ).toBeUndefined();
   });
 
-  it('is absent when nothing observed members in the region', () => {
-    // A rectangle on screen is not a collection. Only the runtime saying it has
-    // members makes it one, which is the same rule instance grounding follows.
+  it('is absent when nothing on the screen reports itself a collection', () => {
+    // A rectangle is not a collection, and neither is a region that merely holds
+    // things. The runtime has to report the *element* as one.
+    const context = onClients({ elementRoles: { 'clients.search': 'searchbox' } });
+    expect(
+      describeVisualContext({ bundle, context, targetSemanticId: 'clients.search' })?.sentences,
+    ).toBeUndefined();
+  });
+
+  it('is offered for an empty collection, because an empty table is still a table', () => {
+    // Requiring an observed repetition made this data-dependent: an audit found
+    // Closed Loop #18's sentence disappearing whenever the search matched one
+    // client. Being a list is a property of the element, not of its contents.
     const context = onClients({ runtimeInstances: [] });
     expect(
-      describeVisualContext({ bundle, context, targetSemanticId: 'clients.search' }),
-    ).toBeUndefined();
+      describeVisualContext({ bundle, context, targetSemanticId: 'clients.search' })
+        ?.regionDescription,
+    ).toBe('the list');
   });
 });
 
@@ -103,11 +131,18 @@ describe('what a region may be called', () => {
           route: '/clients/c1',
           runtimeAccessibleName: 'INV-002',
         },
+        {
+          semanticId: 'invoices.list.open',
+          ref: 'i2',
+          containerSemanticId: 'invoices.list.open',
+          route: '/clients/c1',
+        },
       ],
       elementBoxes: {
         'client-detail.rename': { x: 32, y: 120, width: 120, height: 36 },
         'invoices.list.open': { x: 32, y: 200, width: 800, height: 300 },
       },
+      elementRoles: { 'client-detail.rename': 'button', 'invoices.list.open': 'list' },
     };
     const described = describeVisualContext({
       bundle,
@@ -177,5 +212,160 @@ describe('the location is additive', () => {
     expect(without.status).toBe(withGeometry.status);
     expect(without.answer).toEqual(withGeometry.answer);
     expect(without.actions).toEqual(withGeometry.actions);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// A structural container is not a collection a person perceives
+// ---------------------------------------------------------------------------
+
+describe('a page wrapper is not "the list"', () => {
+  /**
+   * The defect an independent review caught, reproduced from the geometry a
+   * browser actually reported. `clients.create` is a toolbar button whose top
+   * edge is flush with the page section's top edge, and the section holds one
+   * of everything — a count, three buttons, a search field and a table. It was
+   * described as being *inside the list*, which sends a reader to the wrong half
+   * of the screen.
+   */
+  const page = (overrides: Partial<GuideQueryContext> = {}): GuideQueryContext => ({
+    route: '/clients',
+    applicationVersion: bundle.applicationVersion,
+    visibleSemanticIds: ['clients', 'clients.create', 'clients.search', 'clients.table'],
+    runtimeInstances: [
+      {
+        semanticId: 'clients.create',
+        ref: 'a1',
+        containerSemanticId: 'clients',
+        route: '/clients',
+      },
+      {
+        semanticId: 'clients.search',
+        ref: 'a2',
+        containerSemanticId: 'clients',
+        route: '/clients',
+      },
+      { semanticId: 'clients.table', ref: 'a3', containerSemanticId: 'clients', route: '/clients' },
+      {
+        semanticId: 'clients.table.row',
+        ref: 'r1',
+        containerSemanticId: 'clients.table',
+        route: '/clients',
+      },
+      {
+        semanticId: 'clients.table.row',
+        ref: 'r2',
+        containerSemanticId: 'clients.table',
+        route: '/clients',
+      },
+    ],
+    elementBoxes: {
+      clients: { x: 30, y: 103, width: 1380, height: 424 },
+      'clients.create': { x: 184, y: 103, width: 91, height: 34 },
+      'clients.search': { x: 30, y: 169, width: 240, height: 34 },
+      'clients.table': { x: 30, y: 203, width: 1380, height: 324 },
+    },
+    elementContainers: {
+      'clients.create': ['clients'],
+      'clients.search': ['clients'],
+      'clients.table': ['clients'],
+    },
+    elementRoles: {
+      clients: 'section',
+      'clients.create': 'button',
+      'clients.search': 'searchbox',
+      'clients.table': 'table',
+    },
+    ...overrides,
+  });
+
+  it('describes a toolbar button as above the table, not inside the page', () => {
+    const described = describeVisualContext({
+      bundle,
+      context: page(),
+      targetSemanticId: 'clients.create',
+    });
+    expect(described?.sentences?.geometryOnly).toBe(
+      'On this screen, it is directly above the list.',
+    );
+    expect(described?.targetDescription).not.toContain('inside');
+  });
+
+  it('says why the wrapper was not used', () => {
+    const described = describeVisualContext({
+      bundle,
+      context: page(),
+      targetSemanticId: 'clients.create',
+    });
+    expect(described?.receipt?.refusals.join(' ')).toContain(
+      'clients holds members but reports section',
+    );
+  });
+
+  it('offers nothing at all when the only container is structural', () => {
+    // No table on this screen: a wrapper of one-of-each and a button inside it.
+    // Unknown beats wrong, so there is no sentence — and a receipt explains it.
+    const described = describeVisualContext({
+      bundle,
+      context: page({
+        elementBoxes: {
+          clients: { x: 30, y: 103, width: 1380, height: 424 },
+          'clients.create': { x: 184, y: 103, width: 91, height: 34 },
+        },
+      }),
+      targetSemanticId: 'clients.create',
+    });
+    expect(described?.sentences).toBeUndefined();
+    expect(described?.receipt?.refusals.length).toBeGreaterThan(0);
+  });
+
+  it('still allows a control genuinely inside a repeated collection', () => {
+    // The permitted case: a control that lives in the table, in a table that
+    // really does repeat. The rule refuses wrappers, not containment.
+    const described = describeVisualContext({
+      bundle,
+      context: page({
+        visibleSemanticIds: ['clients.table', 'clients.table.delete'],
+        elementBoxes: {
+          'clients.table': { x: 30, y: 203, width: 1380, height: 324 },
+          'clients.table.delete': { x: 1200, y: 240, width: 80, height: 30 },
+        },
+        elementContainers: { 'clients.table.delete': ['clients.table'] },
+        elementRoles: { 'clients.table': 'table', 'clients.table.delete': 'button' },
+      }),
+      targetSemanticId: 'clients.table.delete',
+    });
+    expect(described?.targetDescription).toBe('inside the list');
+  });
+
+  it('refuses containment by a repeated container that reports a structural role', () => {
+    // A section that happens to render the same control twice clears the
+    // repetition test. The role stops it from containing anything.
+    const described = describeVisualContext({
+      bundle,
+      context: page({
+        visibleSemanticIds: ['clients', 'clients.create'],
+        runtimeInstances: [
+          {
+            semanticId: 'clients.create',
+            ref: 'a1',
+            containerSemanticId: 'clients',
+            route: '/clients',
+          },
+          {
+            semanticId: 'clients.create',
+            ref: 'a2',
+            containerSemanticId: 'clients',
+            route: '/clients',
+          },
+        ],
+        elementBoxes: {
+          clients: { x: 30, y: 103, width: 1380, height: 424 },
+          'clients.create': { x: 184, y: 140, width: 91, height: 34 },
+        },
+      }),
+      targetSemanticId: 'clients.create',
+    });
+    expect(JSON.stringify(described?.sentences ?? {})).not.toContain('inside');
   });
 });
