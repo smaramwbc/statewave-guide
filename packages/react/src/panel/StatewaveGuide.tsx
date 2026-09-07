@@ -124,6 +124,15 @@ export interface StatewaveGuideProps {
    * Scope, counts and failures — never records, never another subject, and
    * never anything a store said went wrong in words a user would see.
    */
+  /**
+   * Removes the current highlight ring, if the host draws one.
+   *
+   * Wire it to `useGuide().clearHighlight`. Without it the panel can start a
+   * pointer but never retract one — and a walkthrough that moves to a step
+   * whose control is not on screen leaves the previous ring standing on the
+   * wrong element, which is the panel claiming something it cannot see.
+   */
+  clearPointer?: () => void;
   memoryDiagnostics?: {
     enabled: boolean;
     scope: string;
@@ -243,6 +252,8 @@ function Brand({ branding }: { branding: GuideBranding | undefined }): ReactElem
 function Answer(props: {
   response: GuideQueryResponse;
   onShowMe(actions: readonly GuideSafeAction[]): void;
+  /** Retracts the pointer ring. Absent when the host draws none. */
+  onClearPointer?: () => void;
   onSelectInstance?: (ref: string) => void;
   busy: boolean;
   pointing: boolean;
@@ -273,6 +284,42 @@ function Answer(props: {
       : (sentences?.withVisibleText ?? sentences?.geometryOnly);
   const answer = response.answer;
   const [stepIndex, setStepIndex] = useState<number | undefined>(undefined);
+
+  /**
+   * The pointing actions the contract offers for one step, if any.
+   *
+   * Read, never built. The panel used to run the *response's* actions whatever
+   * step you were on, so a walkthrough three steps in still highlighted step
+   * one's button — which reads exactly like a guide that is stuck. The fix is
+   * to point at the current step; deciding *what* pointing at it means is the
+   * engine's, and a gate holds that line (ADR 0022).
+   */
+  const stepPointerActions = (index: number): readonly GuideSafeAction[] | undefined => {
+    const actions = steps[index]?.actions;
+    return actions !== undefined && actions.length > 0 ? actions : undefined;
+  };
+
+  /**
+   * Move the walkthrough, and move the pointer with it — or retract it.
+   *
+   * The ring either points at the step the user is on, or it is gone. The
+   * failure this exists to close: advancing to a step whose control is not on
+   * screen yet (a dialog the user has not opened) used to leave the previous
+   * ring standing, and the panel saying "Highlighted in the app" about the
+   * wrong element. Now the attempt is made — the executor answers honestly if
+   * the target is not there, the run's stop clears the ring, and the note says
+   * "That is not on screen at the moment." instead of the ring lying.
+   */
+  const goToStep = (index: number | undefined): void => {
+    setStepIndex(index);
+    if (!props.pointing) return;
+    const actions = index === undefined ? undefined : stepPointerActions(index);
+    if (actions === undefined) {
+      props.onClearPointer?.();
+      return;
+    }
+    props.onShowMe(actions);
+  };
   const steps = answer?.steps ?? [];
   const stepping = stepIndex !== undefined && steps.length > 1;
   /**
@@ -446,7 +493,12 @@ function Answer(props: {
                 // to make a no-op visible is the no-op wearing a costume.
                 data-emphasis={plan?.emphasisedAction === 'SHOW_ME' ? 'memory' : undefined}
                 onClick={() => {
-                  props.onShowMe(response.actions);
+                  // During a walkthrough, Show me means "show me THIS step" —
+                  // the current step's own control when it names one, the
+                  // response's actions otherwise (an entry step's navigation
+                  // lives there, not on the step).
+                  const stepActions = stepping ? stepPointerActions(stepIndex) : undefined;
+                  props.onShowMe(stepActions ?? response.actions);
                   props.onMemoryEvent?.('SHOW_ME_USED', {
                     ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
                   });
@@ -484,7 +536,7 @@ function Answer(props: {
                 <button
                   type="button"
                   className="sw-guide__button sw-guide__button--quiet"
-                  onClick={() => setStepIndex(Math.max(0, stepIndex - 1))}
+                  onClick={() => goToStep(Math.max(0, stepIndex - 1))}
                   disabled={stepIndex === 0}
                 >
                   Previous
@@ -496,7 +548,7 @@ function Answer(props: {
                   <button
                     type="button"
                     className="sw-guide__button sw-guide__button--quiet"
-                    onClick={() => setStepIndex(stepIndex + 1)}
+                    onClick={() => goToStep(stepIndex + 1)}
                   >
                     Next
                   </button>
@@ -506,7 +558,7 @@ function Answer(props: {
                     className="sw-guide__button sw-guide__button--quiet"
                     data-testid="guide-step-done"
                     onClick={() => {
-                      setStepIndex(undefined);
+                      goToStep(undefined);
                       // The one interaction that licenses "You've completed this
                       // guide before." Reaching the last step and pressing Done
                       // is the whole of the evidence; nothing weaker counts.
@@ -778,7 +830,23 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
               response={turn.response}
               busy={showMe.state.running}
               pointing={turn.response === lastResponse && pointing}
-              onShowMe={(actions) => void showMe.run(actions)}
+              onShowMe={(actions) =>
+                void showMe.run(actions).then((finished) => {
+                  // The hook stops honestly when a target is not on screen; the
+                  // ring has to stop with it. Leaving the previous highlight up
+                  // while the note says "not on screen" is two parts of one
+                  // panel contradicting each other.
+                  if (finished.stoppedBecause !== undefined) props.clearPointer?.();
+                })
+              }
+              {...(props.clearPointer === undefined
+                ? {}
+                : {
+                    onClearPointer: () => {
+                      props.clearPointer?.();
+                      showMe.reset();
+                    },
+                  })}
               {...(props.contextualForm === undefined
                 ? {}
                 : { contextualForm: props.contextualForm })}

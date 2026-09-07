@@ -307,6 +307,21 @@ export interface GuideAnswerStep {
   text: string;
   /** The control it names, when the interface names one. */
   semanticId?: string;
+  /**
+   * How to point at this step's control, when there is one to point at.
+   *
+   * A walkthrough needs to move the pointer as the reader advances, and the
+   * renderer may not build that itself: constructing a safe action is a
+   * decision about what the product permits, and ADR 0022 keeps that on this
+   * side of the contract. So the engine offers the sequence per step, subject
+   * to the same ownership rules as {@link GuideQueryResponse.actions}, and the
+   * UI either runs it or does nothing.
+   *
+   * Inert by construction — scroll and highlight only. A step never focuses,
+   * because moving the caret while somebody is reading instructions takes the
+   * keyboard away from them.
+   */
+  actions?: readonly GuideSafeAction[];
 }
 
 /**

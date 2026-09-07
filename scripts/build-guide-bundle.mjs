@@ -172,6 +172,36 @@ for (const feature of enriched.features) {
    * doing: an unhandled kind can no longer be a silent omission because there is
    * no second implementation to be incomplete.
    */
+  /**
+   * The semantic id a proposition names, or `undefined` when it names none.
+   *
+   * Only the field the instruction is actually about — a `confirm_action`'s
+   * control, a container's own node, the first field a user is told to fill in.
+   * Never a sibling that merely shares provenance.
+   */
+  const namedControl = (proposition) => {
+    const id = (label) =>
+      typeof label?.nodeId === 'string' && label.nodeId.startsWith('element:')
+        ? label.nodeId.slice('element:'.length)
+        : undefined;
+    switch (proposition.kind) {
+      case 'perform_action':
+      case 'confirm_action':
+        return id(proposition.control);
+      case 'open_container':
+        return id(proposition.container) ?? id(proposition.via);
+      case 'observe':
+        return id(proposition.what);
+      case 'enter_fields':
+        // The first field is where the instruction starts — "enter the email,
+        // name and plan" points at the email box. Pointing at the dialog would
+        // be defensible; pointing at the button that opened it is not.
+        return id(proposition.fields?.[0]);
+      default:
+        return undefined;
+    }
+  };
+
   const steps = [];
   for (const step of guidance.steps) {
     const text = realiseInstruction(step.proposition);
@@ -185,6 +215,27 @@ for (const feature of enriched.features) {
       .filter((ref) => ref.startsWith('element:'))
       .map((ref) => ref.slice('element:'.length))
       .filter((id) => controls.some((control) => control.semanticId === id));
+
+    // The control this step actually names, taken from its own proposition.
+    //
+    // `owned[0]` was an arbitrary pick out of everything the step's provenance
+    // touched, and provenance is a neighbourhood: an `enter_fields` step for the
+    // create dialog cites the trigger that opened it, and `clients.create` sorts
+    // before `clients.create-dialog.email`. So the step that says "enter the
+    // client's billing email, name and plan" pointed at the New client button —
+    // and a walkthrough that highlighted the same button on every step looked,
+    // reasonably, like it was stuck.
+    //
+    // Day 3's rule, one layer further down: evidence being true of the feature
+    // does not make it true of the step. Ask the proposition what it names.
+    const named = namedControl(step.proposition);
+    const semanticId =
+      named !== undefined && owned.includes(named)
+        ? named
+        : owned.length === 0
+          ? undefined
+          : owned[0];
+
     const destination = step.proposition.destination;
     steps.push({
       index: step.index,
@@ -192,7 +243,7 @@ for (const feature of enriched.features) {
       role: step.role,
       origin: step.origin,
       text,
-      ...(owned.length === 0 ? {} : { semanticId: owned[0] }),
+      ...(semanticId === undefined ? {} : { semanticId }),
       ...(typeof destination?.nodeId === 'string' && destination.nodeId.startsWith('route:')
         ? { screenRoute: destination.nodeId.slice('route:'.length), screenName: destination.text }
         : {}),
