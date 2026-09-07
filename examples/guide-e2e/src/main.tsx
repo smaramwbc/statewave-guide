@@ -342,6 +342,7 @@ function Host() {
         <StatewaveGuide
           ask={ask}
           execute={guide.execute}
+          clearPointer={() => highlight.clear()}
           open={open}
           onClose={() => setOpen(false)}
           theme={forcedDark ? { ...theme, appearance: 'dark' } : theme}

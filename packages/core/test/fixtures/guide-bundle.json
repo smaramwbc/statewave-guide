@@ -1148,7 +1148,7 @@
           "role": "input",
           "origin": "verified-workflow",
           "text": "Enter the client's billing email, name and plan.",
-          "semanticId": "clients.create"
+          "semanticId": "clients.create-dialog.email"
         },
         {
           "index": 4,
@@ -3216,7 +3216,7 @@
           "role": "confirmation",
           "origin": "verified-submit",
           "text": "Choose \"Save changes\".",
-          "semanticId": "settings.form"
+          "semanticId": "settings.save"
         }
       ],
       "conceptNouns": [

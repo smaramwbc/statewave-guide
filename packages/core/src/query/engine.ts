@@ -160,7 +160,31 @@ function contextualise(
     // them: instruction and automation permission are different questions, and
     // `Choose "Create client"` is displayed precisely because the guide will
     // never click it.
-    steps.push(target === undefined ? { text } : { text, semanticId: target });
+    if (target === undefined) {
+      steps.push({ text });
+      continue;
+    }
+
+    // The pointing sequence for this step, offered only for a control this
+    // feature owns — the same rule the response-level actions obey. A step
+    // naming a control the feature does not own is a sentence, never an offer
+    // to point.
+    const owned = controls.get(target);
+    const stepLabel =
+      owned?.nameable === true && owned.label !== undefined ? { label: owned.label } : {};
+    const stepActions: GuideSafeAction[] =
+      owned === undefined
+        ? []
+        : [
+            { kind: 'scroll', semanticId: target, ...stepLabel },
+            { kind: 'highlight', semanticId: target, ...stepLabel },
+          ];
+
+    steps.push(
+      stepActions.length === 0
+        ? { text, semanticId: target }
+        : { text, semanticId: target, actions: stepActions },
+    );
   }
   return { steps, pruned };
 }
