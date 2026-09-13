@@ -50,17 +50,43 @@ export interface GuideMemoryOptions {
   store?: GuideMemoryStore;
 }
 
+/**
+ * What became of a write the user asked for, out loud.
+ *
+ * `APPLIED` is not "the call returned". It means the value was written and then
+ * *read back* — the profile a later answer will consult now says what the user
+ * chose. A store that accepts a write and loses it is indistinguishable from one
+ * that works, right up until the moment it matters, and a green tick on a
+ * preference that did not survive is the worst kind of reassurance.
+ *
+ * `UNAVAILABLE` is memory being switched off or unscoped. It is not a failure —
+ * nothing was attempted — and it must not be reported as one.
+ */
+export type GuideMemoryWriteOutcome = 'APPLIED' | 'FAILED' | 'UNAVAILABLE';
+
 export interface GuideMemoryController {
   ready: boolean;
   profile: GuideMemoryProfile | undefined;
   /** Record something that happened. Never throws, whatever the store does. */
   record(kind: GuideMemoryEventKind, input?: { featureId?: string; stepCount?: number }): void;
+  /**
+   * Record a choice the user made, and report whether it took.
+   *
+   * Awaitable so a UI can say what happened. The promise settles once the value
+   * has been written and read back, never before.
+   */
   setPreference(
     preference: 'guidanceDetail' | 'assistanceMode',
     value: GuidanceDetailPreference | AssistanceModePreference,
-  ): void;
-  /** Forget this subject. The next question behaves like a first question. */
-  clear(): void;
+  ): Promise<GuideMemoryWriteOutcome>;
+  /**
+   * Forget this subject. The next question behaves like a first question.
+   *
+   * Resolves `APPLIED` only when the reread comes back empty. "Forget me" is
+   * the one control where a confirmation nobody checked is a promise nobody
+   * kept.
+   */
+  clear(): Promise<GuideMemoryWriteOutcome>;
   /** How to present a response, given what is remembered. */
   plan(response: GuideQueryResponse): GuidePresentationPlan;
   diagnostics: {
@@ -122,6 +148,17 @@ export interface GuideMemoryController {
  */
 const SESSION = Math.random().toString(36).slice(2, 8);
 let sequence = 0;
+
+/**
+ * Whether a profile still knows anything about the person it describes.
+ *
+ * Used to check that "forget me" actually forgot. A profile always has a subject
+ * id — it is the question being asked, not something remembered about the answer
+ * — so what matters is whether any preference or any history survived.
+ */
+function remembersAnything(profile: GuideMemoryProfile): boolean {
+  return Object.keys(profile.explicitPreferences).length > 0 || profile.featureHistory.length > 0;
+}
 
 export function useGuideMemory(options: GuideMemoryOptions | undefined): GuideMemoryController {
   const [profile, setProfile] = useState<GuideMemoryProfile | undefined>(undefined);
@@ -190,58 +227,83 @@ export function useGuideMemory(options: GuideMemoryOptions | undefined): GuideMe
    * The catch is the point. A store that throws leaves `profile` undefined,
    * which is exactly the state a memory-less build is in.
    */
-  const refresh = useCallback(async () => {
+  /**
+   * Reload the profile, and hand it back.
+   *
+   * It returns what it read as well as storing it. React state is not readable
+   * by the caller that triggered the write — the closure holds the old value —
+   * and confirming a write means looking at what came back, not at what was
+   * sent. Everything that reports an outcome to a user reads this return value.
+   */
+  const refresh = useCallback(async (): Promise<GuideMemoryProfile | undefined> => {
     if (!enabled || scope === undefined || appId === undefined || subjectId === undefined) {
       setProfile(undefined);
       setReady(true);
-      return;
+      return undefined;
     }
     try {
       const events = await storeRef.current.read(scope);
       setEventsRead(events.length);
-      setProfile(
-        projectMemoryProfile({
-          events,
-          subjectId,
-          ...(workspaceId === undefined ? {} : { workspaceId }),
-          appId,
-          ...(applicationVersion === undefined ? {} : { applicationVersion }),
-        }),
-      );
+      const next = projectMemoryProfile({
+        events,
+        subjectId,
+        ...(workspaceId === undefined ? {} : { workspaceId }),
+        appId,
+        ...(applicationVersion === undefined ? {} : { applicationVersion }),
+      });
+      setProfile(next);
+      setReady(true);
+      return next;
     } catch (error) {
       // Kept for the developer inspector and shown to nobody else.
       noteFailure(error);
       setProfile(undefined);
+      setReady(true);
+      return undefined;
     }
-    setReady(true);
   }, [appId, applicationVersion, enabled, noteFailure, scope, subjectId, workspaceId]);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  const append = useCallback(
-    (event: GuideMemoryEvent) => {
-      if (!enabled) return;
-      void (async () => {
-        try {
-          // Validated here as well as in the store, so the inspector can tell a
-          // refused write from one that never happened. The store validates
-          // again on its own account — it is untrusted and so is this caller.
-          const accepted = validateMemoryEvent(event).ok;
-          setCounts((current) =>
-            accepted
-              ? { ...current, written: current.written + 1 }
-              : { ...current, rejected: current.rejected + 1 },
-          );
-          await storeRef.current.append(event);
-          await refresh();
-        } catch (error) {
-          noteFailure(error);
-        }
-      })();
+  /**
+   * Write one event and reload, reporting the profile that resulted.
+   *
+   * The awaitable half. `append` below is the same thing with the answer thrown
+   * away, which is right for the dozens of observations a session records and
+   * wrong for the two things a user presses a button to do.
+   */
+  const writeEvent = useCallback(
+    async (event: GuideMemoryEvent): Promise<GuideMemoryProfile | undefined> => {
+      if (!enabled) return undefined;
+      try {
+        // Validated here as well as in the store, so the inspector can tell a
+        // refused write from one that never happened. The store validates
+        // again on its own account — it is untrusted and so is this caller.
+        const accepted = validateMemoryEvent(event).ok;
+        setCounts((current) =>
+          accepted
+            ? { ...current, written: current.written + 1 }
+            : { ...current, rejected: current.rejected + 1 },
+        );
+        await storeRef.current.append(event);
+      } catch (error) {
+        noteFailure(error);
+      }
+      // Reloaded even after a failed write: the caller decides what happened by
+      // reading the result, and "the write threw but the value is there" and
+      // "the write returned but the value is not" are both real.
+      return refresh();
     },
     [enabled, noteFailure, refresh],
+  );
+
+  const append = useCallback(
+    (event: GuideMemoryEvent) => {
+      void writeEvent(event);
+    },
+    [writeEvent],
   );
 
   const record = useCallback<GuideMemoryController['record']>(
@@ -267,10 +329,10 @@ export function useGuideMemory(options: GuideMemoryOptions | undefined): GuideMe
   );
 
   const setPreference = useCallback<GuideMemoryController['setPreference']>(
-    (preference, value) => {
-      if (appId === undefined || subjectId === undefined) return;
+    async (preference, value) => {
+      if (!enabled || appId === undefined || subjectId === undefined) return 'UNAVAILABLE';
       sequence += 1;
-      append({
+      const after = await writeEvent({
         eventId: `pf-${SESSION}-${sequence}`,
         appId,
         subjectId,
@@ -283,23 +345,30 @@ export function useGuideMemory(options: GuideMemoryOptions | undefined): GuideMe
         authority: 'EXPLICIT_USER_PREFERENCE',
         metadata: { preference, value },
       });
+      // Confirmed by reading it back. A store that took the write and lost it
+      // looks exactly like one that worked, and this is the difference between
+      // a tick that means something and a tick that is decoration.
+      return after?.explicitPreferences[preference] === value ? 'APPLIED' : 'FAILED';
     },
-    [append, appId, applicationVersion, subjectId, workspaceId],
+    [enabled, writeEvent, appId, applicationVersion, subjectId, workspaceId],
   );
 
-  const clear = useCallback(() => {
+  const clear = useCallback<GuideMemoryController['clear']>(async () => {
     // Honours `enabled` like every other path. An audit found this one guarding
     // only on scope, so a host with memory switched off could still reach into
     // a store and erase a bucket it had never been allowed to write.
-    if (!enabled || scope === undefined) return;
-    void (async () => {
-      try {
-        await storeRef.current.clear(scope);
-      } catch (error) {
-        noteFailure(error);
-      }
-      await refresh();
-    })();
+    if (!enabled || scope === undefined) return 'UNAVAILABLE';
+    try {
+      await storeRef.current.clear(scope);
+    } catch (error) {
+      noteFailure(error);
+    }
+    const after = await refresh();
+    // "Forget me" is the one control where an unchecked confirmation is a
+    // promise nobody kept, so this asks whether anything is left rather than
+    // whether the call returned. A profile that still knows the user is a
+    // failure however cleanly the delete resolved.
+    return after === undefined || !remembersAnything(after) ? 'APPLIED' : 'FAILED';
   }, [enabled, noteFailure, refresh, scope]);
 
   const plan = useCallback<GuideMemoryController['plan']>(

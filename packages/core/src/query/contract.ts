@@ -179,6 +179,26 @@ export interface GuideQueryContext {
   /** Semantic ids rendered but disabled. */
   disabledSemanticIds?: readonly string[];
   /**
+   * Permissions the signed-in user holds, as the host's own auth layer reports
+   * them.
+   *
+   * **Reporting this field is a claim of completeness.** Present means "this is
+   * everything the user holds", so a permission absent from the list is one the
+   * guide will tell the user they do not have. A host that reports half its
+   * permissions will produce an answer that is confidently wrong, which is
+   * worse than the one it replaces.
+   *
+   * Absent is the safe answer and the default: the guide then states the
+   * requirement without claiming anything about who is asking. An empty array
+   * is *not* absent — it means a user who holds nothing, which is exactly what
+   * a signed-out session looks like.
+   *
+   * Strings are compared exactly. They are the host's own identifiers, matched
+   * against the identifiers the ProductModel compiled out of the same source,
+   * so no normalisation is applied and none is guessed at.
+   */
+  permissions?: readonly string[];
+  /**
    * Concrete items observed on screen right now.
    *
    * Supplied by the host from what it is actually rendering. Nothing here is
@@ -280,7 +300,18 @@ export type GuideSafeAction =
   // meant. Without it the executor resolves the first match, which after a user
   // chose the second row is confidently the wrong thing — a name is not
   // identity, and neither is a semantic id once a list repeats it.
-  | { kind: 'highlight'; semanticId: string; label?: string; instanceRef?: string }
+  // `title` and `message` are the words the pointer carries with it. Both are
+  // already-authorised prose chosen on this side of the contract — a control's
+  // supported name and the step's own sentence — because a renderer that wrote
+  // its own callout text would be making a claim about the product.
+  | {
+      kind: 'highlight';
+      semanticId: string;
+      label?: string;
+      instanceRef?: string;
+      title?: string;
+      message?: string;
+    }
   | { kind: 'scroll'; semanticId: string; label?: string; instanceRef?: string }
   | { kind: 'focus'; semanticId: string; label?: string; instanceRef?: string }
   | { kind: 'open_guide_step'; featureId: string; stepIndex: number; label?: string };
@@ -300,6 +331,57 @@ export interface GuideQueryAmbiguity {
   candidates: readonly { featureId: string; title?: string; semanticId?: string }[];
   /** A sentence a UI may show. Never names anything unsupported. */
   message: string;
+}
+
+/**
+ * What doing a step actually consists of.
+ *
+ * `NAVIGATE` goes to a screen, `PRESS` operates a control, `TYPE` puts the
+ * user's own data into one.
+ */
+export type GuideStepActionKind = 'NAVIGATE' | 'PRESS' | 'TYPE';
+
+/** Why a guide will not take a step for the user. */
+export type GuideStepRefusal =
+  /** The step commits the change the whole task exists to make. */
+  | 'COMMITS_A_CHANGE'
+  /** The step supplies data, and the data is the user's. */
+  | 'SUPPLIES_DATA'
+  /** Nothing this feature owns is on the other end of it. */
+  | 'NO_CONTROL_TO_PRESS';
+
+/**
+ * Whether a guide may take this step instead of the user, and why not.
+ *
+ * Every safe action in {@link GuideSafeAction} is inert — it moves attention and
+ * changes nothing. This is the field where that stops being true, which is why
+ * it is a field of its own rather than another action kind: a host that runs
+ * everything in `actions` must never discover it has been pressing things.
+ *
+ * The line is drawn from compiled evidence, not from the DOM. A step's `role`
+ * says what it is for, and two of the four roles are categorically unsafe to
+ * automate:
+ *
+ * | role           | means                              | a guide may |
+ * | -------------- | ---------------------------------- | ----------- |
+ * | `entry`        | go to the screen                   | yes         |
+ * | `trigger`      | open the task — a dialog, a form   | yes         |
+ * | `input`        | supply the user's own data         | no          |
+ * | `confirmation` | commit it                          | no          |
+ *
+ * Pressing "New client" reveals a dialog and can be undone by closing it.
+ * Pressing "Create client" creates a client. A convenience that occasionally
+ * does the second thing is not a convenience, so the refusal is structural
+ * rather than a warning somebody can click past.
+ */
+export interface GuideStepPerformance {
+  kind: GuideStepActionKind;
+  /** The control it happens on, when this feature owns one. */
+  semanticId?: string;
+  /** Whether a guide may do this on the user's behalf. */
+  byGuide: 'ALLOWED' | 'REFUSED';
+  /** Why not. Present exactly when `byGuide` is `REFUSED`. */
+  refusedBecause?: GuideStepRefusal;
 }
 
 /** One user-facing instruction. */
@@ -322,6 +404,42 @@ export interface GuideAnswerStep {
    * keyboard away from them.
    */
   actions?: readonly GuideSafeAction[];
+  /**
+   * What doing this step consists of, and whether a guide may do it.
+   *
+   * Separate from {@link GuideAnswerStep.actions} on purpose: everything in
+   * there is inert, and this is not. See {@link GuideStepPerformance}.
+   */
+  performance?: GuideStepPerformance;
+}
+
+/**
+ * Whether the user asking satisfies a condition.
+ *
+ * `UNKNOWN` is the default and the honest one: the host reported no permission
+ * list, so the guide states what the feature requires and claims nothing about
+ * who is reading. `HELD` and `NOT_HELD` are only ever reached from
+ * {@link GuideQueryContext.permissions}, and mean the host said so.
+ *
+ * There is no fourth value for "probably". A condition the runtime cannot
+ * settle is `UNKNOWN`, and the sentence changes to match.
+ */
+export type GuideConditionStatus = 'UNKNOWN' | 'HELD' | 'NOT_HELD';
+
+/**
+ * Something that must be true for a feature to be usable, and whether it is.
+ *
+ * The sentence and the verdict travel together because they are decided
+ * together: "You need permission to create a client", "You have permission to
+ * create a client" and "You do not have permission to create a client" are
+ * three different claims, and choosing between them is not a rendering
+ * decision. A UI styles `status`; it never derives the words from it.
+ */
+export interface GuideAnswerCondition {
+  /** The sentence to show. Already phrased for the verdict it carries. */
+  text: string;
+  /** Whether the current user meets it, so far as the host has said. */
+  status: GuideConditionStatus;
 }
 
 /**
@@ -353,7 +471,7 @@ export interface GuideAnswer {
   purpose?: string;
   summary?: string;
   steps: readonly GuideAnswerStep[];
-  conditions: readonly string[];
+  conditions: readonly GuideAnswerCondition[];
   questions: readonly string[];
 }
 

@@ -247,9 +247,17 @@ async function persistentSession({ id, url, viewport }) {
  */
 async function completeStepThrough(page) {
   await page.click('[data-testid="guide-step-through"]');
+  // Walked by the advance slot rather than by a label. The slot never moves and
+  // its label is decided by what each step was compiled as — "Do it for me" on
+  // a step the guide may take, "Next" otherwise — so a helper that clicked a
+  // word could only ever walk the steps that happened to say that word.
   for (let guard = 0; guard < 12; guard += 1) {
     if ((await page.locator('[data-testid="guide-step-done"]').count()) > 0) break;
-    await page.click('.sw-guide__answer:last-of-type button:has-text("Next")');
+    // Skip rather than act: this helper is about reaching the end, and pressing
+    // the application's own controls is a different test's business.
+    const skip = page.locator('[data-testid="guide-step-skip"]');
+    if ((await skip.count()) > 0) await skip.first().click();
+    else await page.click('[data-testid="guide-step-next"]');
   }
   await page.click('[data-testid="guide-step-done"]');
   await page

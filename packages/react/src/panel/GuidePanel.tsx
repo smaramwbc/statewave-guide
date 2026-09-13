@@ -77,7 +77,9 @@ function GuideResponseView(props: {
       {answer !== undefined && answer.conditions.length > 0 && (
         <div className="swg-conditions">
           {answer.conditions.map((condition) => (
-            <p key={condition}>{condition}</p>
+            <p key={condition.text} data-status={condition.status}>
+              {condition.text}
+            </p>
           ))}
         </div>
       )}

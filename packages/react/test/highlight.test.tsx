@@ -12,12 +12,12 @@ import { StatewaveGuideProvider } from '../src/provider.js';
 import { useGuide } from '../src/use-guide.js';
 import { stubRect } from './setup.js';
 
-function engine(): {
+function engine(controllerOptions: { dim?: boolean } = {}): {
   registry: GuideElementRegistry & ElementRegistryInternals;
   controller: HighlightController;
 } {
   const registry = createElementRegistry();
-  const controller = createHighlightController({ registry });
+  const controller = createHighlightController({ registry, ...controllerOptions });
   // The controller takes the public registry and finds the private half
   // itself; the test keeps both, the way the provider does.
   return { registry: { ...registry, ...internalsOf(registry) }, controller };
@@ -83,7 +83,9 @@ describe('highlight controller', () => {
 
     const overlay = overlayNodes();
     expect(overlay.root).not.toBeNull();
-    expect(overlay.dimmers).toBe(4);
+    // Nothing is dimmed. A highlight is an invitation to use the control, and a
+    // page behind a scrim reads as a page that has been switched off.
+    expect(overlay.dimmers).toBe(0);
     expect(overlay.rings).toBe(1);
 
     const ring = document.querySelector<HTMLElement>('.sw-guide-ring');
@@ -95,6 +97,75 @@ describe('highlight controller', () => {
     expect(popover?.textContent).toContain('Create a client');
     expect(popover?.textContent).toContain('Start here.');
 
+    controller.destroy();
+  });
+
+  /**
+   * Dimming survives as a choice, not a default.
+   *
+   * A first-run tour, where nothing else on the page *should* be touched, is a
+   * real case. It is just not the case a question-and-answer guide is in.
+   */
+  it('dims the page only when the host asks for it', async () => {
+    const { registry, controller } = engine({ dim: true });
+    const node = mountedButton('clients.create');
+    stubRect(node, { top: 120, left: 40, width: 160, height: 32, bottom: 152, right: 200 });
+    registry.register({ id: 'clients.create' });
+    registry.setNode('clients.create', node);
+
+    await controller.highlight('clients.create', { scrollIntoView: false });
+
+    expect(overlayNodes().dimmers).toBe(4);
+    controller.destroy();
+  });
+
+  /**
+   * The callout must never be in the way of the thing it points at.
+   *
+   * It is auto-placed beside the target, so in a dense form it routinely lands
+   * over the next control in the sequence. Nothing inside it is interactive, so
+   * clicks belong to the page underneath.
+   */
+  it('lets every pointer event through to the page', async () => {
+    const { registry, controller } = engine();
+    const node = mountedButton('clients.create');
+    stubRect(node, { top: 120, left: 40, width: 160, height: 32, bottom: 152, right: 200 });
+    registry.register({ id: 'clients.create' });
+    registry.setNode('clients.create', node);
+
+    await controller.highlight('clients.create', {
+      title: 'Create a client',
+      message: 'Start here.',
+      scrollIntoView: false,
+    });
+
+    const styles = document.querySelector('style[data-statewave-guide]')?.textContent ?? '';
+    const popoverRule = styles.slice(styles.indexOf('.sw-guide-popover {'));
+    expect(popoverRule.slice(0, popoverRule.indexOf('}'))).toContain('pointer-events: none');
+    controller.destroy();
+  });
+
+  /**
+   * A caret is what makes this a callout rather than a notification that landed
+   * nearby — it says *which* control the words are about, which is the whole
+   * question in a form where six fields sit within forty pixels.
+   */
+  it('points the caret at the side the target is on', async () => {
+    const { registry, controller } = engine();
+    const node = mountedButton('clients.create');
+    stubRect(node, { top: 10, left: 40, width: 160, height: 32, bottom: 42, right: 200 });
+    registry.register({ id: 'clients.create' });
+    registry.setNode('clients.create', node);
+
+    await controller.highlight('clients.create', {
+      message: 'Start here.',
+      placement: 'bottom',
+      scrollIntoView: false,
+    });
+
+    const popover = document.querySelector('.sw-guide-popover');
+    expect(popover?.getAttribute('data-placement')).toBe('bottom');
+    expect(popover?.querySelector('.sw-guide-popover-caret')).not.toBeNull();
     controller.destroy();
   });
 

@@ -423,7 +423,18 @@ if (sha(JSON.stringify(titles)) !== TITLES)
  * anything — which matters here because three of those fields are how runtime
  * language reaches the engine at all.
  */
-const CONTEXT_FIELDS = '08ff17e7b82e518eaefb605de2be5878';
+/**
+ * Moved once, deliberately, after the round was scored.
+ *
+ * `permissions` was added so a compiled condition can be settled against the
+ * user who is asking — "you need", "you have", "you do not have". It is a
+ * *count* of one added field and no removed ones, and it does not touch this
+ * review's subject: the round asks whether a placeholder may describe a control
+ * it is not allowed to name, and a permission identifier is never spoken at all
+ * (`packages/core/test/runtime-permissions.test.ts` pins that). The previous
+ * pin was 08ff17e7b82e518eaefb605de2be5878.
+ */
+const CONTEXT_FIELDS = '70988cc2e0a616b31c8c2c04caf81772';
 const contractSource = readFileSync(path.join(ROOT, 'packages/core/src/query/contract.ts'), 'utf8');
 const contextBlock = new RegExp('export interface GuideQueryContext \\{([\\s\\S]*?)\\n\\}').exec(
   contractSource,

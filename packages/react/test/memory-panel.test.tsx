@@ -42,7 +42,7 @@ const RESPONSE: GuideQueryResponse = {
     title: 'New client',
     purpose: 'Lets you create a new client.',
     steps: STEPS,
-    conditions: ['You need permission to create a client.'],
+    conditions: [{ text: 'You need permission to create a client.', status: 'UNKNOWN' as const }],
     questions: [],
   },
   actions: [{ kind: 'highlight', semanticId: 'clients.create' }],

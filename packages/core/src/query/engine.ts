@@ -18,8 +18,11 @@
 
 import type {
   GuideAnswer,
+  GuideAnswerCondition,
   GuideAnswerStep,
+  GuideConditionStatus,
   GuidePrunedStep,
+  GuideStepPerformance,
   GuideQueryContext,
   GuideQueryDiagnostics,
   GuideQueryIntent,
@@ -146,7 +149,7 @@ function contextualise(
         });
         continue;
       }
-      steps.push({ text: shown });
+      steps.push({ text: shown, performance: stepPerformance(step, undefined) });
       continue;
     }
 
@@ -161,7 +164,7 @@ function contextualise(
     // `Choose "Create client"` is displayed precisely because the guide will
     // never click it.
     if (target === undefined) {
-      steps.push({ text });
+      steps.push({ text, performance: stepPerformance(step, undefined) });
       continue;
     }
 
@@ -172,33 +175,141 @@ function contextualise(
     const owned = controls.get(target);
     const stepLabel =
       owned?.nameable === true && owned.label !== undefined ? { label: owned.label } : {};
+    // The callout beside the ring says the same sentence the panel is showing.
+    // Both halves are already-authorised prose: the heading is the control's
+    // supported name, and the body is this step, verbatim. Nothing is composed.
+    const stepCallout =
+      owned?.nameable === true && owned.label !== undefined
+        ? { title: owned.label, message: text }
+        : { message: text };
     const stepActions: GuideSafeAction[] =
       owned === undefined
         ? []
         : [
             { kind: 'scroll', semanticId: target, ...stepLabel },
-            { kind: 'highlight', semanticId: target, ...stepLabel },
+            { kind: 'highlight', semanticId: target, ...stepLabel, ...stepCallout },
           ];
 
+    const performance = stepPerformance(step, target);
     steps.push(
       stepActions.length === 0
-        ? { text, semanticId: target }
-        : { text, semanticId: target, actions: stepActions },
+        ? { text, semanticId: target, performance }
+        : { text, semanticId: target, actions: stepActions, performance },
     );
   }
   return { steps, pruned };
 }
 
-/** The conditions a feature carries, phrased as stored. */
-function conditionText(
+/**
+ * What a step consists of, decided from what it was compiled as.
+ *
+ * The four roles the compiler emits are not decoration — they are the record of
+ * *why* a step exists, and two of them mark work nobody but the user may do.
+ * Reading the role is how this stays a structural rule rather than a guess
+ * about what a button is likely to do: no heuristics on labels, no probing the
+ * DOM for a `type="submit"`, nothing that a rename could quietly flip.
+ *
+ * An unrecognised role is refused, not allowed. A compiler that grows a fifth
+ * role should have to come here and say what it means.
+ */
+function stepPerformance(
+  step: GuideFeatureEntry['steps'][number],
+  target: string | undefined,
+): GuideStepPerformance {
+  const on = target === undefined ? {} : { semanticId: target };
+
+  if (step.role === 'entry') return { kind: 'NAVIGATE', ...on, byGuide: 'ALLOWED' };
+
+  if (step.role === 'input') {
+    // The one thing a guide can never supply. Even where the value looks
+    // obvious — a plan, a default — it is the user's record being written.
+    return { kind: 'TYPE', ...on, byGuide: 'REFUSED', refusedBecause: 'SUPPLIES_DATA' };
+  }
+
+  if (step.role === 'confirmation') {
+    // The step the whole task exists to reach. Pressing it is the change.
+    return { kind: 'PRESS', ...on, byGuide: 'REFUSED', refusedBecause: 'COMMITS_A_CHANGE' };
+  }
+
+  if (step.role === 'trigger') {
+    // Reveals the task rather than completing it: a dialog that opens, a form
+    // that expands, both undone by closing them. This is the only role a guide
+    // may act on, and only when this feature owns the control — pressing
+    // something a feature does not own is pressing something nobody verified.
+    return target === undefined
+      ? { kind: 'PRESS', byGuide: 'REFUSED', refusedBecause: 'NO_CONTROL_TO_PRESS' }
+      : { kind: 'PRESS', semanticId: target, byGuide: 'ALLOWED' };
+  }
+
+  return { kind: 'PRESS', ...on, byGuide: 'REFUSED', refusedBecause: 'NO_CONTROL_TO_PRESS' };
+}
+
+/**
+ * A condition, settled against the runtime where the runtime can settle it.
+ *
+ * The compiled proposition carries two different things and they are not
+ * interchangeable. `permission` is an exact identifier lifted out of the
+ * application's own source — `clients:create` — and is what gets compared.
+ * `capability` is the prose half — "create a client" — and is only ever used to
+ * build a sentence; it is never matched against anything, because matching
+ * English to an identifier is the kind of guess this system exists to avoid.
+ *
+ * Three outcomes, and the third is the default:
+ *
+ * - the host listed the permission          -> `HELD`
+ * - the host listed permissions, not that one -> `NOT_HELD`
+ * - the host listed no permissions at all   -> `UNKNOWN`
+ *
+ * `NOT_HELD` rests on {@link GuideQueryContext.permissions} being complete when
+ * present, which is what that field documents at full strength. An absent list
+ * asserts nothing and gets the sentence this function has always produced.
+ */
+function answerCondition(
   condition: GuideFeatureEntry['guidance']['conditions'][number],
-): string | undefined {
+  context: GuideQueryContext,
+): GuideAnswerCondition | undefined {
   const proposition = condition.proposition as Record<string, unknown>;
   if (proposition['kind'] !== 'requires_permission') return undefined;
+
   const capability = proposition['capability'];
-  return typeof capability === 'string'
-    ? `You need permission to ${capability}.`
-    : 'You need permission to do this.';
+  const named = typeof capability === 'string' ? capability : undefined;
+  const permission = proposition['permission'];
+
+  const held = context.permissions;
+  const status: GuideConditionStatus =
+    held === undefined || typeof permission !== 'string'
+      ? 'UNKNOWN'
+      : held.includes(permission)
+        ? 'HELD'
+        : 'NOT_HELD';
+
+  // A permission identifier is not user-visible language — it is a string from
+  // the source, and naming it here would be the same mistake as reading a route
+  // out loud. Without a compiled capability phrase the sentence stays general,
+  // and says less rather than something unsupported.
+  if (status === 'HELD') {
+    return {
+      text:
+        named === undefined
+          ? 'You have the permission this needs.'
+          : `You have permission to ${named}.`,
+      status,
+    };
+  }
+  if (status === 'NOT_HELD') {
+    return {
+      text:
+        named === undefined
+          ? 'You do not have the permission this needs.'
+          : `You do not have permission to ${named}.`,
+      status,
+    };
+  }
+  return {
+    text:
+      named === undefined ? 'You need permission to do this.' : `You need permission to ${named}.`,
+    status,
+  };
 }
 
 /** Safe actions for an intent, each pointing at something already known. */
@@ -267,7 +378,22 @@ function deriveActions(
     const label = control.nameable && control.label !== undefined ? control.label : undefined;
     const suffix = label === undefined ? {} : { label };
     add({ kind: 'scroll', semanticId: target, ...suffix }, 'the control is owned by this feature');
-    add({ kind: 'highlight', semanticId: target, ...suffix }, 'pointing at it is inert');
+    // The callout heading is the control's own supported name, and the body is
+    // the feature's compiled purpose. There is no step here to quote — a
+    // response-level Show me is "this is the thing", not "do this" — so what it
+    // carries is what the thing is *for*. A heading alone beside a button that
+    // already reads "New client" says nothing the user cannot see.
+    const purpose = feature.guidance.purpose?.text;
+    add(
+      {
+        kind: 'highlight',
+        semanticId: target,
+        ...suffix,
+        ...(label === undefined ? {} : { title: label }),
+        ...(purpose === undefined ? {} : { message: purpose }),
+      },
+      'pointing at it is inert',
+    );
     if (intent === 'SHOW_ME' || intent === 'HOW_TO') {
       add({ kind: 'focus', semanticId: target, ...suffix }, 'focus moves attention, not data');
     }
@@ -410,8 +536,8 @@ export function createGuideQueryEngine(options: GuideQueryEngineOptions): GuideQ
 
     const { steps, pruned } = contextualise(bundle, feature, context, controls);
     const conditions = feature.guidance.conditions
-      .map(conditionText)
-      .filter((entry): entry is string => entry !== undefined);
+      .map((condition) => answerCondition(condition, context))
+      .filter((entry): entry is GuideAnswerCondition => entry !== undefined);
 
     const answer: GuideAnswer = {
       ...(feature.guidance.title?.text === undefined ? {} : { title: feature.guidance.title.text }),
@@ -573,7 +699,7 @@ function verifyResponse(input: {
     input.answer.purpose,
     input.answer.summary,
     ...input.answer.steps.map((step) => step.text),
-    ...input.answer.conditions,
+    ...input.answer.conditions.map((condition) => condition.text),
   ].filter((entry): entry is string => entry !== undefined);
   for (const surface of prose) {
     if (SELECTOR.test(surface)) problems.push({ what: surface, reason: 'LOOKS_LIKE_A_SELECTOR' });

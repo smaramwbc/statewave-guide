@@ -121,6 +121,9 @@ export type { GuideSession, GuideTurn } from './panel/session.js';
 export { useShowMe } from './panel/use-show-me.js';
 export type { ShowMeState, UseShowMeOptions } from './panel/use-show-me.js';
 
+export { createStepInteraction } from './step-interaction.js';
+export type { GuideStepInteraction, StepInteractionOptions } from './step-interaction.js';
+
 export { useHostFocus } from './panel/use-host-focus.js';
 export type { UseHostFocusOptions } from './panel/use-host-focus.js';
 
@@ -194,4 +197,8 @@ export type {
 } from './memory/remote-store.js';
 export type { BrowserGuideMemoryStore } from './memory/browser-store.js';
 export { useGuideMemory } from './memory/use-guide-memory.js';
-export type { GuideMemoryController, GuideMemoryOptions } from './memory/use-guide-memory.js';
+export type {
+  GuideMemoryController,
+  GuideMemoryOptions,
+  GuideMemoryWriteOutcome,
+} from './memory/use-guide-memory.js';
