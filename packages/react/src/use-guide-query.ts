@@ -64,6 +64,14 @@ export interface UseGuideQueryOptions {
   route?: string;
   /** The build this UI is running, matched against the bundle's. */
   applicationVersion?: string;
+  /**
+   * Permissions the signed-in user holds, from the host's auth layer.
+   *
+   * Passing this is a claim that the list is complete — see
+   * {@link GuideQueryContext.permissions}. Leaving it out is the safe default
+   * and costs only the personalised phrasing of a condition.
+   */
+  permissions?: readonly string[];
   focusedSemanticId?: string;
   selectedSemanticId?: string;
   /** Where navigation actually happens. Absent means navigation is unavailable. */
@@ -95,6 +103,11 @@ export function useGuideQuery(options: UseGuideQueryOptions): UseGuideQueryResul
     useCallback(() => registry.getSnapshot(), [registry]),
     useCallback(() => registry.getSnapshot(), [registry]),
   );
+
+  // NUL is not a permission identifier, so joining on it cannot make two
+  // different lists look the same.
+  const permissionKey =
+    options.permissions === undefined ? undefined : options.permissions.join('\u0000');
 
   /**
    * The application as it is *now*.
@@ -159,6 +172,7 @@ export function useGuideQuery(options: UseGuideQueryOptions): UseGuideQueryResul
       ...(options.selectedSemanticId === undefined
         ? {}
         : { selectedSemanticId: options.selectedSemanticId }),
+      ...(options.permissions === undefined ? {} : { permissions: options.permissions }),
       visibleSemanticIds: visible,
       disabledSemanticIds: disabled,
       elementBoxes,
@@ -175,6 +189,10 @@ export function useGuideQuery(options: UseGuideQueryOptions): UseGuideQueryResul
     options.focusedSemanticId,
     options.selectedSemanticId,
     options.selectedInstanceRef,
+    // A host rebuilds its permission array every render, and an array in this
+    // list would make the memo below recompute forever. The contents are what
+    // matter, so the contents are what this depends on.
+    permissionKey,
   ]);
 
   // Recomputed for display whenever the registry changes, so a component showing
@@ -246,7 +264,14 @@ export function useGuideQuery(options: UseGuideQueryOptions): UseGuideQueryResul
         return { status: 'done', action };
       }
       if (action.kind === 'highlight') {
-        await options.highlight?.highlight(id, pick);
+        // The callout text comes from the action, never from here. A renderer
+        // that invented its own heading would be asserting something about the
+        // product, which is the query contract's job and not this hook's.
+        await options.highlight?.highlight(id, {
+          ...pick,
+          ...(action.title === undefined ? {} : { title: action.title }),
+          ...(action.message === undefined ? {} : { message: action.message }),
+        });
         return { status: 'done', action };
       }
       // Focus needs a node, and the public registry deliberately has no way to

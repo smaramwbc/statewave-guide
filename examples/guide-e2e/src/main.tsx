@@ -25,6 +25,7 @@ import {
   createElementRegistry,
   createHighlightController,
   useGuideQuery,
+  createStepInteraction,
   useGuideMemory,
   useHostFocus,
   createRemoteGuideMemoryStore,
@@ -190,12 +191,20 @@ function Host() {
   // conversation is open and is gone on reload. Nothing persists it.
   const [instanceRef, setInstanceRef] = useState<string | undefined>(undefined);
 
+  // Bound once to the registry, so the panel's subscription is not torn down
+  // and rebuilt on every render of the host.
+  const stepInteraction = useMemo(() => createStepInteraction(registry, { highlight }), []);
+
   const guide = useGuideQuery({
     engine,
     registry,
     highlight,
     route: location.pathname,
     applicationVersion: APPLICATION_VERSION,
+    // The same list the application's own `useCan` consults, which is the only
+    // honest way to report it: a host that answered this from somewhere other
+    // than its real auth layer would be telling the guide a second story.
+    permissions: PERMISSIONS,
     ...(focused === undefined ? {} : { focusedSemanticId: focused }),
     navigate: (route: string) => navigate(route),
     ...(instanceRef === undefined ? {} : { selectedInstanceRef: instanceRef }),
@@ -343,6 +352,11 @@ function Host() {
           ask={ask}
           execute={guide.execute}
           clearPointer={() => highlight.clear()}
+          // Opt-in, and the host is what opts in: the walkthrough advances when
+          // the user operates the control a step names, and offers to press it
+          // for them where the contract allows. Which steps those are is not
+          // decided here — see `performance.byGuide` on each step.
+          stepInteraction={stepInteraction}
           open={open}
           onClose={() => setOpen(false)}
           theme={forcedDark ? { ...theme, appearance: 'dark' } : theme}

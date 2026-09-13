@@ -108,9 +108,37 @@ export const GUIDE_CSS = `
   appearance: none; background: transparent; cursor: pointer; width: 100%; text-align: left;
   padding: 8px 10px; border-radius: ${v('radius-control')}; font-size: ${v('font-size-sm')};
   color: ${v('text')};
+  /* The status mark sits at the trailing edge and the label keeps its place, so
+     a tick appearing does not shuffle the text under the pointer. */
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
 .sw-guide .sw-guide__menu-item:hover { background: ${v('surface-elevated')}; }
 .sw-guide .sw-guide__menu-item:focus-visible { outline: 2px solid ${v('focus-ring')}; outline-offset: -2px; }
+.sw-guide .sw-guide__menu-item:disabled { cursor: default; }
+/* Only the item being worked on dims. Dimming the whole menu would read as the
+   panel having gone away. */
+.sw-guide .sw-guide__menu-item[data-state="RUNNING"] { color: ${v('muted-text')}; }
+.sw-guide .sw-guide__menu-item[data-state="FAILED"] { color: ${v('danger')}; }
+
+.sw-guide .sw-guide__menu-status { display: flex; flex: none; align-items: center; }
+.sw-guide .sw-guide__menu-status[data-kind="running"] { color: ${v('muted-text')}; }
+.sw-guide .sw-guide__menu-status[data-kind="done"] { color: ${v('success')}; }
+.sw-guide .sw-guide__menu-status[data-kind="failed"] { color: ${v('danger')}; }
+/* Standing, not transient: which answer detail is actually in force. */
+.sw-guide .sw-guide__menu-status[data-kind="selected"] { color: ${v('primary')}; }
+
+.sw-guide .sw-guide__spin { animation: sw-guide-spin 700ms linear infinite; transform-origin: 50% 50%; }
+@keyframes sw-guide-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .sw-guide .sw-guide__spin { animation: none; }
+}
+
+/* Reachable by a screen reader, absent to everyone else. The status marks are
+   colour and shape; the words are here. */
+.sw-guide .sw-guide__sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
 
 .sw-guide .sw-guide__status {
   display: flex; align-items: center; gap: 8px;
@@ -179,6 +207,13 @@ export const GUIDE_CSS = `
   padding: 11px 14px; font-size: ${v('font-size-sm')}; color: ${v('muted-text')};
 }
 .sw-guide .sw-guide__condition-mark { color: ${v('muted-text')}; }
+/* A settled condition looks different from an unsettled one. UNKNOWN keeps the
+   neutral treatment, because "this is what the feature requires" is exactly as
+   much as the guide knows when the host reports no permissions. */
+.sw-guide .sw-guide__condition[data-status="HELD"] { color: ${v('text')}; }
+.sw-guide .sw-guide__condition[data-status="HELD"] .sw-guide__condition-mark { color: ${v('success')}; }
+.sw-guide .sw-guide__condition[data-status="NOT_HELD"] { color: ${v('text')}; }
+.sw-guide .sw-guide__condition[data-status="NOT_HELD"] .sw-guide__condition-mark { color: ${v('warning')}; }
 
 .sw-guide .sw-guide__steps {
   list-style: none; counter-reset: sw-step;

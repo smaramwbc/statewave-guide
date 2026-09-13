@@ -39,7 +39,7 @@ function userVisibleText(response: unknown): string[] {
       purpose?: string;
       summary?: string;
       steps: { text: string }[];
-      conditions: string[];
+      conditions: { text: string }[];
       questions: string[];
     };
     pruned: { text: string; detail: string }[];
@@ -51,7 +51,7 @@ function userVisibleText(response: unknown): string[] {
     value.answer?.purpose,
     value.answer?.summary,
     ...(value.answer?.steps ?? []).map((step) => step.text),
-    ...(value.answer?.conditions ?? []),
+    ...(value.answer?.conditions ?? []).map((condition) => condition.text),
     ...(value.answer?.questions ?? []),
     ...value.pruned.map((entry) => entry.text),
     value.ambiguity?.message,
@@ -71,7 +71,12 @@ describe('the first-UI scenarios', () => {
     expect(response.featureId).toBe('clients.create');
     expect(response.answer?.purpose).toBe('Lets you create a new client.');
     expect(response.answer?.steps.map((step) => step.text)).toContain('Open Clients.');
-    expect(response.answer?.conditions).toContain('You need permission to create a client.');
+    // No permission list in the context, so the guide states the requirement
+    // and claims nothing about who is asking.
+    expect(response.answer?.conditions).toContainEqual({
+      text: 'You need permission to create a client.',
+      status: 'UNKNOWN',
+    });
   });
 
   it('B. where is Export CSV', () => {
@@ -95,7 +100,7 @@ describe('the first-UI scenarios', () => {
     expect(response.answer?.conditions.length).toBeGreaterThan(0);
     // A permission, and nothing invented alongside it.
     for (const condition of response.answer?.conditions ?? []) {
-      expect(condition).toMatch(/permission/i);
+      expect(condition.text).toMatch(/permission/i);
     }
   });
 

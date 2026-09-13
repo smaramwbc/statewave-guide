@@ -82,6 +82,70 @@ const memory = useGuideMemory({
 What the host owes the panel beyond this: the runtime context (route, visible semantic ids,
 snapshot id) on every query, and the docked-layout CSS if you dock it. Copy the demo.
 
+### Permissions — optional, and a claim of completeness
+
+`context.permissions` lets the guide settle a condition against the person asking, rather than
+stating it in the abstract ([ADR 0034](adr/0034-a-permission-is-the-hosts-to-assert-and-the-guides-to-repeat.md)):
+
+| you report                         | the guide says                                 |
+| ---------------------------------- | ---------------------------------------------- |
+| nothing (the field is absent)      | You need permission to create a client.        |
+| a list containing `clients:create` | You have permission to create a client.        |
+| a list without it                  | You do not have permission to create a client. |
+
+Read the third row twice before you wire this up. **Reporting the field asserts that the list is
+complete** — a permission absent from it is one the guide will tell your user they do not have. A
+partial list produces an answer that is confidently wrong, which is worse than the abstract sentence
+it replaces. Leave the field out and you keep the first row, which is where every host starts.
+
+`undefined` and `[]` are different: absent means "I was not told", empty means "this user holds
+nothing", which is what a signed-out session is. Strings are compared exactly against the
+identifiers the ProductModel compiled out of your source — no normalisation, no prefix matching, no
+case folding. Report the same list your own authorisation checks consult, from the same place:
+
+```tsx
+const guide = useGuideQuery({
+  engine,
+  registry,
+  route: location.pathname,
+  permissions: session.permissions, // the list `can()` reads, not a second copy
+});
+```
+
+Steps are never pruned by a permission. A user who cannot create a client is often a user about to
+ask somebody who can, and a walkthrough that vanishes tells them nothing to ask for.
+
+### Letting the walkthrough keep up — optional
+
+By default the panel never touches your application: it points, and the user acts. Pass
+`stepInteraction` and two things change
+([ADR 0035](adr/0035-a-guide-may-open-the-task-it-may-not-finish-it.md)):
+
+```tsx
+const stepInteraction = useMemo(() => createStepInteraction(registry), [registry]);
+
+<StatewaveGuide … stepInteraction={stepInteraction} />;
+```
+
+- **The walkthrough advances when the user does the step**, so pressing **New client** in your app
+  does not also require pressing **Next** in the panel.
+- **A "Do it for me" button appears** on steps the guide is permitted to take.
+- **"Show me" demonstrates** — it enters the walkthrough, takes the steps it may, and hands over at
+  the first one only the user can do ([ADR 0036](adr/0036-every-answer-has-a-next-move.md)).
+
+Which steps those are is not yours to configure and not the panel's to decide — it comes off each
+step's compiled `role`:
+
+| the step           | a guide may | why                                         |
+| ------------------ | ----------- | ------------------------------------------- |
+| opens the task     | yes         | a dialog that opens is undone by closing it |
+| supplies data      | no          | the record being written is the user's      |
+| commits the change | **no**      | pressing it _is_ the change                 |
+
+So the guide will press **New client** and will never press **Create client**. Leave
+`stepInteraction` out and you get the previous behaviour exactly: no watching, no pressing, nothing
+in this package reaching into your DOM to operate it.
+
 **Refusals are a feature.** Ask the demo something the product cannot do — the answer is
 _"I do not have anything verified about that."_ If your integration ever makes that sentence rare,
 something upstream is inventing facts; see [refusals.md](refusals.md).

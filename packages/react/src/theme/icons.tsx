@@ -121,6 +121,52 @@ export const Check = ({ double = false }: { double?: boolean }): ReactElement =>
   </svg>
 );
 
+/**
+ * A ring with a gap, spun by CSS.
+ *
+ * The rotation lives in the stylesheet rather than SMIL so that
+ * `prefers-reduced-motion` can stop it — which it does, leaving a static ring
+ * that still reads as "not finished".
+ */
+export const Spinner = (): ReactElement => (
+  <svg {...base} width={16} height={16} className="sw-guide__spin" aria-hidden="true">
+    <circle
+      cx={12}
+      cy={12}
+      r={8}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      opacity={0.25}
+    />
+    <path
+      d="M20 12a8 8 0 0 0-8-8"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+/** Something went wrong and the user needs to know it did. */
+export const Alert = (): ReactElement => (
+  <svg
+    {...base}
+    width={16}
+    height={16}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 3.8L21 19.2H3z" />
+    <path d="M12 10v4" />
+    <path d="M12 16.8v.01" />
+  </svg>
+);
+
 export const Gear = (): ReactElement => (
   <svg
     {...base}

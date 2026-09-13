@@ -49,6 +49,7 @@ import {
 } from '../theme/config.js';
 import type { GuideBranding, GuideLayoutInput } from '../theme/config.js';
 import {
+  Alert,
   Check,
   Chevron,
   Close,
@@ -59,9 +60,12 @@ import {
   Play,
   Send,
   Sparkle,
+  Spinner,
 } from '../theme/icons.js';
 import { emptySession, withAnswer, withQuestion } from './session.js';
 import type { GuideSession } from './session.js';
+import type { GuideStepInteraction } from '../step-interaction.js';
+import type { GuideMemoryWriteOutcome } from '../memory/use-guide-memory.js';
 import { useShowMe } from './use-show-me.js';
 import type { SafeActionOutcome } from '../use-guide-query.js';
 
@@ -133,6 +137,16 @@ export interface StatewaveGuideProps {
    * wrong element, which is the panel claiming something it cannot see.
    */
   clearPointer?: () => void;
+  /**
+   * Watching for, and taking, the interaction a step describes.
+   *
+   * Absent — the default — means the panel does neither, which is how every
+   * release before this one behaved. Supply
+   * `createStepInteraction(registry)` to opt in. What the guide is then
+   * permitted to press is not this object's decision: the query contract
+   * settles it per step, from what that step was compiled as.
+   */
+  stepInteraction?: GuideStepInteraction;
   memoryDiagnostics?: {
     enabled: boolean;
     scope: string;
@@ -150,8 +164,15 @@ export interface StatewaveGuideProps {
   };
   memory?: {
     guidanceDetail: 'AUTO' | 'CONCISE' | 'FULL';
-    onSetDetail: (value: 'AUTO' | 'CONCISE' | 'FULL') => void;
-    onReset: () => void;
+    /**
+     * Record the choice, and say whether it took.
+     *
+     * A returned promise is awaited and its outcome shown. A handler that
+     * returns nothing is treated as done the moment it returns, which is the
+     * most the panel can honestly claim about a write it cannot observe.
+     */
+    onSetDetail: (value: 'AUTO' | 'CONCISE' | 'FULL') => void | Promise<GuideMemoryWriteOutcome>;
+    onReset: () => void | Promise<GuideMemoryWriteOutcome>;
   };
   onSelectInstance?: (ref: string) => void;
 }
@@ -248,6 +269,37 @@ function Brand({ branding }: { branding: GuideBranding | undefined }): ReactElem
   );
 }
 
+/**
+ * How long Show me lingers on a control before pressing it.
+ *
+ * A demonstration the eye can follow, not an automation. Tuned to be long
+ * enough that the ring is seen and short enough that nobody wonders whether the
+ * button worked.
+ */
+const DEMONSTRATION_PAUSE_MS = 750;
+
+/** How long a finished menu action shows its tick before the menu closes. */
+const MENU_CONFIRMATION_MS = 850;
+
+/**
+ * What a menu item is doing, to the eye.
+ *
+ * Three states and a live region. The spinner is not decoration — the two items
+ * that matter here write to a store that may be across a network, and "did that
+ * work?" was previously unanswerable from the screen. The failure state says so
+ * out loud rather than closing the menu and hoping.
+ */
+function MenuStatus({ state }: { state?: 'RUNNING' | 'DONE' | 'FAILED' }): ReactElement | null {
+  if (state === undefined) return null;
+  const label = state === 'RUNNING' ? 'Working…' : state === 'DONE' ? 'Done' : 'That did not save';
+  return (
+    <span className="sw-guide__menu-status" data-kind={state.toLowerCase()} role="status">
+      <span className="sw-guide__sr-only">{label}</span>
+      {state === 'RUNNING' ? <Spinner /> : state === 'DONE' ? <Check /> : <Alert />}
+    </span>
+  );
+}
+
 /** One answer, rendered from exactly the fields that are present. */
 function Answer(props: {
   response: GuideQueryResponse;
@@ -267,6 +319,8 @@ function Answer(props: {
    */
   presentation?: GuidePresentationPlan;
   onMemoryEvent?: (kind: GuideMemoryEventKind, input?: { featureId?: string }) => void;
+  /** Watching for, and taking, a step's interaction. Absent means neither. */
+  stepInteraction?: GuideStepInteraction;
 }): ReactElement {
   const { response } = props;
   // Both sentences arrive already verified. The default is the richer one, and
@@ -284,6 +338,7 @@ function Answer(props: {
       : (sentences?.withVisibleText ?? sentences?.geometryOnly);
   const answer = response.answer;
   const [stepIndex, setStepIndex] = useState<number | undefined>(undefined);
+  const stepIndexRef = useRef<number | undefined>(undefined);
 
   /**
    * The pointing actions the contract offers for one step, if any.
@@ -310,11 +365,38 @@ function Answer(props: {
    * the target is not there, the run's stop clears the ring, and the note says
    * "That is not on screen at the moment." instead of the ring lying.
    */
-  const goToStep = (index: number | undefined): void => {
+  const goToStep = (index: number | undefined, opening?: readonly GuideSafeAction[]): void => {
+    // The ref is set synchronously, before React has re-rendered. `Show me`
+    // drives the walkthrough by pressing a control and then reading where that
+    // press left it, and `node.click()` dispatches synchronously — so the
+    // answer has to be available before the next line of that loop runs.
+    const leaving = stepIndexRef.current !== undefined && index === undefined;
+    stepIndexRef.current = index;
     setStepIndex(index);
-    if (!props.pointing) return;
-    const actions = index === undefined ? undefined : stepPointerActions(index);
-    if (actions === undefined) {
+
+    // A walkthrough points. Both ways into one — Show me and Step through —
+    // point at the first step, so being inside a walkthrough *is* the reader
+    // having asked; there is no state where the panel is walking somebody
+    // through something while the application sits unmarked.
+    //
+    // This used to be conditional on `props.pointing`, which is derived from
+    // the last run's outcomes — so a single step whose control was not on
+    // screen turned pointing off for the rest of the walkthrough, and every
+    // later step went unmarked even once its control had mounted. The reader
+    // was left exactly where the bug report found them: nothing happening, and
+    // no way to tell why.
+    if (index === undefined) {
+      if (leaving) props.onClearPointer?.();
+      return;
+    }
+    // `opening` is the response's own sequence, passed only when a walkthrough
+    // is being started. The first step is often an entry step — "Open Clients."
+    // — which names a route rather than a control and so offers nothing to
+    // point at; the navigation for it lives on the response. Later steps get no
+    // such fallback: a step that names nothing this feature owns is a step with
+    // nothing to point at, and the ring comes down.
+    const actions = stepPointerActions(index) ?? opening;
+    if (actions === undefined || actions.length === 0) {
       props.onClearPointer?.();
       return;
     }
@@ -322,6 +404,190 @@ function Answer(props: {
   };
   const steps = answer?.steps ?? [];
   const stepping = stepIndex !== undefined && steps.length > 1;
+
+  /**
+   * The step the user is on advances when the user does it.
+   *
+   * A walkthrough that has to be clicked twice — once in the application and
+   * once in the panel — is a walkthrough that makes the reader do bookkeeping.
+   * So while stepping, the control this step names is watched, and operating it
+   * moves the walkthrough on.
+   *
+   * Watched only where operating the control *is* doing the step. A
+   * `confirmation` is excluded for the same reason the guide will not press it
+   * — but that is not this component's judgement to make, so it reads
+   * `performance` and does not infer anything from the control itself. A
+   * `TYPE` step is excluded because clicking a field is not filling it in, and
+   * advancing there would march past work the user has not done.
+   */
+  const watched = stepIndex === undefined ? undefined : steps[stepIndex]?.performance;
+  const watchedId =
+    watched?.kind === 'PRESS' && watched.byGuide === 'ALLOWED' ? watched.semanticId : undefined;
+  /** The control the guide may press for this step, when a host supplied a way. */
+  const canPerform = props.stepInteraction === undefined ? undefined : watchedId;
+  const [performing, setPerforming] = useState(false);
+
+  /**
+   * The one control that moves the walkthrough on, in one place.
+   *
+   * It used to be three buttons appearing and disappearing in the same row, so
+   * the thing to press next slid sideways between steps — "Do it for me" in the
+   * first slot, then nothing there and "Next" two places along. A reader
+   * following a walkthrough with the mouse had to find it again every step.
+   *
+   * Now the slot is fixed and only its label changes, so the same spot advances
+   * the whole way through. The keyboard gets the same thing for free: focus
+   * lands here on every step, and a button already answers Enter and Space.
+   */
+  const advanceRef = useRef<HTMLButtonElement | null>(null);
+  const onLastStep = stepIndex !== undefined && stepIndex === steps.length - 1;
+  const completeWalkthrough = (): void => {
+    goToStep(undefined);
+    // The one interaction that licenses memory treating this feature as done.
+    // Reaching the last step and pressing Done is the whole of the evidence;
+    // nothing weaker counts. (The sentence that used to be shown for it is
+    // retired, and `test:memory-completion-copy-restraint` keeps it out of this
+    // file — including out of comments, so it is described rather than quoted.)
+    props.onMemoryEvent?.('STEP_THROUGH_COMPLETED', {
+      ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
+    });
+  };
+  const advance =
+    canPerform !== undefined
+      ? {
+          label: 'Do it for me',
+          testId: 'guide-step-perform',
+          primary: true,
+          run: () => {
+            void (async () => {
+              setPerforming(true);
+              try {
+                // Nothing is advanced here. Pressing the control fires the
+                // click the walkthrough is already watching for, and that is
+                // what moves the step — so a press by the guide and a press by
+                // the user take exactly the same path. If the control has gone,
+                // the walkthrough simply stays put.
+                await props.stepInteraction?.press(canPerform);
+              } finally {
+                setPerforming(false);
+              }
+            })();
+          },
+        }
+      : onLastStep
+        ? {
+            label: 'Done',
+            testId: 'guide-step-done',
+            // Quiet on purpose. The next move on the final step is the control
+            // the ring is sitting on, not anything in this panel, and a primary
+            // Done invites finishing a task nobody did.
+            primary: false,
+            run: completeWalkthrough,
+          }
+        : {
+            label: 'Next',
+            testId: 'guide-step-next',
+            primary: true,
+            run: () => goToStep((stepIndex ?? 0) + 1),
+          };
+
+  /**
+   * Focus follows the walkthrough, unless somebody is typing in the application.
+   *
+   * The guard is the whole subtlety, and it has to be narrow in both
+   * directions. One of these steps is "enter the client's billing email", and
+   * taking the keyboard off a reader mid-word to put it on a Next button would
+   * be the guide interrupting the work it just asked for. But the panel's own
+   * composer is not somebody's work — it is where the question was typed, and
+   * holding the keyboard there would mean the walkthrough the reader just
+   * started could not be driven from the keys at all.
+   *
+   * So: an editable in the host keeps the keyboard. One inside the panel does
+   * not.
+   */
+  useEffect(() => {
+    if (!stepping) return;
+    const button = advanceRef.current;
+    if (button === null) return;
+    const focused = button.ownerDocument.activeElement as HTMLElement | null;
+    const editable =
+      focused?.tagName === 'INPUT' ||
+      focused?.tagName === 'TEXTAREA' ||
+      focused?.isContentEditable === true;
+    const panel = button.closest('.sw-guide');
+    const insidePanel = focused !== null && panel !== null && panel.contains(focused);
+    if (editable && !insidePanel) return;
+    button.focus();
+    // `performing` is a dependency because the advance is disabled while the
+    // guide is pressing, and a disabled button cannot hold focus — the browser
+    // drops it to the body. Without re-focusing when the press finishes, the
+    // first key worked and the second went nowhere, which is the exact failure
+    // this whole change exists to remove.
+  }, [stepping, stepIndex, performing]);
+
+  /** The control a guide may press at `index`, or nothing. */
+  const pressableAt = (index: number | undefined): string | undefined => {
+    if (index === undefined) return undefined;
+    const performance = steps[index]?.performance;
+    return performance?.kind === 'PRESS' && performance.byGuide === 'ALLOWED'
+      ? performance.semanticId
+      : undefined;
+  };
+
+  /**
+   * Show me, doing what it says.
+   *
+   * It used to run the response's action sequence once and stop — a ring, a
+   * sentence describing the feature, and no next move. Pressing it a second
+   * time re-ran the identical sequence, so it read as a button that does
+   * nothing. That is the dead end this replaces.
+   *
+   * Now it enters the walkthrough and *drives* it: point at the step, take it
+   * where the contract allows, and stop at the first step only the user can do.
+   * For creating a client that is one press — the dialog opens — and then it
+   * hands over at the field, because nobody else may type somebody's data.
+   *
+   * The loop presses and then reads where the press left it rather than
+   * advancing itself. Advancing is the watcher's job, and a press by the guide
+   * has to travel the same path as a press by the user or the two will
+   * eventually disagree.
+   */
+  const driveFromHere = async (): Promise<void> => {
+    const interaction = props.stepInteraction;
+    if (interaction === undefined) return;
+    // Bounded by the number of steps: a walkthrough cannot need more presses
+    // than it has steps, and a press that fails to advance ends the run.
+    for (let guard = 0; guard <= steps.length; guard += 1) {
+      const at = stepIndexRef.current;
+      const control = pressableAt(at);
+      if (control === undefined) return;
+      // Long enough to be a demonstration rather than a flash. Pressing the
+      // instant the button is clicked opens the dialog before the reader has
+      // seen which control opened it, which is the one thing Show me exists to
+      // convey. It also lets the pointing sequence finish its scroll.
+      await new Promise((resolve) => setTimeout(resolve, DEMONSTRATION_PAUSE_MS));
+      const pressed = await interaction.press(control);
+      // Nothing mounted under that id, or the press did not move the
+      // walkthrough on. Either way this is as far as a guide can take it.
+      if (!pressed || stepIndexRef.current === at) return;
+    }
+  };
+  const observe = props.stepInteraction?.observe;
+  useEffect(() => {
+    if (!stepping || watchedId === undefined || observe === undefined) return;
+    return observe(watchedId, () => {
+      // The user got there first. Advance past the step they just did — through
+      // `goToStep`, so the ring moves with the walkthrough exactly as it does
+      // when the button in the panel is the one that was pressed. Stop at the
+      // end rather than wrapping or closing: the last step of a procedure is
+      // the one a reader most wants left on screen.
+      if (stepIndex === undefined) return;
+      goToStep(Math.min(stepIndex + 1, steps.length - 1));
+    });
+    // `goToStep` is deliberately not a dependency: it is rebuilt every render,
+    // and depending on it would tear down and re-add the listener on each one.
+    // What decides this subscription is which control is being watched.
+  }, [stepping, watchedId, observe, stepIndex, steps.length]);
   /**
    * First paint, decided in core rather than here.
    *
@@ -375,12 +641,16 @@ function Answer(props: {
         </p>
       )}
 
+      {/* The verdict is styled here and decided elsewhere. `status` picks a mark
+          and a colour; the sentence arrives already phrased for it, because
+          "you need", "you have" and "you do not have" are three different
+          claims and choosing between them is not a rendering decision. */}
       {(answer?.conditions ?? []).map((condition) => (
-        <div className="sw-guide__condition" key={condition}>
+        <div className="sw-guide__condition" data-status={condition.status} key={condition.text}>
           <span className="sw-guide__condition-mark" aria-hidden="true">
-            <Info />
+            {condition.status === 'HELD' ? <Check /> : <Info />}
           </span>
-          <span>{condition}</span>
+          <span>{condition.text}</span>
         </div>
       ))}
 
@@ -482,7 +752,12 @@ function Answer(props: {
         <>
           {hasBody && <div className="sw-guide__rule" aria-hidden="true" />}
           <div className="sw-guide__actions">
-            {response.actions.length > 0 && (
+            {/* An entry point, so it is not offered once the reader is inside.
+                The ring follows the active step on its own now, which is all
+                this button used to be good for mid-walkthrough — and a control
+                that repeats what is already happening is the kind of thing that
+                makes a panel feel like it is not listening. */}
+            {response.actions.length > 0 && !stepping && (
               <button
                 type="button"
                 className={`sw-guide__button${
@@ -493,15 +768,16 @@ function Answer(props: {
                 // to make a no-op visible is the no-op wearing a costume.
                 data-emphasis={plan?.emphasisedAction === 'SHOW_ME' ? 'memory' : undefined}
                 onClick={() => {
-                  // During a walkthrough, Show me means "show me THIS step" —
-                  // the current step's own control when it names one, the
-                  // response's actions otherwise (an entry step's navigation
-                  // lives there, not on the step).
-                  const stepActions = stepping ? stepPointerActions(stepIndex) : undefined;
-                  props.onShowMe(stepActions ?? response.actions);
                   props.onMemoryEvent?.('SHOW_ME_USED', {
                     ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
                   });
+                  // Begin, point, and take it as far as a guide is allowed to.
+                  // Entering the walkthrough is the whole change — the old
+                  // behaviour pointed once and left the reader with a ring, a
+                  // sentence describing the feature, and no next move at all.
+                  setExpanded(true);
+                  goToStep(0, response.actions);
+                  void driveFromHere();
                 }}
                 disabled={props.busy}
               >
@@ -521,7 +797,11 @@ function Answer(props: {
                   // Done against a collapsed list — completing steps that were
                   // never on screen, and recording it as a completion.
                   setExpanded(true);
-                  setStepIndex(0);
+                  // And point. Starting a walkthrough used to change only the
+                  // panel, so the first thing a reader saw after asking to be
+                  // walked through something was the application exactly as it
+                  // had been. The ring is the walkthrough's other half.
+                  goToStep(0, response.actions);
                   props.onMemoryEvent?.('STEP_THROUGH_STARTED', {
                     ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
                   });
@@ -529,6 +809,31 @@ function Answer(props: {
               >
                 <ListIcon />
                 Step through
+              </button>
+            )}
+            {/* The advance, in a slot that does not move.
+            
+                Which of the three it is comes from the contract: "Do it for me"
+                only where a guide is allowed to take the step (ADR 0035), "Done"
+                on the last one, "Next" otherwise. The panel reads the verdict
+                and decides nothing.
+                
+                One button in one place is also the whole keyboard story — focus
+                lands here on every step, and Enter and Space are what a button
+                already does. */}
+            {stepping && (
+              <button
+                ref={advanceRef}
+                type="button"
+                className={`sw-guide__button${
+                  advance.primary ? ' sw-guide__button--primary' : ' sw-guide__button--quiet'
+                }`}
+                data-testid={advance.testId}
+                disabled={performing}
+                onClick={advance.run}
+              >
+                {advance.label === 'Do it for me' ? <Play /> : null}
+                {advance.label}
               </button>
             )}
             {stepping && (
@@ -544,34 +849,45 @@ function Answer(props: {
                 <span className="sw-guide__stepper-count">
                   {stepIndex + 1} of {steps.length}
                 </span>
-                {stepIndex < steps.length - 1 ? (
+                {/* Moving on without doing it. Offered only when the advance is
+                    an offer to act — otherwise the advance *is* Next, and two
+                    buttons saying it would be one too many. */}
+                {canPerform !== undefined && !onLastStep && (
                   <button
                     type="button"
                     className="sw-guide__button sw-guide__button--quiet"
+                    data-testid="guide-step-skip"
                     onClick={() => goToStep(stepIndex + 1)}
                   >
-                    Next
+                    Skip
                   </button>
-                ) : (
+                )}
+                {canPerform !== undefined && onLastStep && (
                   <button
                     type="button"
                     className="sw-guide__button sw-guide__button--quiet"
                     data-testid="guide-step-done"
-                    onClick={() => {
-                      goToStep(undefined);
-                      // The one interaction that licenses "You've completed this
-                      // guide before." Reaching the last step and pressing Done
-                      // is the whole of the evidence; nothing weaker counts.
-                      props.onMemoryEvent?.('STEP_THROUGH_COMPLETED', {
-                        ...(response.featureId === undefined
-                          ? {}
-                          : { featureId: response.featureId }),
-                      });
-                    }}
+                    onClick={completeWalkthrough}
                   >
                     Done
                   </button>
                 )}
+                {/* A way out that is not "finish it".
+                
+                    Leaving halfway through is an ordinary thing to do — the
+                    reader got what they needed, or changed their mind — and
+                    without this the only exits were completing a walkthrough
+                    they had abandoned, which would record a completion that
+                    never happened, or closing the panel. Stopping records
+                    nothing and takes the ring down with it. */}
+                <button
+                  type="button"
+                  className="sw-guide__button sw-guide__button--quiet"
+                  data-testid="guide-step-stop"
+                  onClick={() => goToStep(undefined)}
+                >
+                  Stop
+                </button>
               </span>
             )}
             {props.pointing && (
@@ -615,6 +931,53 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  /**
+   * What the last menu item the user pressed is doing.
+   *
+   * These controls used to fire and close instantly, which for the two that
+   * cross a network — choosing an answer detail, and forgetting a subject —
+   * meant the user learned nothing about a write that might still be in flight
+   * and might have failed. A menu that closes before its work is done cannot
+   * report the outcome, so it stays open until there is one.
+   */
+  const [menuBusy, setMenuBusy] = useState<
+    { id: string; state: 'RUNNING' | 'DONE' | 'FAILED' } | undefined
+  >(undefined);
+  const menuBusyRef = useRef(menuBusy);
+  menuBusyRef.current = menuBusy;
+
+  /**
+   * Run a menu item, showing what happened to it.
+   *
+   * `APPLIED` and `UNAVAILABLE` both read as done: the second means memory is
+   * switched off, so nothing was attempted and there is nothing to warn about.
+   * Only a real failure gets the alert, and a failure keeps the menu open —
+   * quietly closing over a "forget me" that did not forget is the worst
+   * available outcome.
+   */
+  const runMenuAction = (id: string, act: () => void | Promise<GuideMemoryWriteOutcome>): void => {
+    setMenuBusy({ id, state: 'RUNNING' });
+    void (async () => {
+      let outcome: GuideMemoryWriteOutcome;
+      try {
+        outcome = (await act()) ?? 'APPLIED';
+      } catch {
+        outcome = 'FAILED';
+      }
+      const failed = outcome === 'FAILED';
+      setMenuBusy({ id, state: failed ? 'FAILED' : 'DONE' });
+      if (failed) return;
+      // Long enough to be seen, short enough not to be in the way.
+      setTimeout(() => {
+        // Only if nothing else has been pressed since. Closing the menu on a
+        // stale timer would dismiss an alert the user has not read.
+        if (menuBusyRef.current?.id !== id) return;
+        setMenuBusy(undefined);
+        setMenuOpen(false);
+      }, MENU_CONFIRMATION_MS);
+    })();
+  };
   const threadRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const restoreTo = useRef<Element | null>(null);
@@ -737,14 +1100,20 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
                 type="button"
                 role="menuitem"
                 className="sw-guide__menu-item"
+                data-testid="guide-clear-conversation"
+                data-state={menuBusy?.id === 'clear' ? menuBusy.state : undefined}
+                disabled={menuBusy?.state === 'RUNNING'}
                 onClick={() => {
-                  setSession(emptySession);
-                  setStamps({});
-                  showMe.reset();
-                  setMenuOpen(false);
+                  runMenuAction('clear', () => {
+                    setSession(emptySession);
+                    setStamps({});
+                    showMe.reset();
+                    props.clearPointer?.();
+                  });
                 }}
               >
                 Clear conversation
+                <MenuStatus state={menuBusy?.id === 'clear' ? menuBusy.state : undefined} />
               </button>
               {props.memory !== undefined && (
                 <>
@@ -758,12 +1127,25 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
                       aria-checked={props.memory?.guidanceDetail === value}
                       className="sw-guide__menu-item"
                       data-testid={`guide-detail-${value.toLowerCase()}`}
+                      data-state={menuBusy?.id === `detail-${value}` ? menuBusy.state : undefined}
+                      disabled={menuBusy?.state === 'RUNNING'}
                       onClick={() => {
-                        props.memory?.onSetDetail(value);
-                        setMenuOpen(false);
+                        runMenuAction(`detail-${value}`, () => props.memory?.onSetDetail(value));
                       }}
                     >
                       {value === 'AUTO' ? 'Auto' : value === 'CONCISE' ? 'Concise' : 'Full'}
+                      {/* Which one is in force, standing. The menu showed this
+                          only to a screen reader, through `aria-checked`, so a
+                          sighted user opening it could not tell which answer
+                          detail they were getting. The transient status of a
+                          press takes precedence while there is one. */}
+                      {menuBusy?.id === `detail-${value}` ? (
+                        <MenuStatus state={menuBusy.state} />
+                      ) : props.memory?.guidanceDetail === value ? (
+                        <span className="sw-guide__menu-status" data-kind="selected">
+                          <Check />
+                        </span>
+                      ) : null}
                     </button>
                   ))}
                   <div className="sw-guide__menu-rule" aria-hidden="true" />
@@ -772,12 +1154,14 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
                     role="menuitem"
                     className="sw-guide__menu-item"
                     data-testid="guide-reset-memory"
+                    data-state={menuBusy?.id === 'reset' ? menuBusy.state : undefined}
+                    disabled={menuBusy?.state === 'RUNNING'}
                     onClick={() => {
-                      props.memory?.onReset();
-                      setMenuOpen(false);
+                      runMenuAction('reset', () => props.memory?.onReset());
                     }}
                   >
                     Reset Guide memory
+                    <MenuStatus state={menuBusy?.id === 'reset' ? menuBusy.state : undefined} />
                   </button>
                 </>
               )}
@@ -847,6 +1231,9 @@ export function StatewaveGuide(props: StatewaveGuideProps): ReactElement | null 
                       showMe.reset();
                     },
                   })}
+              {...(props.stepInteraction === undefined
+                ? {}
+                : { stepInteraction: props.stepInteraction })}
               {...(props.contextualForm === undefined
                 ? {}
                 : { contextualForm: props.contextualForm })}

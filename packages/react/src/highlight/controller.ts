@@ -108,6 +108,15 @@ export interface HighlightController {
   highlight(id: string, options?: HighlightOptions): Promise<HighlightResult>;
   /** Removes the current highlight. Safe to call when nothing is highlighted. */
   clear(): void;
+  /**
+   * Show the control being pointed at as having just been pressed.
+   *
+   * Resolves once the mark has been on screen long enough to register, so a
+   * caller can press immediately afterwards and the two read as one action.
+   * Does nothing when nothing is highlighted — the acknowledgement is drawn on
+   * the ring, and without a ring there is nothing to acknowledge with.
+   */
+  showPress(): Promise<void>;
   /** Scrolls an element into view. Resolves when the scroll settles. Never throws. */
   scrollTo(id: string, options?: ScrollToOptions): Promise<ScrollResult>;
   /**
@@ -152,11 +161,33 @@ export interface HighlightControllerOptions {
    * Read once, when the controller is created.
    */
   defaults?: Partial<HighlightOptions>;
+  /**
+   * Dim the rest of the page while something is highlighted. Defaults to false.
+   *
+   * A controller-level choice rather than a per-call one, because the overlay
+   * outlives a single highlight and a scrim that appeared and vanished between
+   * consecutive steps would read as a fault. Read once, when the overlay is
+   * first built.
+   */
+  dim?: boolean;
   /** Where development warnings go. This package never writes to the console itself. */
   onWarning?: (message: string) => void;
 }
 
 const DEFAULT_PADDING = 8;
+
+/**
+ * How long the press mark stays on the ring before the click lands.
+ *
+ * Short enough to read as one action rather than a pause, long enough that a
+ * frame of it is actually painted. A real button shows `:active` while the
+ * finger is down; this is the same moment, drawn for a press nobody made with
+ * a finger.
+ */
+const PRESS_MARK_MS = 260;
+
+/** How long the mark lingers afterwards, when nothing else takes it off. */
+const PRESS_MARK_HOLD_MS = 400;
 
 /** What the controller is currently pointing at. */
 interface ActiveHighlight {
@@ -358,7 +389,7 @@ export function createHighlightController(
     if (!doc) return null;
     if (!overlay) {
       injectHighlightStyles(doc);
-      overlay = createOverlay(doc);
+      overlay = createOverlay(doc, { dim: options.dim === true });
     }
     return overlay;
   }
@@ -513,6 +544,9 @@ export function createHighlightController(
 
     active = { id, node, options: resolved };
     handle.setContent(resolved.title, resolved.message);
+    // A fresh highlight is never a pressed one. Without this a mark set on the
+    // previous control would still be on the ring when it arrives at the next.
+    handle.setPressed(false);
     reposition();
     attachListeners();
     setActiveId(id);
@@ -616,6 +650,26 @@ export function createHighlightController(
     clear,
     scrollTo,
     checkTarget,
+
+    async showPress() {
+      const marked = overlay;
+      if (marked === null || active === null) return;
+      marked.setPressed(true);
+      // Resolves with the mark still up. The caller presses next, and the press
+      // has to happen *while* the control is marked — that is the whole point,
+      // and taking it off here made the acknowledgement invisible at exactly
+      // the moment it was for.
+      await new Promise((resolve) => setTimeout(resolve, PRESS_MARK_MS));
+      // Usually redundant: the press advances the walkthrough, and the next
+      // highlight clears the mark. This is for the press that advances nothing,
+      // which must not leave a control marked as pressed forever.
+      setTimeout(() => {
+        // Only the overlay that got the mark. `clear()` builds a new one, and a
+        // stale handle reaching into a live overlay is how a press mark ends up
+        // on the *next* control — the guide claiming a press it never made.
+        if (overlay === marked) marked.setPressed(false);
+      }, PRESS_MARK_HOLD_MS);
+    },
     get activeId() {
       return activeId;
     },

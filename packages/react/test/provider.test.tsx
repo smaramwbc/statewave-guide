@@ -143,7 +143,7 @@ describe('<StatewaveGuideProvider>', () => {
       expect(result).not.toBeNull();
     });
     expect((result as GuideActionResult | null)?.success).toBe(true);
-    expect(document.querySelectorAll('.sw-guide-dim')).toHaveLength(4);
+    expect(document.querySelectorAll('.sw-guide-dim')).toHaveLength(0);
     expect(document.querySelector('.sw-guide-popover')?.textContent).toContain('Here');
   });
 

@@ -861,7 +861,7 @@ Registering an element and highlighting it:
                        (a selector would be rejected here, with invalid_input)
 6.  Policy             risk 'safe' → allowed
 7.  Handler            controller.highlight('clients.create')
-8.  Engine             resolveNode → scroll into view → spotlight + ring + popover
+8.  Engine             resolveNode → scroll into view → ring + callout beside it
 9.  Result             { ok: true, action: 'highlight', requestId: 'req_1', data: … }
 ```
 
