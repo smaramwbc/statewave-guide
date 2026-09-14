@@ -2,10 +2,16 @@
  * Presentation only.
  *
  * Every rule here targets markup the benchmark application already renders. No
- * semantic id, accessible name, route or behaviour is touched, and no file under
- * `packages/indexer/test/fixtures` is modified — the evidence fixture is frozen
- * and a nicer-looking demo is not a reason to move it. What changes is entirely
- * how it is painted.
+ * semantic id, accessible name or route is touched by this file — what changes
+ * is entirely how the application is painted.
+ *
+ * The fixture itself has moved once, and only once: it gained a toast system,
+ * because every mutating action in it used to succeed in silence and real
+ * software says so. Nothing in that addition carries a `data-guide`, so the
+ * compiled bundle is byte-identical — `test:guide-bundle-reproducible` is what
+ * says so rather than this comment. Adding *features* would be a different
+ * matter entirely: the ProductModel is frozen, scored benchmark output, and a
+ * new one costs the whole reviewed corpus.
  *
  * Deliberately *not* here: extra navigation items. A left rail listing Deals,
  * Tasks and Reports would look more like a CRM and would be three links to
@@ -283,4 +289,292 @@ body.demo [data-guide='settings.new-key'] {
 .demo-hostile p {
   margin: 0;
   color: #475569;
+}
+
+/* ---------------------------------------------------------------------------
+   The modal, painted as one.
+
+   The fixture has always rendered a real dialog — `role="dialog"`,
+   `aria-modal`, a backdrop element, a close button — and it has always looked
+   like a form that fell out of the bottom of the page, because nothing styled
+   it. Guidance that points into a modal is one of the few genuinely hard cases
+   for an overlay, and a demo where the modal is not a modal was quietly not
+   testing it.
+   --------------------------------------------------------------------------- */
+
+body.demo .dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 20, 28, 0.42);
+  backdrop-filter: blur(2px);
+  animation: demo-fade 120ms ease-out;
+}
+body.demo .dialog {
+  width: min(520px, 100%);
+  max-height: calc(100vh - 80px);
+  overflow: auto;
+  background: var(--demo-surface);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(17, 20, 28, 0.06),
+    0 32px 70px -28px rgba(17, 20, 28, 0.45);
+  animation: demo-rise 140ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+body.demo .dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 0;
+}
+body.demo .dialog__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+body.demo .dialog__close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--demo-muted);
+  font-size: 22px;
+  line-height: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+body.demo .dialog__close:hover {
+  background: var(--demo-bg);
+  color: var(--demo-text);
+}
+body.demo .dialog__body {
+  padding: 14px 20px 20px;
+}
+body.demo .dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 20px 20px;
+}
+body.demo .new-client__blurb {
+  margin: 0 0 14px;
+  color: var(--demo-muted);
+}
+
+@keyframes demo-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes demo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Toasts.
+
+   Bottom left on purpose: the guide docks right, and a stack of notifications
+   sliding in underneath it would be a demo arranged to avoid the interesting
+   case rather than one that renders where an application renders.
+   --------------------------------------------------------------------------- */
+
+body.demo .toasts {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  pointer-events: none;
+}
+body.demo .toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  width: min(360px, calc(100vw - 40px));
+  padding: 12px 13px;
+  border: 1px solid var(--demo-border);
+  border-radius: 12px;
+  background: var(--demo-surface);
+  box-shadow:
+    0 1px 2px rgba(17, 20, 28, 0.05),
+    0 18px 40px -20px rgba(17, 20, 28, 0.35);
+  animation: demo-toast-in 180ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+body.demo .toast__mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+body.demo .toast[data-tone='success'] .toast__mark {
+  background: #12805c;
+}
+body.demo .toast[data-tone='error'] .toast__mark {
+  background: #b42318;
+}
+body.demo .toast[data-tone='info'] .toast__mark {
+  background: var(--demo-primary);
+}
+body.demo .toast__body {
+  flex: 1;
+  min-width: 0;
+}
+body.demo .toast__title {
+  margin: 0;
+  font-weight: 600;
+}
+body.demo .toast__detail {
+  margin: 2px 0 0;
+  color: var(--demo-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+body.demo .toast__close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--demo-muted);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+body.demo .toast__close:hover {
+  color: var(--demo-text);
+}
+
+@keyframes demo-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.demo .dialog,
+  body.demo .dialog__backdrop,
+  body.demo .toast {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The list, the form, and the states either of them can be in.
+   --------------------------------------------------------------------------- */
+
+body.demo .table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--demo-surface);
+  border: 1px solid var(--demo-border);
+  border-radius: var(--demo-radius);
+  overflow: hidden;
+}
+body.demo .table thead th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--demo-muted);
+  background: #fafbfc;
+  border-bottom: 1px solid var(--demo-border);
+}
+body.demo .table tbody td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--demo-border);
+}
+body.demo .table tbody tr:last-child td {
+  border-bottom: 0;
+}
+body.demo .table tbody tr {
+  cursor: pointer;
+  transition: background 90ms ease;
+}
+body.demo .table tbody tr:hover {
+  background: #fafbff;
+}
+/* The row's Delete only on hover or focus: a destructive control repeated down
+   every row is a lot of red for a list somebody is reading. */
+body.demo .table tbody td:last-child {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+body.demo .table tbody tr [data-guide='clients.table.delete'] {
+  opacity: 0;
+  transition: opacity 90ms ease;
+}
+body.demo .table tbody tr:hover [data-guide='clients.table.delete'],
+body.demo .table tbody tr:focus-within [data-guide='clients.table.delete'] {
+  opacity: 1;
+}
+
+body.demo .empty,
+body.demo .alert {
+  padding: 18px;
+  border-radius: var(--demo-radius);
+  background: var(--demo-surface);
+  border: 1px solid var(--demo-border);
+  color: var(--demo-muted);
+}
+body.demo .alert {
+  border-color: #f1c7c2;
+  background: #fef6f5;
+  color: #8a271d;
+}
+body.demo .field {
+  display: block;
+  margin-bottom: 14px;
+}
+body.demo .field__label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: 500;
+}
+body.demo .field__error {
+  display: block;
+  margin-top: 5px;
+  color: #b42318;
+  font-size: 12.5px;
+}
+body.demo .form__error {
+  margin: 0 0 12px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #fef6f5;
+  color: #8a271d;
+}
+body.demo .client-form__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+body.demo .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

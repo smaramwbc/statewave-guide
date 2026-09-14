@@ -269,17 +269,11 @@ function Brand({ branding }: { branding: GuideBranding | undefined }): ReactElem
   );
 }
 
-/**
- * How long Show me lingers on a control before pressing it.
- *
- * A demonstration the eye can follow, not an automation. Tuned to be long
- * enough that the ring is seen and short enough that nobody wonders whether the
- * button worked.
- */
-const DEMONSTRATION_PAUSE_MS = 750;
-
 /** How long a finished menu action shows its tick before the menu closes. */
 const MENU_CONFIRMATION_MS = 850;
+
+/** How long the walkthrough says it has ended before going quiet again. */
+const FINISHED_NOTE_MS = 4000;
 
 /**
  * What a menu item is doing, to the eye.
@@ -339,6 +333,9 @@ function Answer(props: {
   const answer = response.answer;
   const [stepIndex, setStepIndex] = useState<number | undefined>(undefined);
   const stepIndexRef = useRef<number | undefined>(undefined);
+  // Read inside the drive loop, where a captured prop would be a stale one.
+  const busyRef = useRef(props.busy);
+  busyRef.current = props.busy;
 
   /**
    * The pointing actions the contract offers for one step, if any.
@@ -395,7 +392,17 @@ function Answer(props: {
     // point at; the navigation for it lives on the response. Later steps get no
     // such fallback: a step that names nothing this feature owns is a step with
     // nothing to point at, and the ring comes down.
-    const actions = stepPointerActions(index) ?? opening;
+    // The navigation has to survive.
+    //
+    // `?? opening` was wrong in a way that only showed up on a feature living
+    // on another screen: a step with its own pointing actions discarded the
+    // opening sequence entirely, and the `navigate` inside it with them — so
+    // "how do I create an invoice?" asked from /clients scrolled at a control
+    // that was never going to be there and reported it as not on screen. The
+    // step decides *what* to point at; the opening decides how to get to it.
+    const own = stepPointerActions(index);
+    const travel = (opening ?? []).filter((action) => action.kind === 'navigate');
+    const actions = own === undefined ? opening : [...travel, ...own];
     if (actions === undefined || actions.length === 0) {
       props.onClearPointer?.();
       return;
@@ -403,7 +410,12 @@ function Answer(props: {
     props.onShowMe(actions);
   };
   const steps = answer?.steps ?? [];
-  const stepping = stepIndex !== undefined && steps.length > 1;
+  // One step is still a walkthrough. It used to require two, which left a
+  // single-step answer — "where is Export CSV?" — with a ring on screen, no
+  // progress, no way to put the ring down, and a Show me button that did the
+  // same thing every time it was pressed. That was the reported dead end,
+  // surviving in the one shape nobody had looked at.
+  const stepping = stepIndex !== undefined && steps.length >= 1;
 
   /**
    * The step the user is on advances when the user does it.
@@ -421,11 +433,31 @@ function Answer(props: {
    * advancing there would march past work the user has not done.
    */
   const watched = stepIndex === undefined ? undefined : steps[stepIndex]?.performance;
-  const watchedId =
-    watched?.kind === 'PRESS' && watched.byGuide === 'ALLOWED' ? watched.semanticId : undefined;
-  /** The control the guide may press for this step, when a host supplied a way. */
-  const canPerform = props.stepInteraction === undefined ? undefined : watchedId;
+  /**
+   * The control to watch, which is not the same as the control to offer.
+   *
+   * Operating a button *is* doing the step, whoever operated it — so every
+   * `PRESS` step is watched, including the one that commits the change. An
+   * earlier version watched only the steps a guide was allowed to press, on the
+   * reasoning that advancing past a commit would claim a task was finished
+   * without evidence. That got it backwards: pressing "Create client" is
+   * precisely the evidence. The guide may not *press* it (ADR 0035, unchanged);
+   * noticing that somebody else did is not acting, it is paying attention.
+   *
+   * A `TYPE` step is still not watched. Clicking into a field is not filling it
+   * in, and advancing there would march past work nobody did.
+   */
+  const watchedId = watched?.kind === 'PRESS' ? watched.semanticId : undefined;
+  /**
+   * The control the guide may press for this step, when a host supplied a way.
+   *
+   * The narrower half: offering to act needs the contract's permission, while
+   * watching needs only that a press is what the step consists of.
+   */
+  const canPerform =
+    props.stepInteraction === undefined || watched?.byGuide !== 'ALLOWED' ? undefined : watchedId;
   const [performing, setPerforming] = useState(false);
+  const [justFinished, setJustFinished] = useState(false);
 
   /**
    * The one control that moves the walkthrough on, in one place.
@@ -443,6 +475,12 @@ function Answer(props: {
   const onLastStep = stepIndex !== undefined && stepIndex === steps.length - 1;
   const completeWalkthrough = (): void => {
     goToStep(undefined);
+    // Finishing in complete silence read as the guide having lost track. This
+    // is about the walkthrough and nothing else — not about the product, and
+    // not about the reader. It says a thing ended, which is the one fact the
+    // panel is entitled to state about its own state.
+    setJustFinished(true);
+    setTimeout(() => setJustFinished(false), FINISHED_NOTE_MS);
     // The one interaction that licenses memory treating this feature as done.
     // Reaching the last step and pressing Done is the whole of the evidence;
     // nothing weaker counts. (The sentence that used to be shown for it is
@@ -525,64 +563,24 @@ function Answer(props: {
     // this whole change exists to remove.
   }, [stepping, stepIndex, performing]);
 
-  /** The control a guide may press at `index`, or nothing. */
-  const pressableAt = (index: number | undefined): string | undefined => {
-    if (index === undefined) return undefined;
-    const performance = steps[index]?.performance;
-    return performance?.kind === 'PRESS' && performance.byGuide === 'ALLOWED'
-      ? performance.semanticId
-      : undefined;
-  };
-
-  /**
-   * Show me, doing what it says.
-   *
-   * It used to run the response's action sequence once and stop — a ring, a
-   * sentence describing the feature, and no next move. Pressing it a second
-   * time re-ran the identical sequence, so it read as a button that does
-   * nothing. That is the dead end this replaces.
-   *
-   * Now it enters the walkthrough and *drives* it: point at the step, take it
-   * where the contract allows, and stop at the first step only the user can do.
-   * For creating a client that is one press — the dialog opens — and then it
-   * hands over at the field, because nobody else may type somebody's data.
-   *
-   * The loop presses and then reads where the press left it rather than
-   * advancing itself. Advancing is the watcher's job, and a press by the guide
-   * has to travel the same path as a press by the user or the two will
-   * eventually disagree.
-   */
-  const driveFromHere = async (): Promise<void> => {
-    const interaction = props.stepInteraction;
-    if (interaction === undefined) return;
-    // Bounded by the number of steps: a walkthrough cannot need more presses
-    // than it has steps, and a press that fails to advance ends the run.
-    for (let guard = 0; guard <= steps.length; guard += 1) {
-      const at = stepIndexRef.current;
-      const control = pressableAt(at);
-      if (control === undefined) return;
-      // Long enough to be a demonstration rather than a flash. Pressing the
-      // instant the button is clicked opens the dialog before the reader has
-      // seen which control opened it, which is the one thing Show me exists to
-      // convey. It also lets the pointing sequence finish its scroll.
-      await new Promise((resolve) => setTimeout(resolve, DEMONSTRATION_PAUSE_MS));
-      const pressed = await interaction.press(control);
-      // Nothing mounted under that id, or the press did not move the
-      // walkthrough on. Either way this is as far as a guide can take it.
-      if (!pressed || stepIndexRef.current === at) return;
-    }
-  };
   const observe = props.stepInteraction?.observe;
   useEffect(() => {
     if (!stepping || watchedId === undefined || observe === undefined) return;
     return observe(watchedId, () => {
       // The user got there first. Advance past the step they just did — through
       // `goToStep`, so the ring moves with the walkthrough exactly as it does
-      // when the button in the panel is the one that was pressed. Stop at the
-      // end rather than wrapping or closing: the last step of a procedure is
-      // the one a reader most wants left on screen.
+      // when the button in the panel is the one that was pressed.
       if (stepIndex === undefined) return;
-      goToStep(Math.min(stepIndex + 1, steps.length - 1));
+      if (stepIndex < steps.length - 1) {
+        goToStep(stepIndex + 1);
+        return;
+      }
+      // The last step, done. The walkthrough used to sit here at "3 of 3" while
+      // the application went off and created the client, waiting to be told
+      // something it had just watched happen — and asking the reader to press
+      // Done to confirm work they had visibly finished. Pressing the control
+      // the final step names is the completion, so it is recorded as one.
+      completeWalkthrough();
     });
     // `goToStep` is deliberately not a dependency: it is rebuilt every render,
     // and depending on it would tear down and re-add the listener on each one.
@@ -771,13 +769,22 @@ function Answer(props: {
                   props.onMemoryEvent?.('SHOW_ME_USED', {
                     ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
                   });
-                  // Begin, point, and take it as far as a guide is allowed to.
-                  // Entering the walkthrough is the whole change — the old
-                  // behaviour pointed once and left the reader with a ring, a
-                  // sentence describing the feature, and no next move at all.
-                  setExpanded(true);
-                  goToStep(0, response.actions);
-                  void driveFromHere();
+                  // Point, and nothing else.
+                  //
+                  // This used to start the walkthrough and drive it, pressing
+                  // each control the contract allowed. It worked, and it is not
+                  // what anybody asked for: a guide that operates an
+                  // application without being told to, every time, is a guide
+                  // somebody has to watch. The only press the guide makes now
+                  // is the one behind "Do it for me", pressed deliberately, one
+                  // step at a time.
+                  //
+                  // So the two entry points split by scope rather than by
+                  // automation, which is what their labels always said: this
+                  // one shows you where the thing is, and "Step through" walks
+                  // you through using it. Neither is a dead end — the ring has
+                  // a Stop, and the walkthrough is one button away.
+                  props.onShowMe(response.actions);
                 }}
                 disabled={props.busy}
               >
@@ -838,17 +845,23 @@ function Answer(props: {
             )}
             {stepping && (
               <span className="sw-guide__stepper">
-                <button
-                  type="button"
-                  className="sw-guide__button sw-guide__button--quiet"
-                  onClick={() => goToStep(Math.max(0, stepIndex - 1))}
-                  disabled={stepIndex === 0}
-                >
-                  Previous
-                </button>
-                <span className="sw-guide__stepper-count">
-                  {stepIndex + 1} of {steps.length}
-                </span>
+                {/* Nowhere to go back to when there is one step. */}
+                {steps.length > 1 && (
+                  <button
+                    type="button"
+                    className="sw-guide__button sw-guide__button--quiet"
+                    onClick={() => goToStep(Math.max(0, stepIndex - 1))}
+                    disabled={stepIndex === 0}
+                  >
+                    Previous
+                  </button>
+                )}
+                {/* "1 of 1" is not progress, it is arithmetic. */}
+                {steps.length > 1 && (
+                  <span className="sw-guide__stepper-count">
+                    {stepIndex + 1} of {steps.length}
+                  </span>
+                )}
                 {/* Moving on without doing it. Offered only when the advance is
                     an offer to act — otherwise the advance *is* Next, and two
                     buttons saying it would be one too many. */}
@@ -890,10 +903,32 @@ function Answer(props: {
                 </button>
               </span>
             )}
-            {props.pointing && (
+            {/* Anything the guide put on screen, it can take off again.
+            
+                A walkthrough has Stop. An answer with no steps to walk —
+                "why can't I see Delete?" — had a ring and no way to put it
+                down short of asking something else, which is the same dead end
+                one shape over. */}
+            {props.pointing && !stepping && props.onClearPointer !== undefined && (
+              <button
+                type="button"
+                className="sw-guide__button sw-guide__button--quiet"
+                data-testid="guide-clear-pointer"
+                onClick={() => props.onClearPointer?.()}
+              >
+                Stop
+              </button>
+            )}
+            {props.pointing && !justFinished && (
               <span className="sw-guide__pointing">
                 <Check double />
                 Highlighted in the app
+              </span>
+            )}
+            {justFinished && (
+              <span className="sw-guide__pointing" data-testid="guide-step-finished" role="status">
+                <Check />
+                That was the last step
               </span>
             )}
           </div>
