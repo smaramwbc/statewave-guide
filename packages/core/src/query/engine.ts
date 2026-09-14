@@ -108,7 +108,11 @@ function contextualise(
   const steps: GuideAnswerStep[] = [];
   const pruned: GuidePrunedStep[] = [];
 
-  for (const step of feature.steps) {
+  for (const [position, step] of feature.steps.entries()) {
+    // Whether the *procedure* continues, read from what was compiled rather
+    // than from what survived pruning: a trigger does not stop opening a dialog
+    // because the reader happened to be on the right screen already.
+    const opensMore = position < feature.steps.length - 1;
     const text = step.text;
     const target =
       step.semanticId !== undefined && controls.has(step.semanticId) ? step.semanticId : undefined;
@@ -149,7 +153,7 @@ function contextualise(
         });
         continue;
       }
-      steps.push({ text: shown, performance: stepPerformance(step, undefined) });
+      steps.push({ text: shown, performance: stepPerformance(step, undefined, opensMore) });
       continue;
     }
 
@@ -164,7 +168,7 @@ function contextualise(
     // `Choose "Create client"` is displayed precisely because the guide will
     // never click it.
     if (target === undefined) {
-      steps.push({ text, performance: stepPerformance(step, undefined) });
+      steps.push({ text, performance: stepPerformance(step, undefined, opensMore) });
       continue;
     }
 
@@ -190,7 +194,7 @@ function contextualise(
             { kind: 'highlight', semanticId: target, ...stepLabel, ...stepCallout },
           ];
 
-    const performance = stepPerformance(step, target);
+    const performance = stepPerformance(step, target, opensMore);
     steps.push(
       stepActions.length === 0
         ? { text, semanticId: target, performance }
@@ -215,6 +219,7 @@ function contextualise(
 function stepPerformance(
   step: GuideFeatureEntry['steps'][number],
   target: string | undefined,
+  opensMore: boolean,
 ): GuideStepPerformance {
   const on = target === undefined ? {} : { semanticId: target };
 
@@ -232,6 +237,26 @@ function stepPerformance(
   }
 
   if (step.role === 'trigger') {
+    // A trigger is only "reveals the task" while something comes after it. With
+    // nothing following, the trigger *is* the task: `clients.export` is a lone
+    // trigger, and pressing it does not open a dialog somebody can close — it
+    // downloads the file. An exploratory run asked "where is Export CSV?" and
+    // the guide exported the clients, which is the same class of mistake as
+    // pressing Create client and exactly as unwelcome.
+    //
+    // So the shape of the procedure decides it, not the label on the control.
+    // A trigger with later steps opens something; a trigger alone commits, and
+    // gets the reason that already exists for committing.
+    if (!opensMore) {
+      return target === undefined
+        ? { kind: 'PRESS', byGuide: 'REFUSED', refusedBecause: 'NO_CONTROL_TO_PRESS' }
+        : {
+            kind: 'PRESS',
+            semanticId: target,
+            byGuide: 'REFUSED',
+            refusedBecause: 'COMMITS_A_CHANGE',
+          };
+    }
     // Reveals the task rather than completing it: a dialog that opens, a form
     // that expands, both undone by closing them. This is the only role a guide
     // may act on, and only when this feature owns the control — pressing

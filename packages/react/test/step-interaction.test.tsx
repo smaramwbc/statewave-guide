@@ -156,12 +156,17 @@ describe('the walkthrough and the user', () => {
   });
 
   /**
-   * The step the guide must never take. It is also never watched — a
-   * walkthrough that advanced itself past the commit would be claiming the task
-   * was done on evidence it does not have.
+   * The step the guide must never take — and must still notice.
+   *
+   * Two different questions that an earlier version answered with one rule.
+   * Offering to press the control that commits the change is forbidden, and
+   * stays forbidden. Watching for somebody *else* pressing it is not acting; it
+   * is how the guide learns the task is finished, and refusing to look meant a
+   * walkthrough sat at "3 of 3" while the application went off and created the
+   * client.
    */
-  it('never offers to commit, and never watches for it', async () => {
-    const { watched, interaction } = seam();
+  it('never offers to commit, but does watch for it', async () => {
+    const { watched, fire, interaction } = seam();
     await stepping(interaction);
     // Step one is a trigger, so the advance is an offer to act and moving on
     // without acting is Skip. Step two is typing, so the advance is Next.
@@ -170,8 +175,47 @@ describe('the walkthrough and the user', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     await waitFor(() => expect(position()).toBe('3 of 3'));
 
+    // No offer to press it.
     expect(screen.queryByTestId('guide-step-perform')).toBeNull();
-    expect(watched).not.toContain('clients.create-dialog.submit');
+    // But it is being watched.
+    expect(watched).toContain('clients.create-dialog.submit');
+
+    // And doing it ends the walkthrough, rather than leaving the reader to
+    // confirm work the guide just watched them finish.
+    fire['clients.create-dialog.submit']?.();
+    await waitFor(() => expect(screen.queryByText(/of 3$/)).toBeNull());
+  });
+
+  /** The completion is recorded, and only by actually completing it. */
+  it('records the completion when the last step is done in the application', async () => {
+    const kinds: string[] = [];
+    const made = seam();
+    render(
+      <StatewaveGuide
+        ask={() => RESPONSE}
+        execute={async (action) => ({ status: 'done', action }) as never}
+        stepInteraction={made.interaction}
+        onMemoryEvent={(kind) => kinds.push(kind)}
+        open
+        onClose={() => {}}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('Ask the guide a question'), {
+      target: { value: 'How do I create a client?' },
+    });
+    fireEvent.click(screen.getByLabelText('Send'));
+    await screen.findByText('Lets you create a new client.');
+    fireEvent.click(screen.getByTestId('guide-step-through'));
+
+    fireEvent.click(screen.getByTestId('guide-step-skip'));
+    await waitFor(() => expect(position()).toBe('2 of 3'));
+    fireEvent.click(screen.getByTestId('guide-step-next'));
+    await waitFor(() => expect(position()).toBe('3 of 3'));
+    expect(kinds).not.toContain('STEP_THROUGH_COMPLETED');
+
+    made.fire['clients.create-dialog.submit']?.();
+
+    await waitFor(() => expect(kinds).toContain('STEP_THROUGH_COMPLETED'));
   });
 
   it('presses the control for the user, and the walkthrough follows', async () => {
@@ -185,40 +229,25 @@ describe('the walkthrough and the user', () => {
   });
 
   /**
-   * The bug this release was reported for.
+   * Show me points, and points only.
    *
-   * Show me used to run the response's actions once and stop: a ring, a
-   * sentence describing the feature, and nothing to do next. Pressing it again
-   * re-ran the same sequence, so it read as a button that does nothing. It is
-   * now a way *into* the walkthrough.
+   * It drove the walkthrough for a while — pressing each control the contract
+   * allowed, one after another. It worked, and it was the wrong default: a
+   * guide that operates an application without being told to, every time, is a
+   * guide somebody has to watch. The only press it makes now is the one behind
+   * "Do it for me".
    */
-  it('Show me enters the walkthrough instead of ending there', async () => {
-    const { interaction } = seam();
-    await answered(interaction);
-    expect(screen.queryByText(/of 3$/)).toBeNull();
-
-    fireEvent.click(screen.getByRole('button', { name: /Show me/ }));
-
-    await screen.findByText(/of 3$/);
-  });
-
-  /**
-   * And it demonstrates: it takes the step it is allowed to take, then hands
-   * over at the first one only the reader can do. For creating a client that is
-   * one press — the dialog opens — and then it stops at the field, because
-   * nobody else may type somebody's data.
-   */
-  it('Show me takes the steps it may, and hands over at the first it may not', async () => {
+  it('never presses anything on its own', async () => {
     const { pressed, interaction } = seam();
     await answered(interaction);
 
     fireEvent.click(screen.getByRole('button', { name: /Show me/ }));
+    await new Promise((resolve) => setTimeout(resolve, 2500));
 
-    await waitFor(() => expect(position()).toBe('2 of 3'), { timeout: 4000 });
-    // The trigger, and only the trigger. It did not go on to press the control
-    // that commits the change, and it did not attempt to type.
-    expect(pressed).toEqual(['clients.create']);
-    expect(screen.queryByTestId('guide-step-perform')).toBeNull();
+    expect(pressed).toEqual([]);
+    // And it is not a dead end: the ring can be put down, and the walkthrough
+    // is one button away.
+    expect(screen.getByTestId('guide-step-through')).toBeDefined();
   });
 
   /**

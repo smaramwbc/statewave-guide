@@ -93,6 +93,51 @@ describe('taking a step for the user', () => {
   });
 
   /**
+   * A trigger is only "reveals the task" while something comes after it.
+   *
+   * Found by driving the app as a user: asking *where* Export CSV was made the
+   * guide export the clients. `clients.export` is a lone trigger — pressing it
+   * does not open a dialog anybody can close, it downloads the file — so the
+   * shape of the procedure decides this, not the label on the control.
+   */
+  it('refuses a trigger with nothing after it, because that is the task', () => {
+    const response = guide.query({
+      query: 'where is Export CSV?',
+      context: { route: '/clients', applicationVersion: V },
+    });
+    const step = (response.answer?.steps ?? []).find((entry) => entry.text.includes('Export CSV'));
+    expect(step?.performance?.byGuide).toBe('REFUSED');
+    expect(step?.performance?.refusedBecause).toBe('COMMITS_A_CHANGE');
+  });
+
+  /** The same role, with a dialog behind it, is still allowed. */
+  it('still allows a trigger that opens something', () => {
+    const trigger = (createClient().answer?.steps ?? []).find((step) =>
+      step.text.includes('New client'),
+    );
+    expect(trigger?.performance?.byGuide).toBe('ALLOWED');
+  });
+
+  /**
+   * Stated over the whole bundle: nothing a guide may press is the last thing
+   * in its own procedure.
+   */
+  it('never allows a press that finishes a procedure', () => {
+    for (const featureId of guide.listFeatures()) {
+      const response = guide.query({
+        query: `How do I use ${featureId}?`,
+        context: { applicationVersion: V },
+      });
+      const steps = response.answer?.steps ?? [];
+      steps.forEach((step, index) => {
+        if (step.performance?.byGuide !== 'ALLOWED') return;
+        if (step.performance.kind !== 'PRESS') return;
+        expect(index).toBeLessThan(steps.length - 1);
+      });
+    }
+  });
+
+  /**
    * Allowed is not the same as pressable. A step may name a control this
    * feature does not own — nothing verified it, so nothing may press it.
    */

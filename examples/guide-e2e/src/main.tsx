@@ -32,6 +32,7 @@ import {
 } from '@statewavedev/guide-react';
 import type { GuideBranding, GuideLayoutInput, GuideThemeInput } from '@statewavedev/guide-react';
 import { Customizer, usePlayground } from './Customizer.js';
+import { ToastHost, announceRequest } from './Toasts.js';
 import './demo.css';
 import './playground.css';
 import bundleJson from '../../../packages/core/test/fixtures/guide-bundle.json';
@@ -55,7 +56,30 @@ const state = {
   clients: [...CLIENTS],
   settings: { organisationName: 'Fixture Ltd', notificationsEnabled: true, defaultPlan: 'team' },
 };
-recordNetwork(api as unknown as Parameters<typeof recordNetwork>[0], backend(state));
+/**
+ * The backend, with a notification layer wrapped round it.
+ *
+ * Every request the application makes already passes through here, so this is
+ * where a host puts the toasts a real front end shows — rather than inside the
+ * fixture, which is frozen evidence the ProductModel was compiled from. The
+ * handler is untouched; what is added is somebody saying out loud what it just
+ * did. A GET raises nothing.
+ */
+const routes = backend(state);
+const announcingRoutes = (request: { method: string; path: string; body: unknown }) => {
+  // Synchronous, like the handler it wraps. An `async` version here would hand
+  // the adapter a promise where it expects a response, which is the kind of
+  // wrapper that works in every test and fails in the browser.
+  const response = routes(request);
+  announceRequest(
+    request.method,
+    request.path,
+    request.body,
+    response.status >= 200 && response.status < 300,
+  );
+  return response;
+};
+recordNetwork(api as unknown as Parameters<typeof recordNetwork>[0], announcingRoutes);
 
 /**
  * Test-only seams, driven from the query string.
@@ -397,6 +421,7 @@ createRoot(document.querySelector('#root')!).render(
     >
       <BrowserRouter>
         <Host />
+        <ToastHost />
       </BrowserRouter>
     </SessionProvider>
   </StrictMode>,
