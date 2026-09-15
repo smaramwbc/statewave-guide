@@ -33,6 +33,13 @@ const RESPONSE: GuideQueryResponse = {
       {
         text: 'Choose "New client".',
         semanticId: 'clients.create',
+        // The pointing sequence the engine emits for a step. Present here
+        // because the panel reports a press it could not land by running it,
+        // and a fixture without one exercises a path the product never takes.
+        actions: [
+          { kind: 'scroll', semanticId: 'clients.create' },
+          { kind: 'highlight', semanticId: 'clients.create' },
+        ],
         performance: { kind: 'PRESS', semanticId: 'clients.create', byGuide: 'ALLOWED' },
       },
       {
@@ -349,6 +356,46 @@ describe('the walkthrough and the user', () => {
 
     expect(document.activeElement).toBe(field);
     field.remove();
+  });
+
+  /**
+   * A press that cannot land says so.
+   *
+   * Reported from the running demo and reproduced by wandering off to another
+   * screen mid-walkthrough: "Do it for me" was still offered, pressing it did
+   * nothing at all, and the panel said nothing about it — which from the
+   * outside is indistinguishable from the guide being broken. It is the same
+   * failure a pointing run already reports, so it now reports it the same way.
+   */
+  it('says so when the control it was asked to press has gone', async () => {
+    const made = seam();
+    // A seam whose press never lands, the way it does not once the control has
+    // unmounted.
+    const gone: GuideStepInteraction = {
+      observe: made.interaction.observe,
+      press: async () => false,
+    };
+    render(
+      <StatewaveGuide
+        ask={() => RESPONSE}
+        // And an executor that agrees: nothing is on screen any more.
+        execute={async (action) => ({ status: 'target_not_available', action }) as never}
+        stepInteraction={gone}
+        clearPointer={() => {}}
+        open
+        onClose={() => {}}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText('Ask the guide a question'), {
+      target: { value: 'How do I create a client?' },
+    });
+    fireEvent.click(screen.getByLabelText('Send'));
+    await screen.findByText('Lets you create a new client.');
+    fireEvent.click(screen.getByTestId('guide-step-through'));
+
+    fireEvent.click(screen.getByTestId('guide-step-perform'));
+
+    await screen.findByText('That is not on screen at the moment.');
   });
 
   /**

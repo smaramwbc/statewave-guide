@@ -503,9 +503,23 @@ function Answer(props: {
                 // Nothing is advanced here. Pressing the control fires the
                 // click the walkthrough is already watching for, and that is
                 // what moves the step — so a press by the guide and a press by
-                // the user take exactly the same path. If the control has gone,
-                // the walkthrough simply stays put.
-                await props.stepInteraction?.press(canPerform);
+                // the user take exactly the same path.
+                const pressed = await props.stepInteraction?.press(canPerform);
+                if (pressed === false) {
+                  // The control is gone — the reader navigated somewhere else
+                  // in the application while the walkthrough was open. This
+                  // used to be a silent no-op: the button was still offered,
+                  // pressing it did nothing, and the panel said nothing about
+                  // it, which is indistinguishable from the guide being broken.
+                  //
+                  // Reported by running the step's own pointing sequence, which
+                  // fails the same way for the same reason and is already wired
+                  // to retract the ring and say "That is not on screen at the
+                  // moment." One failure path, not two.
+                  const actions = stepPointerActions(stepIndex ?? 0);
+                  if (actions !== undefined) props.onShowMe(actions);
+                  else props.onClearPointer?.();
+                }
               } finally {
                 setPerforming(false);
               }
@@ -809,6 +823,23 @@ function Answer(props: {
                   // walked through something was the application exactly as it
                   // had been. The ring is the walkthrough's other half.
                   goToStep(0, response.actions);
+                  // The opening sequence carries the navigation, so an entry
+                  // step is done the moment the walkthrough starts. Sitting on
+                  // it made the first thing a reader saw after pressing Step
+                  // through from the Dashboard a step they had just watched
+                  // happen — "Open Clients.", on the Clients screen.
+                  //
+                  // Not a press, and deliberately: navigating is already one of
+                  // the inert actions the opening ran. Nothing is being done
+                  // here that was not done a moment ago.
+                  if (steps[0]?.performance?.kind === 'NAVIGATE' && steps.length > 1) {
+                    void (async () => {
+                      for (let wait = 0; wait < 40 && (wait === 0 || busyRef.current); wait += 1) {
+                        await new Promise((resolve) => setTimeout(resolve, 60));
+                      }
+                      if (stepIndexRef.current === 0) goToStep(1);
+                    })();
+                  }
                   props.onMemoryEvent?.('STEP_THROUGH_STARTED', {
                     ...(response.featureId === undefined ? {} : { featureId: response.featureId }),
                   });
