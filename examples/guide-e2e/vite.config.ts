@@ -30,6 +30,19 @@ export default defineConfig({
       react: path.join(here, 'node_modules/react'),
       'react-dom': path.join(here, 'node_modules/react-dom'),
       'react-router-dom': path.join(here, 'node_modules/react-router-dom'),
+      // Everything else the fixture imports, resolved from *here* rather than
+      // from where the file happens to sit.
+      //
+      // The fixture is aliased in from `packages/indexer/test/fixtures`, which
+      // is not a workspace package and has no `node_modules` of its own — so a
+      // bare `import axios` inside it resolves by walking up from
+      // `packages/indexer/…` and finds nothing in a clean checkout. It built on
+      // this machine for months because a stray `node_modules` had been left
+      // inside the fixture by hand; the first CI run on a fresh clone failed
+      // six browser gates on it. These two lines are the same trick the three
+      // above already play, applied to the rest of what the fixture needs.
+      axios: path.join(here, 'node_modules/axios'),
+      'react-hook-form': path.join(here, 'node_modules/react-hook-form'),
       'fixture-app': path.join(here, 'src/fixture-app.ts'),
       'fixture-src': fixture,
       'harness-backend': path.join(repo, 'packages/runtime/test/harness/fixture-backend.ts'),

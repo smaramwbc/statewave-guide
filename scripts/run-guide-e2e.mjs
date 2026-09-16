@@ -58,7 +58,12 @@ const wantsStatewave = (process.env['STATEWAVE_GUIDE_URL'] ?? '').length > 0;
 console.log('\nBuilding the interactive host…');
 const built = spawnSync('npx', ['vite', 'build'], {
   cwd: HOST,
-  stdio: 'ignore',
+  // Captured rather than discarded. `stdio: 'ignore'` turned every build
+  // failure into the sentence "the interactive host did not build" and nothing
+  // else, which is unhelpful on a laptop and useless on a CI runner nobody can
+  // attach to — the first push of this repository failed eleven gates this way
+  // and said nothing about why.
+  encoding: 'utf8',
   // The demo's backend runs on its own port, so the page needs its absolute
   // URL. Baked in at build time and only when this run has a Statewave to talk
   // to; an ordinary build leaves the default relative path in place.
@@ -71,6 +76,9 @@ const built = spawnSync('npx', ['vite', 'build'], {
 });
 if (built.status !== 0) {
   console.log('FAIL — the interactive host did not build.\n');
+  const said = `${built.stdout ?? ''}${built.stderr ?? ''}`.trim();
+  console.log(said.length > 0 ? said : '(the build produced no output at all)');
+  console.log('');
   process.exit(1);
 }
 

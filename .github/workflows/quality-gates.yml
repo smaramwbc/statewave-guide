@@ -23,9 +23,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # No `version:` here on purpose. `packageManager` in package.json is the
+      # single place this repository states which pnpm it wants, and
+      # `pnpm/action-setup` refuses outright when both are set — which is how
+      # this workflow failed every run in the first ten seconds, from the first
+      # push, for as long as there was nowhere to push to.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 22
